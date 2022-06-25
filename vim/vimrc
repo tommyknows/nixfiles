@@ -1,0 +1,316 @@
+"Remapping dvorak layout
+"Navigation was hjkl, now is qkjx (left, up, down, right)
+"Deleting was x, is now h, recording macros with l instead of q
+noremap q h
+noremap h x
+noremap x l
+noremap l q
+nnoremap ; :
+
+" Tmux navigation (see plugin)
+" Remapping split screen navigation for vim & tmux
+let g:tmux_navigator_no_mappings = 1
+nnoremap <silent> <C-q> :TmuxNavigateLeft<cr>
+nnoremap <silent> <C-j> :TmuxNavigateDown<cr>
+nnoremap <silent> <C-k> :TmuxNavigateUp<cr>
+nnoremap <silent> <C-x> :TmuxNavigateRight<cr>
+
+" Re-map the space bar to fold and unfold
+nnoremap <space> za
+onoremap <space> <C-C>za
+vnoremap <space> zf
+
+" Remap camelCaseMotion Keys
+map <silent> w <Plug>CamelCaseMotion_w
+map <silent> b <Plug>CamelCaseMotion_b
+map <silent> e <Plug>CamelCaseMotion_e
+map <silent> ge <Plug>CamelCaseMotion_ge
+sunmap w
+sunmap b
+sunmap e
+sunmap ge
+
+"Map ',/' to clear search highlighting
+nmap <silent> ,/ :nohlsearch<CR>
+
+" Map w!! to execute write with sudo permissions. Will ask about password
+cmap w!! w !sudo tee % >/dev/null
+
+" Create the undo-directory if it doesn't exist.
+" We use a directory in /tmp to clean it up automatically
+if !isdirectory("/tmp/vim-undo")
+    call mkdir("/tmp/vim-undo", "", 0700)
+endif
+
+colorscheme material-monokai
+
+set runtimepath+=~/.config/vim
+
+let mapleader=","
+let maplocalleader="."
+set fillchars=fold:\ ,               " how folding is displayed
+set foldlevel=99                 " Open all folds on open file
+set autoread                   " Reload file when they change on disk
+set backspace=indent,eol,start           " allow backspacing over everything in insert mode
+set breakindent
+set copyindent                   " copy the previous indentation on autoindenting
+set encoding=utf-8                 " use UTF-8 to correctly display all characters
+set fillchars=fold:\ ,               " how folding is displayed
+set foldlevel=99                 " Open all folds on open file
+set hlsearch                   " highlight search terms
+set incsearch                  " show search matches as you type
+set laststatus=2                 " Always show statusline / airline
+set linebreak
+set list                     " Display invisible characters (tabs, spaces)
+set listchars=tab:>.,trail:.,extends:#,nbsp:.  " Display tabs as '>...', trailing spaces as '.', '#' when line continues at end of display, '.' also for 'no-breakable characters'
+set nocompatible                 " do not use compatible mode, we do not need it
+set noerrorbells                 " don't beep
+set pyxversion=3                 " use python 3
+set scrolloff=5                  " Keep 5 lines visible when scrolling
+set shiftround                   " use multiple of shiftwidth when indenting with '<' and '>'
+set showmatch                  " set show matching parenthesis
+set smarttab                   " insert tabs on the start of a line according to shiftwidth, not tabstop
+set splitbelow                   " open split screen below existing one
+set splitright                   " open split screen on the right
+set title                    " change the terminal's title
+set titlestring=%(\v\i\m\ (%{expand(\"%:t\")})%) " set the title for screen, set's it to 'vim ($filename)'
+set undofile
+set undolevels=1000                " use many muchos levels of undo
+set visualbell                 " don't beep
+set wildignore=*.swp,*.bak             " Ignore these files when expanding wildcards
+set wrap                     " wrap lines
+set textwidth=120                " sane for most things, can be overwritten per language
+set colorcolumn=120                " sane for most things, can be overwritten per language
+set wrapmargin=2
+set shell=zsh
+set updatetime=300
+
+set termguicolors
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+
+" Disable indentLine per default, enabled in yaml filetype
+let g:indentLine_enabled = 0
+
+" In insert mode, absolute numbers, in command mode relative / hybrid ones
+set number
+augroup numbertoggle
+    autocmd!
+    autocmd BufEnter,FocusGained,InsertLeave * set relativenumber
+    autocmd BufLeave,FocusLost,InsertEnter   * set norelativenumber
+augroup END
+
+" Remember and jump to the last position when reopening a file
+if has("autocmd")
+    au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
+endif
+
+" Options for ALE Linting
+" Hide loclist but show (automatically) quickfix window
+"let g:ale_set_loclist = 0
+"let g:ale_set_quickfix = 1
+"let g:ale_open_list = 0
+"" Define format of messages
+"let g:ale_echo_msg_error_str = 'E'
+"let g:ale_echo_msg_warning_str = 'W'
+"let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
+"" Error and warning signs.
+"let g:ale_sign_error = '⤫'
+"let g:ale_sign_warning = '⚠'
+
+" for go, only use golangci-lint. gopls would be an option too,
+" but then we have duplicate messages. golangci shows more than
+" gopls, so we use that.
+" for tex, disable / do not use lacheck. chktex is enough.
+"# , 'golangci-lint'],
+"let g:ale_linters = {
+            "\ 'go': ['gopls'],
+            "\ 'gomod': ['gomod'],
+            "\ 'tex': ['chktex'],
+            "\ }
+"let g:ale_fixers = {
+            "\ '*': ['remove_trailing_lines', 'trim_whitespace'],
+            "\ 'go': ['goimports'],
+            "\ 'terraform': ['terraform'],
+            "\ 'rust': ['rustfmt'],
+            "\ }
+"" Lint files only on save
+"let g:ale_fix_on_save = 1
+"let g:ale_lint_on_save = 1
+"let g:ale_lint_on_text_changed = 0
+"let g:ale_lint_on_enter = 0
+
+" Automatically close quickfix list on exit
+aug QFClose
+    au!
+    au WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
+aug END
+" End Linting Options
+
+" tagbar options
+nmap <F7> :TagbarToggle<CR>
+let g:tagbar_type_go = {
+            \ 'ctagstype' : 'go',
+            \ 'kinds'   : [
+                \ 'p:package',
+                \ 'i:imports:1',
+                \ 'c:constants',
+                \ 'v:variables',
+                \ 't:types',
+                \ 'n:interfaces',
+                \ 'w:fields',
+                \ 'e:embedded',
+                \ 'm:methods',
+                \ 'r:constructor',
+                \ 'f:functions'
+            \ ],
+            \ 'sro' : '.',
+            \ 'kind2scope' : {
+                \ 't' : 'ctype',
+                \ 'n' : 'ntype'
+            \ },
+            \ 'scope2kind' : {
+                \ 'ctype' : 't',
+                \ 'ntype' : 'n'
+            \ },
+            \ 'ctagsbin'  : 'gotags',
+            \ 'ctagsargs' : '-sort -silent'
+        \ }
+
+" Coc Options
+" Use `[e` and `]e` to navigate diagnostics
+nmap <silent> [e <Plug>(coc-diagnostic-prev)
+nmap <silent> ]e <Plug>(coc-diagnostic-next)
+
+" Remap keys for gotos
+" use C-O and C-I to jump back and forth
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gt <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+nmap <silent> grn <Plug>(coc-rename)
+nmap <silent> gh :call CocActionAsync('highlight')<CR>
+
+" to auto-highlight on hover, uncomment this:
+"autocmd CursorHold * silent call CocActionAsync('highlight')
+highlight CocHighlightText ctermbg=Yellow ctermfg=Black
+
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call ShowDocumentation()<CR>
+function! ShowDocumentation()
+  if CocAction('hasProvider', 'hover')
+    call CocActionAsync('doHover')
+  else
+    call feedkeys('K', 'in')
+  endif
+endfunction
+
+" cycle through completion options with C-n and C-o
+inoremap <expr> <C-o> coc#pum#visible() ? coc#pum#prev(1) : "\<C-o>"
+
+" Use <C-l> for trigger snippet expand
+imap <C-l> <Plug>(coc-snippets-expand)
+
+" Use <TAB> for select text for visual placeholder of snippet.
+vmap <TAB> <Plug>(coc-snippets-select)
+
+" Use <C-k> for jump to previous placeholder, it's default of coc.nvim
+let g:coc_snippet_prev = '<s-tab>'
+
+" Use <TAB> for both expand and jump (make expand higher priority.)
+imap <TAB> <Plug>(coc-snippets-expand-jump)
+
+
+function! CheckBackSpace() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+inoremap <silent><expr> <TAB>
+      \ coc#pum#visible() ? coc#_select_confirm() :
+      \ coc#expandableOrJumpable() ? "\<C-r>=coc#rpc#request('doKeymap', ['snippets-expand-jump',''])\<CR>" :
+      \ CheckBackSpace() ? "\<TAB>" :
+      \ coc#refresh()
+
+
+" Use <TAB> for jump to next placeholder, it's default of coc.nvim
+let g:coc_snippet_next = '<tab>'
+let g:coc_node_path = '/Users/ramon/.nix-profile/bin/node'
+
+
+
+" Use <TAB> for both expand and jump (make expand higher priority.)
+"imap <S-TAB> <Plug>(coc-snippets-prev)
+"vmap <S-TAB> <Plug>(coc-snippets-prev)
+
+"always open the quickfix list
+"let g:ale_open_list = 1
+
+" autodetect go present slides as markdown
+autocmd BufNewFile,BufRead *.slide set filetype=markdown
+
+" if we have a file ending in '.tpl', extract the actual filetype
+" (e.g. 'myfile.yaml.tpl' -> yaml) from the name and set it.
+autocmd BufNewFile,BufRead *.tpl let &filetype = expand("%:r:e")
+
+" Customize fzf colors to match your color scheme
+" - fzf#wrap translates this to a set of `--color` options
+let g:fzf_colors =
+\ { 'fg':    ['fg', 'Normal'],
+  \ 'bg':    ['bg', 'Normal'],
+  \ 'hl':    ['fg', 'Comment'],
+  \ 'fg+':   ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+  \ 'bg+':   ['bg', 'CursorLine', 'CursorColumn'],
+  \ 'hl+':   ['fg', 'Statement'],
+  \ 'info':  ['fg', 'PreProc'],
+  \ 'border':  ['fg', 'Ignore'],
+  \ 'prompt':  ['fg', 'Conditional'],
+  \ 'pointer': ['fg', 'Exception'],
+  \ 'marker':  ['fg', 'Keyword'],
+  \ 'spinner': ['fg', 'Label'],
+  \ 'header':  ['fg', 'Comment'] }
+
+" open FZF in tmux popup
+let g:fzf_layout = { 'tmux': '-p90%,60%' }
+let g:tex_flavor = 'latex'
+
+vmap <leader>a <Plug>(coc-codeaction-selected)
+nmap <leader>a <Plug>(coc-codeaction-selected)
+
+augroup AdaptIndent
+    autocmd!
+    autocmd BufRead *.ts syntax match spaces / / conceal cchar=  "two spaces, important...
+    autocmd BufRead *.ts set concealcursor=nvi
+    autocmd BufRead *.ts set conceallevel=2
+augroup end
+
+" debug with vimspector
+let g:vimspector_base_dir = '/Users/ramon/.vim/vimspector'
+let $NODE_MODULES = finddir( 'node_modules', ';' )
+"let g:vimspector_enable_mappings = 'HUMAN'
+let g:vimspector_install_gadgets = [ 'delve', 'vscode-node-debug2' ]
+packadd! vimspector
+nnoremap <Leader>d :call vimspector#Launch()<CR>
+nnoremap <Leader>dr :call vimspector#Reset()<CR>
+nnoremap <Leader>dc :call vimspector#Continue()<CR>
+
+nnoremap <Leader>dt :call vimspector#ToggleBreakpoint()<CR>
+nnoremap <Leader>dT :call vimspector#ClearBreakpoints()<CR>
+
+nmap <Leader>dk <Plug>VimspectorRestart
+nmap <Leader>dq <Plug>VimspectorStepOut
+nmap <Leader>dx <Plug>VimspectorStepInto
+nmap <Leader>dj <Plug>VimspectorStepOver
+nmap <Leader>di <Plug>VimspectorBalloonEval
+
+nmap <Leader>b :Buffers<CR>
+nmap <Leader>f :Files<CR>
+nmap <Leader>g :Rg<CR>
+
+let g:vimspector_sign_priority = {
+  \    'vimspectorBP':         900,
+  \    'vimspectorBPCond':     899,
+  \    'vimspectorBPLog':      898,
+  \    'vimspectorBPDisabled': 897,
+  \    'vimspectorPC':         999,
+  \ }
