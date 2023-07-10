@@ -1,6 +1,6 @@
 set -l workdir "~/Documents/work"
 
-if ! set -q $argv[1]
+if ! set -q argv[1]
     cd $workdir
 end
 
