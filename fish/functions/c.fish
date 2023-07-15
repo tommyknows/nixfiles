@@ -24,12 +24,17 @@ if ! git worktree list --porcelain | rg "branch refs/heads/$branch_name" &>/dev/
     else if test $branch_name != $argv[1]
         set commit_sha "$argv[1]"
         echo -n " at remote branch $argv[1]"
+        set track_upstream true
     end
 
     if $create_local_branch
         git worktree add -b $branch_name $dir_name $commit_sha &> /dev/null
     else
         git worktree add $dir_name $branch_name $commit_sha &> /dev/null
+    end
+
+    if set --query $track_upstream
+        git branch --set-upstream-to=origin/$branch_name
     end
 
     if [ -d $groot/$default_branch/node_modules ]

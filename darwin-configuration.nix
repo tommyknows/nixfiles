@@ -144,7 +144,8 @@ in {
         nodePackages_latest.markdownlint-cli
         nodejs 
         pam-reattach
-        python312
+        python310
+        pre-commit
         protoc-gen-go
         protobuf3_20
         qemu
@@ -288,12 +289,16 @@ in {
           };
           "remote.origin" = {
             prune = true;
+            fetch = "+refs/heads/*:refs/remotes/origin/*";
           };
           "includeIf \"gitdir:~/Documents/work/\"" = {
             path = "~/Documents/work/.gitconfig_include";
           };
           "url \"ssh://git@github.com/\"" = {
             insteadOf = "https://github.com/";
+          };
+          "core" = {
+            "hooksPath" = "/Users/ramon/.nixpkgs/git-hooks";
           };
         };
         delta = {

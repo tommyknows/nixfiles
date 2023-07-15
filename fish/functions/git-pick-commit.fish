@@ -11,5 +11,4 @@ if [ -z "$diffs" ]
     --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)')
 end
 
-string join \n $diffs | fzf --reverse --no-sort --query "$argv[1]" --select-1 | rg '.*\*\s+([a-f0-9]*) .*' -r '$1'
-
+string match -rg '\*:?.* ([a-f0-9]*) - .*' (string join \n $diffs | fzf --reverse --no-sort --query "$argv[1]" --select-1)
