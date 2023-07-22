@@ -125,6 +125,7 @@ in {
         google-cloud-sdk
         gopls
         gotags
+        gotestsum
         gnupg
         iterm2
         jq
