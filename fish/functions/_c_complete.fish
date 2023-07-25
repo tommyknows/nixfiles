@@ -34,6 +34,9 @@ if set --query argv[1]
         case "v*"
             git for-each-ref --format='%(refname:short)' refs/tags | rg -v (string join "|" $local_branches) |sed '/-/!s/$/_/' | sort -rV | sed 's/_$//'
         case "o*"
+            # fetch the branches in the background. When the user then autocompletes to "origin" with <TAB>,
+            # the new branches should (hopefully) show up by then already.
+            git fetch >/dev/null 2>&1 &
             git for-each-ref --format='%(refname:short)' refs/remotes/origin \
                 # exclude some branches / names
                 | rg -v 'origin/HEAD' | rg -v '^origin$'
