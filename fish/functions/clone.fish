@@ -4,6 +4,12 @@ if [ -z "$argv[2]" ]
     set clone_path (string split --right --max=1 "/" $repo_name)[-1]
 end
 
+# check if repo exists
+if ! git ls-remote https://github.com/$repo_name > /dev/null
+    echo "Repository $repo_name does not exist!"
+    return
+end
+
 echo "Cloning repository github.com/$repo_name to $clone_path..."
 mkd $clone_path > /dev/null
 # we only want to clone the .git directory, not checkout anything. Additionally, `--bare` implies:

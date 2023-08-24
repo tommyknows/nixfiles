@@ -25,6 +25,12 @@ if ! git worktree list --porcelain | rg "branch refs/heads/$branch_name" &>/dev/
         set commit_sha "$argv[1]"
         echo -n " at remote branch $argv[1]"
         set track_upstream true
+
+        # check if we have the remote branch fetched, and if not, pull
+        if ! git branch --remotes --quiet | rg "$argv[1]"
+            echo "Pulling changes from remote..."
+            git pull &> /dev/null
+        end
     end
 
     if $create_local_branch

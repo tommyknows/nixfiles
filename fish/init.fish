@@ -59,6 +59,7 @@ set -gx FNM_ARCH "arm64";
 
 # TODO: that token's probably expired, but I'm leaving this here as an example on how to read out the keychain.
 set -gx GITHUB_PRIVATE_TOKEN (security find-generic-password -a "$USER" -s "GitHub Token" -w)
+set -gx SNYK_API_TOKEN (security find-generic-password -a "ramon.ruttimann@snyk.io" -s "Snyk API Token" -w)
 
 # and to install NPM packages 
 set -gx NODE_PATH $HOME/.npm-packages/lib/node_modules

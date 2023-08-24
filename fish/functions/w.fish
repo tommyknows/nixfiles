@@ -12,7 +12,7 @@ if string match -q '*github.com/snyk/*' $argv[1]
         set -l pull_info (string match -r '/?(.*)/pull/(.*)' -g $repo)
 
         set repo $pull_info[1]
-        set branch (curl -L --silent \
+        set branch origin/(curl -L --silent \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer $GITHUB_PRIVATE_TOKEN"\
             -H "X-GitHub-Api-Version: 2022-11-28" \

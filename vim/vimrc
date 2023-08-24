@@ -148,34 +148,10 @@ aug END
 " End Linting Options
 
 " tagbar options
-nmap <F7> :TagbarToggle<CR>
-let g:tagbar_type_go = {
-            \ 'ctagstype' : 'go',
-            \ 'kinds'   : [
-                \ 'p:package',
-                \ 'i:imports:1',
-                \ 'c:constants',
-                \ 'v:variables',
-                \ 't:types',
-                \ 'n:interfaces',
-                \ 'w:fields',
-                \ 'e:embedded',
-                \ 'm:methods',
-                \ 'r:constructor',
-                \ 'f:functions'
-            \ ],
-            \ 'sro' : '.',
-            \ 'kind2scope' : {
-                \ 't' : 'ctype',
-                \ 'n' : 'ntype'
-            \ },
-            \ 'scope2kind' : {
-                \ 'ctype' : 't',
-                \ 'ntype' : 'n'
-            \ },
-            \ 'ctagsbin'  : 'gotags',
-            \ 'ctagsargs' : '-sort -silent'
-        \ }
+" open tagbar to the right side of the *current* window
+let g:tagbar_position = 'rightbelow vertical'
+" open the tagbar, automatically focus it and close it after selection
+nmap <F7> :TagbarOpenAutoClose<CR>
 
 " Coc Options
 " Use `[e` and `]e` to navigate diagnostics
@@ -314,3 +290,37 @@ let g:vimspector_sign_priority = {
   \    'vimspectorBPDisabled': 897,
   \    'vimspectorPC':         999,
   \ }
+
+" hide dot files by default. Press 'gh' to toggle dot file hiding
+let g:netrw_list_hide = '\(^\|\s\s)\zs\.\S\+'
+let g:netrw_liststyle = 3
+"let g:netrw_browse_split = 4
+"If g:netrw_winsize is less than zero, then
+"the absolute value of g:netrw_winsize will be
+"used to specify the quantity of lines or
+"columns for the new window.
+let g:netrw_winsize = -25
+
+let g:NetrwIsOpen=0
+
+function! ToggleNetrw()
+    if g:NetrwIsOpen
+        let i = bufnr("$")
+        while (i >= 1)
+            if (getbufvar(i, "&filetype") == "netrw")
+                silent exe "bwipeout " . i 
+            endif
+            let i-=1
+        endwhile
+        let g:NetrwIsOpen=0
+    else
+        let g:NetrwIsOpen=1
+        silent Lexplore
+    endif
+endfunction
+
+" Add your own mapping. For example:
+nmap <silent> <F8> :call ToggleNetrw()<CR>
+
+" do not create all the BufKill mappings, they're annoying with <Leader>b for buffer list.
+let g:BufKillCreateMappings = 0

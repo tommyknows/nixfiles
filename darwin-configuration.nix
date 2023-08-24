@@ -107,7 +107,6 @@ in {
         bazel_6
         bazelisk
         coreutils
-        ctags
         ctlptl
         cmake
         diffutils
@@ -126,8 +125,11 @@ in {
         gopls
         gotags
         gotestsum
+        # things like present, godoc, goimports...
+        gotools
         gnupg
         iterm2
+        jless
         jq
         kind
         # Kubebuilder needs additional tools (etcd, apiserver) which are currently not
@@ -143,7 +145,9 @@ in {
         mockgen
         neovim
         nodePackages_latest.markdownlint-cli
+        nodePackages.prettier
         nodejs 
+        open-policy-agent
         pam-reattach
         python310
         pre-commit
@@ -162,10 +166,12 @@ in {
         terraform
         teleport
         tilt
+        universal-ctags
         velero
         wireguard-tools
         xz
         yq
+        yarn
         unstable.nodePackages.snyk
         unstable.helix
         nodePackages.ts-node
@@ -208,6 +214,7 @@ in {
           coc-yaml
           fzf-vim
           indentLine
+          markdown-preview-nvim
           nerdcommenter
           rust-vim
           tagbar
@@ -227,6 +234,7 @@ in {
           vim-tmux-clipboard
           vim-tmux-focus-events
           vim-tmux-navigator
+          vim-vinegar
         ];
         extraConfig = (builtins.readFile ./vim/vimrc);
       };
@@ -290,7 +298,9 @@ in {
           };
           "remote.origin" = {
             prune = true;
-            fetch = "+refs/heads/*:refs/remotes/origin/*";
+            # TODO: i don't think this is needed? It breaks submodules with the weird "multiple updates to ref" error
+            # message that I have no idea how to fix.
+            #fetch = "+refs/heads/*:refs/remotes/origin/*";
           };
           "includeIf \"gitdir:~/Documents/work/\"" = {
             path = "~/Documents/work/.gitconfig_include";
@@ -318,6 +328,7 @@ in {
           ccat = "bat --style snip";
           cat = "bat";
           cp = "cp -v";
+          dps = "docker ps --format \"table {{.ID}}\t{{.Image}}\t{{.Command}}\t{{.Ports}}\t{{.Status}}\"";
           grb = "git pull origin (default_branch) --rebase";
           l = "lsd -l --group-dirs first";
           la = "lsd -a";
@@ -378,6 +389,20 @@ in {
               repo = "theme-bobthefish";
               sha256 = "miGpqrNub687ovCcN2qp3pzO+IDuwZ0stO88KMSt8t0=";
               rev = "9d5046821ca4d9641a0bab3f18f41ee16d8439ee";
+            };
+          }
+          {
+            name = "autopair";
+            src = pkgs.fishPlugins.autopair.src;
+          }
+          {
+            # TODO: doesn't really seem to work...at least autocompletion of container IDs doesn't work :(
+            name = "docker-autocompletions";
+            src = pkgs.fetchFromGitHub {
+              owner = "halostatue";
+              repo = "fish-docker";
+              sha256 = "1B8Y7KtBVEcMojKPIapvK/sOIk99DqhXQuDXHRXzU7U=";
+              rev = "086ce5f01bf1b9208c13b1a1e24cae1c099dda06";
             };
           }
         ];
