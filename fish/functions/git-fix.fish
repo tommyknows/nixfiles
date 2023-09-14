@@ -8,8 +8,8 @@ if ! git diff --quiet
     set stashed true
 end
 
-git commit --fixup "$sha"
-env GIT_SEQUENCE_EDITOR=true git rebase --interactive --autosquash "$sha^"
+git commit --no-verify --fixup "$sha"
+env GIT_SEQUENCE_EDITOR=true git rebase --no-verify --interactive --autosquash "$sha^"
 
 if test -n "$stashed"
     git stash pop

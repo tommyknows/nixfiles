@@ -172,7 +172,8 @@ in {
         xz
         yq
         yarn
-        unstable.nodePackages.snyk
+        # TODO: doesn't build.
+        # unstable.snyk
         unstable.helix
         nodePackages.ts-node
         nodePackages.typescript
@@ -225,6 +226,7 @@ in {
           vim-cue
           vim-fish
           vim-fugitive
+          vim-gh-line
           vim-gopher
           vim-markdown
           vim-material-monokai
@@ -298,9 +300,10 @@ in {
           };
           "remote.origin" = {
             prune = true;
-            # TODO: i don't think this is needed? It breaks submodules with the weird "multiple updates to ref" error
+            # TODO: This is needed to fetch the origin's branches and update them locally.
+            # Sadly it breaks submodules with the weird "multiple updates to ref" error
             # message that I have no idea how to fix.
-            #fetch = "+refs/heads/*:refs/remotes/origin/*";
+            fetch = "+refs/heads/*:refs/remotes/origin/*";
           };
           "includeIf \"gitdir:~/Documents/work/\"" = {
             path = "~/Documents/work/.gitconfig_include";
@@ -354,7 +357,7 @@ in {
           kctx = "kubectl ctx";
           tat = "tmux a -t";
           tan = "tmux new -s";
-          untar = "tar -xvzf";
+          untar = "tar -xvf";
         };
         # reads in all functions from :/fish/functions and registers them given their file name.
         functions = lib.mapAttrs'
@@ -435,6 +438,7 @@ in {
         baseIndex = 1;
         extraConfig = builtins.readFile ./tmux/config.tmux;
         plugins = with pkgs.tmuxPlugins; [
+          tmux-thumbs
           vim-tmux-navigator
           {
             plugin = battery;

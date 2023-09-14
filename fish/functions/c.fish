@@ -20,17 +20,17 @@ if ! git worktree list --porcelain | rg "branch refs/heads/$branch_name" &>/dev/
     set commit_sha
     if test (count $argv) -gt 1
         set commit_sha "$argv[2]"
-        echo -n " at commit $commit_sha"
+        echo " at commit $commit_sha"
     else if test $branch_name != $argv[1]
         set commit_sha "$argv[1]"
-        echo -n " at remote branch $argv[1]"
+        echo " at remote branch $argv[1]"
         set track_upstream true
 
-        # check if we have the remote branch fetched, and if not, pull
-        if ! git branch --remotes --quiet | rg "$argv[1]"
-            echo "Pulling changes from remote..."
-            git pull &> /dev/null
-        end
+        # Fetch potential changes from the remote.
+        echo "Pulling changes from remote..."
+        git pull &> /dev/null
+    else
+        echo ""
     end
 
     if $create_local_branch
@@ -46,7 +46,10 @@ if ! git worktree list --porcelain | rg "branch refs/heads/$branch_name" &>/dev/
     if [ -d $groot/$default_branch/node_modules ]
         ln -s $groot/$default_branch/node_modules $dir_name/node_modules
     end
-    echo ""
+    # TODO: copy other config files?
+    if [ -f $groot/$default_branch/config.local.json -a ! -f $dir_name/config.local.json ]
+        ln -s $groot/$default_branch/config.local.json $dir_name/config.local.json
+    end
 end
 
 cd $dir_name

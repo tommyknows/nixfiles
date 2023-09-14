@@ -324,3 +324,11 @@ nmap <silent> <F8> :call ToggleNetrw()<CR>
 
 " do not create all the BufKill mappings, they're annoying with <Leader>b for buffer list.
 let g:BufKillCreateMappings = 0
+
+" disable keymappings for vim-gh-line
+let g:gh_line_map_default = 0
+let g:gh_line_blame_map_default = 1
+" copy to clipboard instead of opening page directly.
+let g:gh_open_command = 'fn() { echo "$@" | pbcopy; }; fn '
+" use version hashes instead of branch names.
+let g:gh_use_canonical = 1
