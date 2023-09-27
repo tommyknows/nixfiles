@@ -149,6 +149,7 @@ in {
         nodejs 
         open-policy-agent
         pam-reattach
+        postgresql
         python310
         pre-commit
         protoc-gen-go
@@ -164,6 +165,7 @@ in {
         slack
         skopeo
         terraform
+        terraform-ls
         teleport
         tilt
         universal-ctags
@@ -416,7 +418,7 @@ in {
       };
       go = {
         enable = true;
-        package = unstable.go;
+        package = unstable.go_1_21;
         goPath = "Documents/go";
         goPrivate = ["github.com/snyk"];
       };
