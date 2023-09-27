@@ -305,9 +305,6 @@ in {
             # message that I have no idea how to fix.
             fetch = "+refs/heads/*:refs/remotes/origin/*";
           };
-          "includeIf \"gitdir:~/Documents/work/\"" = {
-            path = "~/Documents/work/.gitconfig_include";
-          };
           "url \"ssh://git@github.com/\"" = {
             insteadOf = "https://github.com/";
           };
@@ -315,6 +312,12 @@ in {
             "hooksPath" = "/Users/ramon/.nixpkgs/git-hooks";
           };
         };
+        includes = [{
+            condition = "gitdir:~/Documents/work/";
+            contents = {
+              user = { email = "ramon.ruttimann@snyk.io"; };
+            };
+        }];
         delta = {
           enable = true;
           options = {
