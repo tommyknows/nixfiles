@@ -39,7 +39,7 @@ cmap w!! w !sudo tee % >/dev/null
 " Create the undo-directory if it doesn't exist.
 " We use a directory in /tmp to clean it up automatically
 if !isdirectory("/tmp/vim-undo")
-    call mkdir("/tmp/vim-undo", "", 0700)
+    call mkdir("/tmp/vim-undo", "", 0777)
 endif
 
 colorscheme material-monokai
