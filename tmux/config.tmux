@@ -68,7 +68,7 @@ setw -g window-status-separator ""
 
 set-option -g status-interval 5
 set-option -g automatic-rename on
-set-option -g automatic-rename-format '#T'
+set-option -g automatic-rename-format '#(/Users/ramon/.nixpkgs/tmux/title.sh "#{pane_current_path}") #{pane_current_command}'
 
 set -g pane-border-style fg=black
 set -g pane-active-border-style fg=white,bg=default

@@ -6,17 +6,20 @@ end
 
 set commit $argv[3]
 
-if string match -q '*github.com/snyk/*' $argv[1]
-    set repo (string replace -r '.*github.com/snyk' '' $argv[1] | string replace -r '/$' '')
-    if echo $repo | rg -q '/pull/[0-9].*'
-        set -l pull_info (string match -r '/?(.*)/pull/(.*)' -g $repo)
+set -l owner "snyk"
 
-        set repo $pull_info[1]
+if string match -q '*github.com/*' $argv[1]
+    # nice regex to extract the owner, repo, and the PR number.
+    set pull_info (string match -r '.*github.com/(.[^/]*)/(.[^/]*)(?:/pull/([0-9]*)(?:/.*)?)?' -g $argv[1])
+    set owner $pull_info[1]
+    set repo $pull_info[2]
+    if test (count $pull_info) -gt 2 
+        set -l pr $pull_info[3]
         set branch origin/(curl -L --silent \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer $GITHUB_PRIVATE_TOKEN"\
             -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/snyk/$repo/pulls/$pull_info[2] | jq .head.ref -r)
+            https://api.github.com/repos/$owner/$repo/pulls/$pr | jq .head.ref -r)
     end
 else
     set repo $argv[1]
@@ -26,7 +29,7 @@ end
 
 set dir $workdir/$repo
 if [ ! -d $dir ]
-    if ! s $repo
+    if ! clone $owner/$repo $dir
         return
     end
 else

@@ -109,6 +109,7 @@ in {
         coreutils
         ctlptl
         cmake
+        circleci-cli
         diffutils
         b3sum
         delve
@@ -120,9 +121,9 @@ in {
         fzf
         gitleaks
         glab
-        golangci-lint
+        unstable.golangci-lint
         google-cloud-sdk
-        gopls
+        unstable.gopls
         gotags
         gotestsum
         # things like present, godoc, goimports...
@@ -166,7 +167,7 @@ in {
         skopeo
         terraform
         terraform-ls
-        teleport
+        unstable.teleport_13
         tilt
         universal-ctags
         velero
@@ -283,6 +284,7 @@ in {
           lg = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all";
           # git doesn't "find" the git-fix command, so let's alias it here.
           fix = "!fish -c \"git-fix\"";
+          root = "rev-parse --show-toplevel";
           pick-commit = "!fish -c \"git-pick-commit\"";
         };
         attributes = [

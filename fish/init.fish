@@ -63,3 +63,5 @@ set -gx SNYK_API_TOKEN (security find-generic-password -a "ramon.ruttimann@snyk.
 
 # and to install NPM packages 
 set -gx NODE_PATH $HOME/.npm-packages/lib/node_modules
+
+abbr -a groot --position anywhere --function __groot --set-cursor=!

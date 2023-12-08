@@ -5,7 +5,7 @@ if test (count $argv) -ne 0
     set dir_name (string replace -a "/" "_" "$branch_name")
     # if the branch to delete is the same branch as we're currently on, switch to 
     # the default branch dir first.
-    if [ (basename (git rev-parse --show-toplevel)) == $dir_name ]
+    if [ (basename (git rev-parse --show-toplevel)) = $dir_name ]
         c $default_branch
     end
 else

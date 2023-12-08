@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+COMMIT_MSG_FILE=$1
+COMMIT_SOURCE=$2
+
+if [[ -z "$COMMIT_SOURCE" ]]; then
+  branch=$(git rev-parse --abbrev-ref HEAD)
+  hint=$(cat "$COMMIT_MSG_FILE")
+  ticket=$(git config branch."$branch".note)
+  echo -e "\n\n[$ticket]" > "$COMMIT_MSG_FILE"
+  echo "$hint" >> "$COMMIT_MSG_FILE"
+fi
