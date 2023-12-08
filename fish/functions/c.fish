@@ -50,6 +50,7 @@ end
 set -l default_branch (default_branch)
 set -l local_branch_name (string replace 'origin/' '' "$argv[1]")
 set -l checkout_target
+set -l track_upstream false
 # if these don't match, the user specified to check out an origin/<BRANCH>. 
 if test "$local_branch_name" != "$argv[1]"
     set checkout_target "$argv[1]"
@@ -90,6 +91,7 @@ if test -n "$checkout_target"
 else
     echo ""
 end
+
 if "$track_upstream"
     # Fetch potential changes from the remote.
     echo "Checking out remote branch, pulling changes from remote..."
