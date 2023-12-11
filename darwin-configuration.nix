@@ -123,6 +123,7 @@ in {
         glab
         unstable.golangci-lint
         google-cloud-sdk
+        google-cloud-sql-proxy
         unstable.gopls
         gotags
         gotestsum
