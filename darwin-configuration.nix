@@ -292,9 +292,10 @@ in {
           "go.sum binary"
         ];
         extraConfig = {
-          push = { default = "current"; };
-          pull = { rebase = true; };
-          init = { defaultBranch = "main"; };
+          push   = { default = "current"; };
+          pull   = { rebase = true; };
+          rebase = { updateRefs = true; };
+          init   = { defaultBranch = "main"; };
           "branch \"master\"" = {
             remote = "origin";
             merge = "refs/heads/master";
