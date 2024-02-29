@@ -18,7 +18,12 @@ mkd $clone_path > /dev/null
 git clone --bare --single-branch "git@github.com:$repo_name.git" ./.git 2>/dev/null
 
 echo "Fetching references..."
-git fetch origin 'refs/heads/*:refs/remotes/origin/*' 2&>/dev/null
+# This value was previously set in the global gitconfig. However, that breaks
+# git-clones within a directory, which we sometimes use (submodules!).
+# On a standard workflow, `git clone` naturally sets the below config setting
+# *locally*, so we want to imitate that.
+git config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+git fetch origin 2&>/dev/null
 git remote set-head origin -a
 
 set default_branch (git remote show origin | sed -n '/HEAD branch/s/.*: //p')

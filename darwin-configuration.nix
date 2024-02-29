@@ -173,11 +173,12 @@ in {
         universal-ctags
         velero
         wireguard-tools
+        wireguard-go
         xz
         yq
         yarn
         # TODO: doesn't build.
-        # unstable.snyk
+        #unstable.snyk
         unstable.helix
         nodePackages.ts-node
         nodePackages.typescript
@@ -306,10 +307,6 @@ in {
           };
           "remote.origin" = {
             prune = true;
-            # TODO: This is needed to fetch the origin's branches and update them locally.
-            # Sadly it breaks submodules with the weird "multiple updates to ref" error
-            # message that I have no idea how to fix.
-            fetch = "+refs/heads/*:refs/remotes/origin/*";
           };
           "url \"ssh://git@github.com/\"" = {
             insteadOf = "https://github.com/";
@@ -360,8 +357,15 @@ in {
           "gt." = "go test .";
           gb = "go build ./...";
           "gb." = "go build .";
-          gdm = "git diff (default_branch)";
+          gdm = "git diff origin/(default_branch)";
           gds = "git diff --stat";
+          # TODO: Remove line from init.fish. At time of writing,
+          # this wasn't available in the latest release.
+          #groot = {
+            #position = "anywhere";
+            #function = "__groot";
+            #set-cursor = "!";
+          #};
           k = "kubectl";
           kctx = "kubectl ctx";
           tat = "tmux a -t";
@@ -422,7 +426,7 @@ in {
       };
       go = {
         enable = true;
-        package = unstable.go_1_21;
+        package = unstable.go_1_22;
         goPath = "Documents/go";
         goPrivate = ["github.com/snyk"];
       };

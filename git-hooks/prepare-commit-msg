@@ -3,7 +3,7 @@
 COMMIT_MSG_FILE=$1
 COMMIT_SOURCE=$2
 
-if [[ -z "$COMMIT_SOURCE" ]]; then
+if [[ -z "$COMMIT_SOURCE" && "$(realpath "$COMMIT_MSG_FILE")" =~ "/Users/ramon/Documents/work" ]]; then
   branch=$(git rev-parse --abbrev-ref HEAD)
   hint=$(cat "$COMMIT_MSG_FILE")
   ticket=$(git config branch."$branch".note)

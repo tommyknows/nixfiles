@@ -96,21 +96,28 @@ if "$track_upstream"
     # Fetch potential changes from the remote.
     echo "Checking out remote branch, pulling changes from remote..."
     git fetch origin $local_branch_name &> /dev/null
+else if test -n "$checkout_target" && ! git cat-file -e $checkout_target
+    echo "Checkout target doesn't exist, trying to pull changes from remote..."
+    git fetch origin $checkout_target
 end
 
-set -l create_branch_flag ""
+set -l create_branch_flag
 # if the branch doesn't exist yet, use `-b` to create it.
 if ! git rev-parse --verify --quiet $local_branch_name &>/dev/null
     set create_branch_flag "-b"
 end
-git worktree add $dir_name $create_branch_flag $local_branch_name $checkout_target &> /dev/null
 
-if [ -d $groot/$default_branch/node_modules ]
-    ln -s $groot/$default_branch/node_modules $dir_name/node_modules
+if ! git worktree add -q $dir_name $create_branch_flag $local_branch_name $checkout_target
+    echo "Error adding worktree!"
+    return
 end
+
+echo "Symlinking files & directories..."
 # TODO: copy other config files?
-if [ -f $groot/$default_branch/config.local.json -a ! -f $dir_name/config.local.json ]
-    ln -s $groot/$default_branch/config.local.json $dir_name/config.local.json
+for fileOrDir in "config.local.json" ".local-dev-deps" "tools/node_modules" "tools/.bin"
+    if [ -e $groot/$default_branch/$fileOrDir -a ! -f $dir_name/$fileOrDir ]
+        ln -s $groot/$default_branch/$fileOrDir $dir_name/$fileOrDir
+    end
 end
 
 if test -z "$jira_ticket" 
