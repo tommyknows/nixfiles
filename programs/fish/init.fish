@@ -48,20 +48,7 @@ end
 
 set -gx BAT_THEME "Monokai Extended"
 
-# Required for fnm (npm version manager...)
-set -gx PATH "/Users/ramon/Library/Caches/fnm_multishells/75309_1657698261730/bin" $PATH;
-set -gx FNM_MULTISHELL_PATH "/Users/ramon/Library/Caches/fnm_multishells/75309_1657698261730";
-set -gx FNM_VERSION_FILE_STRATEGY "local";
-set -gx FNM_DIR "/Users/ramon/Library/Application Support/fnm";
-set -gx FNM_LOGLEVEL "info";
-set -gx FNM_NODE_DIST_MIRROR "https://nodejs.org/dist";
-set -gx FNM_ARCH "arm64";
-
 # TODO: that token's probably expired, but I'm leaving this here as an example on how to read out the keychain.
 set -gx GITHUB_PRIVATE_TOKEN (security find-generic-password -a "$USER" -s "GitHub Token" -w)
-set -gx SNYK_API_TOKEN (security find-generic-password -a "ramon.ruttimann@snyk.io" -s "Snyk API Token" -w)
-
-# and to install NPM packages 
-set -gx NODE_PATH $HOME/.npm-packages/lib/node_modules
 
 abbr -a groot --position anywhere --function __groot --set-cursor=!

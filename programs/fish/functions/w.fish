@@ -32,7 +32,7 @@ end
 
 set commit $argv[3]
 
-set -l owner "snyk"
+set -l owner "$WORK_GITHUB_USER"
 
 if string match -q '*github.com/*' $argv[1]
     # nice regex to extract the owner, repo, and the rest

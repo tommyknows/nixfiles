@@ -4,7 +4,7 @@ argparse --exclusive 'directory,repository' 'd/directory=' 'r/repository=' -- $a
 # checked out, repository.
 if set --query _flag_repository
     # list remote tags and sort them accordingly.
-    for ref in (git ls-remote -ht git@github.com:snyk/(basename $_flag_repository) | awk '{print $2}')
+    for ref in (git ls-remote -ht git@github.com:$WORK_GITHUB_USER/(basename $_flag_repository) | awk '{print $2}')
         if string match -q 'refs/heads/*' "$ref"
             set -a heads 'origin/'(echo $ref | string replace 'refs/heads/' '')
         else

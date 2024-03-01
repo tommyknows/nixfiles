@@ -1,2 +1,2 @@
-fish/functions/reset_snyk_env.fish
-fish/functions/db-login.fish
+programs/fish/functions/reset_snyk_env.fish
+programs/fish/functions/db-login.fish
