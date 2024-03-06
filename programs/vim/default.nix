@@ -1,15 +1,14 @@
 # TODO: can we alias stuff, e.g. pkgs = pkgs.vimPlugins?
-{ pkgs, ... }:
-
+{pkgs, ...}:
 # can these be moved to flake.nix / flake.lock?
 let
-  vim-material-monokai  = pkgs.vimUtils.buildVimPlugin {
+  vim-material-monokai = pkgs.vimUtils.buildVimPlugin {
     name = "material-monokai";
     src = pkgs.fetchFromGitHub {
-        owner = "tommyknows";
-        repo = "vim-material-monokai";
-        rev = "267d0a30faa62db893ef36d5c94213264cd48f93";
-        sha256 = "B01qZkzHUg3gn8mlXS63tSKP+9Nqd9wpJBFFkII3jk4=";
+      owner = "tommyknows";
+      repo = "vim-material-monokai";
+      rev = "267d0a30faa62db893ef36d5c94213264cd48f93";
+      sha256 = "B01qZkzHUg3gn8mlXS63tSKP+9Nqd9wpJBFFkII3jk4=";
     };
   };
   vim-gopher = pkgs.vimUtils.buildVimPlugin {
@@ -82,6 +81,6 @@ in {
       vim-tmux-navigator
       vim-vinegar
     ];
-    extraConfig = (builtins.readFile ./vimrc);
+    extraConfig = builtins.readFile ./vimrc;
   };
 }

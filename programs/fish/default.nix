@@ -1,4 +1,9 @@
-{ pkgs, unstable, lib, ... }: {
+{
+  pkgs,
+  unstable,
+  lib,
+  ...
+}: {
   xdg.configFile = {
     # load all completions and configs for fish from the Dotfiles repo.
     "fish/completions" = {
@@ -14,7 +19,7 @@
       for f in $plugin_dir/*.fish
         source $f
       end
-      '';
+    '';
   };
 
   # TODO: this is used as home-manager config, but maybe we can also set this as the toplevel
@@ -53,9 +58,9 @@
       # TODO: Remove line from init.fish. At time of writing,
       # this wasn't available in the latest release.
       #groot = {
-        #position = "anywhere";
-        #function = "__groot";
-        #set-cursor = "!";
+      #position = "anywhere";
+      #function = "__groot";
+      #set-cursor = "!";
       #};
       k = "kubectl";
       kctx = "kubectl ctx";
@@ -65,10 +70,13 @@
       untar = "tar -xvf";
     };
     # reads in all functions from :/fish/functions and registers them given their file name.
-    functions = lib.mapAttrs'
-      (name: _: lib.nameValuePair
-        (builtins.head (builtins.split ".fish" name))
-        (builtins.readFile (./. + ("/functions/"+name)))
+    functions =
+      lib.mapAttrs'
+      (
+        name: _:
+          lib.nameValuePair
+          (builtins.head (builtins.split ".fish" name))
+          (builtins.readFile (./. + ("/functions/" + name)))
       ) (lib.attrsets.filterAttrs (n: v: v == "regular") (builtins.readDir ./functions));
     plugins = [
       {

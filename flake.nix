@@ -14,15 +14,20 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
-  outputs = { nixpkgs, unstable, nix-darwin, home-manager, ... }@inputs:
-    let
-      system = "aarch64-darwin";
-      # define all the unstable packages we use in a single place.
-      unstablePackages = final: prev: {
-        go_1_22 = unstable.legacyPackages.${system}.go_1_22;
-        gopls = unstable.legacyPackages.${system}.gopls;
-      };
-    in {
+  outputs = {
+    nixpkgs,
+    unstable,
+    nix-darwin,
+    home-manager,
+    ...
+  } @ inputs: let
+    system = "aarch64-darwin";
+    # define all the unstable packages we use in a single place.
+    unstablePackages = final: prev: {
+      go_1_22 = unstable.legacyPackages.${system}.go_1_22;
+      gopls = unstable.legacyPackages.${system}.gopls;
+    };
+  in {
     darwinConfigurations = {
       work-laptop = nix-darwin.lib.darwinSystem {
         inherit system;
@@ -36,11 +41,11 @@
             home-manager = {
               useGlobalPkgs = true;
               users.ramon = import ./hosts/laptop/home.nix;
-              extraSpecialArgs = { work_toggle = "enabled"; };
+              extraSpecialArgs = {work_toggle = "enabled";};
             };
 
             # overwrite / add some packages to pkgs from unstable.
-            nixpkgs.overlays = [ unstablePackages ];
+            nixpkgs.overlays = [unstablePackages];
           }
         ];
       };

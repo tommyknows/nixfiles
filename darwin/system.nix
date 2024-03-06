@@ -1,4 +1,8 @@
-{ pkgs, config, ... }: {
+{
+  pkgs,
+  config,
+  ...
+}: {
   system = {
     stateVersion = 4;
     defaults = {
@@ -31,16 +35,16 @@
     };
 
     # make applications show up in spotlight...
-    activationScripts.applications.text = pkgs.lib.mkForce (''
-        echo "setting up ~/Applications/..."
-        rm -rf ~/Applications/*
-        find ${config.system.build.applications}/Applications -maxdepth 1 -type l | while read f; do
-          src="$(/usr/bin/stat -f%Y $f)"
-          appname="$(basename $src)"
-          osascript -e "tell app \"Finder\" to make alias file at POSIX file \"/Users/ramon/Applications/\" to POSIX file \"$src\" with properties {name: \"$appname\"}";
-        done
-        mkdir -p /usr/local/bin
-    '');
+    activationScripts.applications.text = pkgs.lib.mkForce ''
+      echo "setting up ~/Applications/..."
+      rm -rf ~/Applications/*
+      find ${config.system.build.applications}/Applications -maxdepth 1 -type l | while read f; do
+        src="$(/usr/bin/stat -f%Y $f)"
+        appname="$(basename $src)"
+        osascript -e "tell app \"Finder\" to make alias file at POSIX file \"/Users/ramon/Applications/\" to POSIX file \"$src\" with properties {name: \"$appname\"}";
+      done
+      mkdir -p /usr/local/bin
+    '';
   };
 
   security = {

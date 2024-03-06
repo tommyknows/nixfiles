@@ -1,16 +1,22 @@
-{ work_toggle, pkgs, unstable, ... }: 
-let
+{
+  work_toggle,
+  pkgs,
+  unstable,
+  ...
+}: let
   work = {
-    "enabled" = [ (import ../work/default.nix) ];
-    "disabled" = [ ];
+    "enabled" = [(import ../work/default.nix)];
+    "disabled" = [];
   };
 in {
-  imports = [
-    ./vim
-    ./git
-    ./fish/default.nix
-    ./tmux
-  ] ++ (work.${work_toggle} or [ ]);
+  imports =
+    [
+      ./vim
+      ./git
+      ./fish/default.nix
+      ./tmux
+    ]
+    ++ (work.${work_toggle} or []);
 
   programs = {
     go = {
@@ -21,7 +27,7 @@ in {
     lsd = {
       enable = true;
       settings = {
-        sorting = { dir-grouping = "first"; };
+        sorting = {dir-grouping = "first";};
       };
     };
     ssh = {
@@ -30,4 +36,3 @@ in {
     };
   };
 }
-
