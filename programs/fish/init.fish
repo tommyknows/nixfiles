@@ -19,20 +19,12 @@ bind -M insert \eo _kubectl_fzf_autocomplete
 bind \er _rzf
 bind -M insert \er _rzf
 
-# adjust the path. by default, the nix paths are after the default system paths.
-# this makes it annoying with default applications like vim, which are installed
-# on the system already too.
-set PATH /Users/ramon/Documents/go/bin \
+fish_add_path --path --move --prepend /Users/ramon/Documents/go/bin \
     /Users/ramon/.nix-profile/bin \
     /run/current-system/sw/bin \
-    /nix/var/nix/profiles/default/bin \
-    /usr/local/bin \
-    /usr/bin \
-    /bin \
-    /usr/sbin \
-    /sbin \
-    /Library/Apple/usr/bin \
-    $HOME/.krew/bin  \
+    /nix/var/nix/profiles/default/bin
+
+fish_add_path --path --move --append $HOME/.krew/bin \
     $HOME/.npm-packages/bin
 
 # TODO: remove? I don't even remember why I have it.
