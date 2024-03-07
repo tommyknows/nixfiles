@@ -73,6 +73,7 @@
     shfmt
     slack
     skopeo
+    snyk
     terraform
     terraform-ls
     teleport_13
@@ -84,8 +85,6 @@
     xz
     yq
     yarn
-    # TODO: doesn't build.
-    #unstable.snyk
     nodePackages.ts-node
     nodePackages.typescript
     nodePackages.cspell

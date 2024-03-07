@@ -26,6 +26,7 @@
     unstablePackages = final: prev: {
       go_1_22 = unstable.legacyPackages.${system}.go_1_22;
       gopls = unstable.legacyPackages.${system}.gopls;
+      snyk = unstable.legacyPackages.${system}.snyk;
     };
   in {
     darwinConfigurations = {
