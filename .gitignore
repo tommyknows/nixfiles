@@ -1,2 +1,3 @@
 programs/fish/functions/reset_snyk_env.fish
 programs/fish/functions/db-login.fish
+work/functions/helm-dependency-fetch.fish
