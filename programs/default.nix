@@ -11,10 +11,11 @@
 in {
   imports =
     [
-      ./vim
-      ./git
+      ./alacritty
       ./fish/default.nix
+      ./git
       ./tmux
+      ./vim
     ]
     ++ (work.${work_toggle} or []);
 

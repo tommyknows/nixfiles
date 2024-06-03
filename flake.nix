@@ -24,6 +24,7 @@
     system = "aarch64-darwin";
     # define all the unstable packages we use in a single place.
     unstablePackages = final: prev: {
+      alacritty = unstable.legacyPackages.${system}.alacritty;
       go_1_22 = unstable.legacyPackages.${system}.go_1_22;
       gopls = unstable.legacyPackages.${system}.gopls;
       snyk = unstable.legacyPackages.${system}.snyk;

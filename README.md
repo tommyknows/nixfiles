@@ -33,12 +33,14 @@ laptop...
 ![screenshot of a markdown file, opened in vim, tmux in iterm](./screenshot-md.png)
 ![screenshot of a Go file, opened in vim, tmux in iterm](./screenshot-go.png)
 
+(pictures where taken before the switch to Alacritty).
+
 ## What makes it different?
 
 ### Completely CLI-based
 
 ...except a few, probably weird to many, exceptions.
-These Dotfiles setup vim, tmux and iterm2 to be your primary driver. No VS
+These Dotfiles setup vim, tmux and alacritty to be your primary driver. No VS
 Code, no terminal windows and tabs, no visual Git interface, no whatever else
 there might be.
 
@@ -126,12 +128,6 @@ Additionally, `ls` has been mapped to `lsd` as well.
 
 This still configures `vim`, not `neovim`: I so far haven't had the patience to
 translate my config.
-
-It also still uses `tmux`, and no iTerm2 integrations for it (or even just using
-iTerm's windowing functionality). I don't think I'll switch (at least less
-likely than to nvim), so I probably won't tackle this.
-
-It does not use Nix flakes. This is my next adventure, for a later day.
 
 Additionally,there's a shared clipboard for tmux and vim. And tmux and the
 system clipboard. But not for vim and system clipboard, yet :(. This would be a

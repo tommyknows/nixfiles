@@ -37,7 +37,6 @@
     # things like present, godoc, goimports...
     gotools
     gnupg
-    iterm2
     jless
     jq
     kind
