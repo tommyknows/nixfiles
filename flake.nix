@@ -28,6 +28,7 @@
       go_1_22 = unstable.legacyPackages.${system}.go_1_22;
       gopls = unstable.legacyPackages.${system}.gopls;
       snyk = unstable.legacyPackages.${system}.snyk;
+      teleport = unstable.legacyPackages.${system}.teleport_14;
     };
   in {
     darwinConfigurations = {

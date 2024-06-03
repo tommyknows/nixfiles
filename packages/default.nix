@@ -75,7 +75,7 @@
     snyk
     terraform
     terraform-ls
-    teleport_13
+    teleport
     tilt
     universal-ctags
     velero
