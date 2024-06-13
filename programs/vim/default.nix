@@ -73,8 +73,9 @@ in {
       vim-gopher
       vim-markdown
       vim-material-monokai
-      vim-surround
+      vim-sandwich
       vim-terraform
+      vim-test
       vim-tmux
       vim-tmux-clipboard
       vim-tmux-focus-events

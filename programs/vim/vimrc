@@ -332,3 +332,25 @@ let g:gh_line_blame_map_default = 1
 let g:gh_open_command = 'fn() { echo "$@" | pbcopy; }; fn '
 " use version hashes instead of branch names.
 let g:gh_use_canonical = 1
+
+"Hello World!"
+
+" surround-mappings. Other helpful ones:
+" - 'saiw(' surround word with '('
+" - 'sr](' replace surrounding ] with (
+" - 'sd[' delete surrounding ]
+" operator-mode for custom motion-targets, e.g. 'ysi(' will
+" yank '<text>' from '(<text>)', or 'dsa"' will delete '"<text>"'
+" from 'fmt.Println("<text>")'
+" by default, vim maps s and S to the same functionality as c.
+xmap S <Plug>(sandwich-add)
+" surround's documentation also mentions xmap-mappings, but I don't
+" think they're needed?
+omap is <Plug>(textobj-sandwich-query-i)
+omap as <Plug>(textobj-sandwich-query-a)
+" auto-select nearest surrounding chars.
+omap isa <Plug>(textobj-sandwich-auto-i)
+omap asa <Plug>(textobj-sandwich-auto-a)
+
+nmap <silent> tt :TestNearest<CR>
+nmap <silent> tf :TestFile<CR>
