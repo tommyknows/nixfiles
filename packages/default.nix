@@ -54,7 +54,7 @@
     neovim
     nodePackages_latest.markdownlint-cli
     nodePackages.prettier
-    nodejs
+    nodejs-slim
     open-policy-agent
     pam-reattach
     postgresql
@@ -75,8 +75,9 @@
     snyk
     terraform
     terraform-ls
-    teleport
+    teleport_14
     tilt
+    translate-shell
     universal-ctags
     velero
     wireguard-tools
