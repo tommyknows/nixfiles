@@ -26,6 +26,10 @@
         white = "0xfffefe";
         yellow = "0xffe47e";
       };
+      colors.cursor = {
+        cursor = "#edeede";
+        text = "#000000";
+      };
       colors = {
         draw_bold_text_with_bright_colors = false;
       };
@@ -35,13 +39,10 @@
       font = {
         size = 14;
       };
+      # fonts are installed through the system (darwin/system.nix)
       font.bold = {
         family = "SauceCodePro Nerd Font";
-        style = "Bold";
-      };
-      font.italic = {
-        family = "SauceCodePro Nerd Font";
-        style = "Italic";
+        style = "SemiBold";
       };
       font.normal = {
         family = "SauceCodePro Nerd Font";
@@ -62,8 +63,8 @@
       };
     };
   };
-  # to get 24-Bit colors to worK, we need to set this.
+  # to get 24-Bit colors to work, we need to set this.
   programs.tmux.extraConfig = ''
-    set -ag terminal-overrides ",alacritty:RGB,xterm-256color:RGB"
+    set -ag terminal-overrides #",alacritty:RGB,xterm-256color-italic:RGB"
 '';
 }
