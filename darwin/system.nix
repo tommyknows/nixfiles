@@ -3,6 +3,10 @@
   config,
   ...
 }: {
+  fonts = {
+    fontDir.enable = true;
+    fonts = [(pkgs.nerdfonts.override { fonts = [ "SourceCodePro" ]; })];
+  };
   system = {
     stateVersion = 4;
     defaults = {
@@ -25,8 +29,6 @@
       trackpad = {
         Clicking = true;
         TrackpadThreeFingerDrag = true;
-        #FirstClickThreshold = 0;
-        #SecondClickThreshold = 0;
       };
     };
     keyboard = {
