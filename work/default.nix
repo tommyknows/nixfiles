@@ -27,6 +27,7 @@
         set -gx NODE_PATH $HOME/.npm-packages/lib/node_modules
       '';
 
+      shellAbbrs = {};
       functions =
         lib.mapAttrs'
         (

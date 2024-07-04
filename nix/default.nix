@@ -7,7 +7,8 @@
 
   nix.settings.experimental-features = ["nix-command" "flakes"];
 
-  nix.settings.sandbox = true;
+  # https://github.com/NixOS/nix/issues/11002
+  nix.settings.sandbox = false;
 
   nix.configureBuildUsers = true;
   nix.nrBuildUsers = 32;
