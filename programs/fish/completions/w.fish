@@ -2,7 +2,7 @@
 # 1st arg: folder / project. "optional", "w" will automatically fetch a repo if the folder shouldn't exist.
 complete --command w --exclusive \
     --condition 'test (count (commandline -opc)) -eq 1' \
-    --arguments '(ls ~/Documents/work/)'
+    --arguments '(command ls ~/Documents/work/)'
 
 # 2nd arg: branch name. This is similar to "c", but passes the directory based on the 1st arg to _c_complete.
 complete --command w --exclusive \
