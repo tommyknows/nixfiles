@@ -25,7 +25,7 @@
     # define all the unstable packages we use in a single place.
     unstablePackages = final: prev: {
       # add mappings for unstable packages here. For example:
-      #alacritty = unstable.legacyPackages.${system}.alacritty;
+      gopls = unstable.legacyPackages.${system}.gopls;
     };
   in {
     darwinConfigurations = {

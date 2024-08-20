@@ -75,3 +75,10 @@ set -g pane-active-border-style fg=white,bg=default
 
 unbind-key C-l
 unbind-key C-h
+
+set -as terminal-features ",*:RGB"
+# Nix automatically installs tmux-sensible, which installs the reattach-to-user-namespace plugin. Something (likely
+# nix?) sets the `default-command` to something like "reattach-to-user-namespace -l zsh", which overwrites the shell...
+# This unsets the option, so that we don't have the default-command anymore. reattach-to-user-namespace isn't needed
+# anymore in more recent versions of tmux.
+set -gu default-command

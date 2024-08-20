@@ -53,6 +53,7 @@
       "gt." = "go test .";
       gb = "go build ./...";
       "gb." = "go build .";
+      "gd" = "go doc -all";
       # three-dot syntax to compare against merge-base, not actual tip.
       # This makes it more similar to Github's diff view that will not
       # show updates to the main branch that aren't in the PR yet.

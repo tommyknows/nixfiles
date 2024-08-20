@@ -25,6 +25,7 @@
     fnm
     ffmpeg
     fzf
+    gh
     git-absorb
     gitleaks
     glab
@@ -37,6 +38,7 @@
     # things like present, godoc, goimports...
     gotools
     gnupg
+    # harlequin # Good lookin' CLI SQL Editor, but not available in repos.
     jless
     jq
     kind
