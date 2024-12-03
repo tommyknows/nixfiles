@@ -1,4 +1,42 @@
 {...}: {
+  programs.gh-dash = {
+    enable = true;
+    settings = {
+      prSections = [
+        {
+          title = "My PRs";
+          filters = "is:open author:@me";
+          layout = {
+            author = {hidden = true;};
+          };
+        }
+        {
+          title = "Needs Review";
+          filters = "is:open review-requested:@me";
+        }
+        {
+          title = "Involved";
+          filters = "is:open -author:@me involves:@me";
+        }
+      ];
+      defaults = {
+        preview = {
+          open = true;
+          width = 100;
+        };
+        layout = {
+          prs = {
+            repo = {
+              width = 20;
+            };
+          };
+        };
+      };
+      pager = {
+        diff = "delta";
+      };
+    };
+  };
   programs.git = {
     enable = true;
     userName = "Ramon Rüttimann";

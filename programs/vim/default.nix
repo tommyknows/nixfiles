@@ -50,11 +50,9 @@ in {
       coc-markdownlint
       coc-nvim
       coc-prettier
-      coc-python
       coc-jest
       coc-rust-analyzer
       coc-snippets
-      coc-tslint-plugin
       coc-yaml
       fzf-vim
       indentLine
@@ -72,6 +70,7 @@ in {
       vim-gh-line
       vim-gopher
       vim-markdown
+      vim-markdown-toc
       vim-material-monokai
       vim-sandwich
       vim-terraform

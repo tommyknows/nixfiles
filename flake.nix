@@ -2,11 +2,11 @@
   description = "Nix System Config";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     # Home manager
-    home-manager.url = "github:nix-community/home-manager/release-24.05";
+    home-manager.url = "github:nix-community/home-manager/release-24.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     # darwin
@@ -26,6 +26,8 @@
     unstablePackages = final: prev: {
       # add mappings for unstable packages here. For example:
       gopls = unstable.legacyPackages.${system}.gopls;
+      golangci-lint = unstable.legacyPackages.${system}.golangci-lint;
+      snyk = unstable.legacyPackages.${system}.snyk;
     };
   in {
     darwinConfigurations = {

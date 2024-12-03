@@ -4,7 +4,6 @@
   ...
 }: {
   home.packages = with pkgs; [
-    _1password
     alejandra # nix formatter
     awscli2
     aws-vault
@@ -39,6 +38,8 @@
     gotools
     gnupg
     # harlequin # Good lookin' CLI SQL Editor, but not available in repos.
+    hyperfine
+    jekyll
     jless
     jq
     kind
@@ -63,7 +64,7 @@
     python310
     pre-commit
     protoc-gen-go
-    protobuf3_20
+    protobuf
     qemu
     qrencode
     rancher
@@ -77,7 +78,7 @@
     snyk
     terraform
     terraform-ls
-    teleport_14
+    teleport
     tilt
     translate-shell
     universal-ctags

@@ -13,6 +13,5 @@
   nix.configureBuildUsers = true;
   nix.nrBuildUsers = 32;
 
-  environment.loginShell = "${pkgs.fish}/bin/fish";
   environment.shells = [pkgs.fish];
 }
