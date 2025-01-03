@@ -14,7 +14,6 @@
     baseIndex = 1;
     extraConfig = builtins.readFile ./config.tmux;
     plugins = with pkgs.tmuxPlugins; [
-      tmux-thumbs
       vim-tmux-navigator
       {
         plugin = battery;
@@ -25,11 +24,11 @@
           setw -g window-status-current-format "#[fg=#1f292d,bg=#b0bec5]#[fg=#1f292d,bg=#b0bec5,nobold,nounderscore,noitalics] #I #W #[fg=#b0bec5,bg=#1f292d]"
 
           # indicate whether Prefix has been captured + time in the right-status area
-          set -g status-right "#[fg=#b0bec5,bg=#1f292d]#[fg=#1f292d,bg=#b0bec5] #{battery_icon} #{battery_percentage} | #{cpu_percentage} #[fg=#506E79,bg=#b0bec5]#[fg=#ffffff,bg=#506E79] %H:%M #[fg=#fd9720,bg=#506E79]#[fg=#1f292d,bg=#fd9720] %h %d #[fg=#e73c50,bg=#fd9720]#[fg=#ffffff,bold,bg=#e73c50]#{?client_prefix, TRIGGERED ,}"
-          ## Status bar that shows networking infos too
+          #set -g status-right "#[fg=#b0bec5,bg=#1f292d]#[fg=#1f292d,bg=#b0bec5] #{battery_icon} #{battery_percentage} | #{cpu_percentage} #[fg=#506E79,bg=#b0bec5]#[fg=#ffffff,bg=#506E79] %H:%M #[fg=#fd9720,bg=#506E79]#[fg=#1f292d,bg=#fd9720] %h %d #[fg=#e73c50,bg=#fd9720]#[fg=#ffffff,bold,bg=#e73c50]#{?client_prefix, TRIGGERED ,}"
+
+          set -g status-right "#[fg=#b0bec5,bg=#1f292d]#[fg=#1f292d,bg=#b0bec5] #{battery_icon} #{battery_percentage} | #[fg=#506E79,bg=#b0bec5]#[fg=#ffffff,bg=#506E79] %H:%M #[fg=#fd9720,bg=#506E79]#[fg=#1f292d,bg=#fd9720] %h %d #[fg=#e73c50,bg=#fd9720]#[fg=#ffffff,bold,bg=#e73c50]#{?client_prefix, TRIGGERED ,}"
         '';
       }
-      cpu
       yank
       {
         plugin = resurrect;
