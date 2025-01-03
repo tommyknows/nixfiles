@@ -53,6 +53,7 @@
     kustomize
     loc
     lz4
+    mergiraf # git merge driver that's AST-aware.
     mockgen
     neovim
     nodePackages_latest.markdownlint-cli
