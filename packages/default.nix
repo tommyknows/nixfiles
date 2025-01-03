@@ -66,6 +66,7 @@
     pre-commit
     protoc-gen-go
     protobuf
+    pstree
     qemu
     qrencode
     rancher
