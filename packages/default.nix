@@ -18,9 +18,9 @@
     diffutils
     b3sum
     delve
-    deno
     # docker installed through docker desktop
     fd
+    fish-lsp
     fnm
     ffmpeg
     fzf

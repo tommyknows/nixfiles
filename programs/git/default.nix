@@ -62,10 +62,10 @@
     ];
     aliases = {
       br = "branch";
-      c = "commit -S -v";
-      ca = "commit -S --amend -v";
-      cn = "commit -S --no-verify -v";
-      cna = "commit -S --no-verify --amend -v";
+      c = "commit -S";
+      ca = "commit -S --amend";
+      cn = "commit -S --no-verify";
+      cna = "commit -S --no-verify --amend";
       hash = "!git rev-parse HEAD | tr -d '\n'";
       msg = "log --format=\"%B\" -n 1";
       mrnotes = "!git log --reverse --format='%n%n**%s**%n%n%b' origin/HEAD..HEAD | pbcopy";
@@ -106,6 +106,16 @@
       "*.dart merge=mergiraf"
     ];
     extraConfig = {
+      branch = {sort = "-committerdate";};
+      tag = {sort = "version:refname";};
+      diff = {
+        algorithm = "histogram";
+        colorMoved = "plain";
+        mnemonicPrefix = "true";
+        renames = true;
+      };
+      commit = {verbose = true;};
+      help = {autocorrect = "prompt";};
       push = {default = "current";};
       pull = {rebase = true;};
       rebase = {updateRefs = true;};
@@ -129,6 +139,7 @@
       };
       merge = {
         name = "mergiraf";
+        conflictstyle = "zdiff3";
         driver = "mergiraf merge --git %O %A %B -s %S -x %X -y %Y -p %P";
       };
       absorb = {

@@ -213,6 +213,8 @@ inoremap <silent><expr> <TAB>
 let g:coc_snippet_next = '<tab>'
 let g:coc_node_path = '/Users/ramon/.nix-profile/bin/node'
 
+let g:coc_config_home = "~/.config/vim"
+
 
 
 " Use <TAB> for both expand and jump (make expand higher priority.)

@@ -19,10 +19,22 @@ bind -M insert \eo _kubectl_fzf_autocomplete
 bind \er _rzf
 bind -M insert \er _rzf
 
+bind -M insert alt-backspace backward-kill-word
+# Fish 4.0 changed the behaviour of alt-left and right to travel
+# full "tokens" instead of words. 
+# > alt-left and alt-right will now move by one argument (which may 
+# > contain quoted spaces), not just one word like ctrl-left and 
+# > ctrl-right do.
+# ctrl-left and right are unusable on Mac because they're used to 
+# switch desktops, so we change the behaviour back.
+bind -M insert alt-left prevd-or-backward-word
+bind -M insert alt-right nextd-or-forward-word
+
 fish_add_path --path --move --prepend /Users/ramon/Documents/go/bin \
     /Users/ramon/.nix-profile/bin \
     /run/current-system/sw/bin \
-    /nix/var/nix/profiles/default/bin
+    /nix/var/nix/profiles/default/bin \
+    /usr/local/bin
 
 fish_add_path --path --move --append $HOME/.krew/bin \
     $HOME/.npm-packages/bin
@@ -39,6 +51,10 @@ function __disable_ctx_on_aws_exit --on-event fish_exit
 end
 
 set -gx BAT_THEME "Monokai Extended"
+
+# set the cursor to a block even in insert mode. Otherwise it'd be a line.
+# see https://fishshell.com/docs/current/interactive.html#vi-mode
+set -gx fish_cursor_insert block
 
 # TODO: that token's probably expired, but I'm leaving this here as an example on how to read out the keychain.
 set -gx GITHUB_PRIVATE_TOKEN (security find-generic-password -a "$USER" -s "GitHub Token" -w)

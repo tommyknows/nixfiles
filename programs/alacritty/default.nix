@@ -34,7 +34,10 @@
         draw_bold_text_with_bright_colors = false;
       };
       cursor = {
-        unfocused_hollow = true;
+        style = {
+          shape = "Block";
+          blinking = "Off";
+        };
       };
       font = {
         size = 14;

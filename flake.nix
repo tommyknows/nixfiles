@@ -1,17 +1,21 @@
 {
   description = "Nix System Config";
 
+  #inputs = rec {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     # Home manager
     home-manager.url = "github:nix-community/home-manager/release-24.11";
+    #home-manager.inputs.nixpkgs = nixpkgs;
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     # darwin
-    nix-darwin.url = "github:LnL7/nix-darwin";
+    nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-24.11";
+    #nix-darwin.inputs.nixpkgs = nixpkgs;
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+
   };
 
   outputs = {
@@ -28,11 +32,13 @@
       gopls = unstable.legacyPackages.${system}.gopls;
       golangci-lint = unstable.legacyPackages.${system}.golangci-lint;
       snyk = unstable.legacyPackages.${system}.snyk;
+      fish = unstable.legacyPackages.${system}.fish;
+      protobuf = unstable.legacyPackages.${system}.protobuf;
     };
   in {
     darwinConfigurations = {
       work-laptop = nix-darwin.lib.darwinSystem {
-        inherit system;
+        #inherit system;
         modules = [
           # Host configuration, non-home-manager stuff.
           ./hosts/laptop/configuration.nix
