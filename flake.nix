@@ -38,10 +38,10 @@
   in {
     darwinConfigurations = {
       work-laptop = nix-darwin.lib.darwinSystem {
-        #inherit system;
         modules = [
           # Host configuration, non-home-manager stuff.
           ./hosts/laptop/configuration.nix
+          ./hosts/laptop/no-determinate.nix
           # base home-manager to get it installed
           home-manager.darwinModules.home-manager
           # expression for all home-manager specific things.
@@ -50,6 +50,26 @@
               useGlobalPkgs = true;
               users.ramon = import ./hosts/laptop/home.nix;
               extraSpecialArgs = {work_toggle = "enabled";};
+            };
+
+            # overwrite / add some packages to pkgs from unstable.
+            nixpkgs.overlays = [unstablePackages];
+          }
+        ];
+      };
+      Ramons-MacBook-Air = nix-darwin.lib.darwinSystem {
+        modules = [
+          # Host configuration, non-home-manager stuff.
+          ./hosts/laptop/configuration.nix
+          ./hosts/laptop/determinate.nix
+          # base home-manager to get it installed
+          home-manager.darwinModules.home-manager
+          # expression for all home-manager specific things.
+          {
+            home-manager = {
+              useGlobalPkgs = true;
+              extraSpecialArgs = {work_toggle = "disabled"; };
+              users.ramon = import ./hosts/laptop/home.nix;
             };
 
             # overwrite / add some packages to pkgs from unstable.

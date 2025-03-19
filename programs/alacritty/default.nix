@@ -61,8 +61,10 @@
         startup_mode = "Windowed";
         option_as_alt = "Both";
       };
-      shell = {
-        program = "${pkgs.fish}/bin/fish";
+      terminal = {
+        shell = {
+          program = "${pkgs.fish}/bin/fish";
+        };
       };
     };
   };

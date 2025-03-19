@@ -42,7 +42,7 @@
     userName = "Ramon Rüttimann";
     userEmail = "me@ramonr.ch";
     signing = {
-      key = null; # Enables GPG to auto-decide
+      key = "/Users/ramon/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/PublicKeys/b82a639650776679601851f8715d6bc6.pub";
       signByDefault = true;
     };
     ignores = [
@@ -142,6 +142,7 @@
         conflictstyle = "zdiff3";
         driver = "mergiraf merge --git %O %A %B -s %S -x %X -y %Y -p %P";
       };
+      gpg = { format = "ssh"; };
       absorb = {
         maxStack = 50;
         oneFixupPerCommit = true;
