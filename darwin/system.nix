@@ -3,7 +3,7 @@
   config,
   ...
 }: {
-  fonts.packages = [(pkgs.nerdfonts.override { fonts = [ "SourceCodePro" ]; })];
+  fonts.packages = [(pkgs.nerdfonts.override {fonts = ["SourceCodePro"];})];
   system = {
     stateVersion = 4;
     defaults = {

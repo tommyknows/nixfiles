@@ -142,7 +142,7 @@
         conflictstyle = "zdiff3";
         driver = "mergiraf merge --git %O %A %B -s %S -x %X -y %Y -p %P";
       };
-      gpg = { format = "ssh"; };
+      gpg = {format = "ssh";};
       absorb = {
         maxStack = 50;
         oneFixupPerCommit = true;

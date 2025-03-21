@@ -15,7 +15,6 @@
     nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-24.11";
     #nix-darwin.inputs.nixpkgs = nixpkgs;
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
-
   };
 
   outputs = {
@@ -68,7 +67,7 @@
           {
             home-manager = {
               useGlobalPkgs = true;
-              extraSpecialArgs = {work_toggle = "disabled"; };
+              extraSpecialArgs = {work_toggle = "disabled";};
               users.ramon = import ./hosts/laptop/home.nix;
             };
 
