@@ -1,4 +1,3 @@
-# TODO: can we alias stuff, e.g. pkgs = pkgs.vimPlugins?
 {pkgs, ...}:
 # can these be moved to flake.nix / flake.lock?
 let

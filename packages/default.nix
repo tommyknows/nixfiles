@@ -9,8 +9,6 @@
     aws-vault
     babelfish
     bat
-    bazel_6
-    bazelisk
     coreutils
     ctlptl
     cmake
@@ -23,7 +21,6 @@
     fish-lsp
     fnm
     ffmpeg
-    fzf
     gh
     git-absorb
     gitleaks
@@ -70,7 +67,6 @@
     qemu
     qrencode
     rancher
-    ripgrep
     rustup
     sd
     shellcheck

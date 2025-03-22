@@ -7,7 +7,7 @@
     enable = true;
     clock24 = true;
     keyMode = "vi";
-    terminal = "xterm-256color-italic";
+    terminal = "xterm-256color";
     shell = "${pkgs.fish}/bin/fish";
     sensibleOnTop = true;
     escapeTime = 1;

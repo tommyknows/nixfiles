@@ -69,7 +69,8 @@
     };
   };
   # to get 24-Bit colors to work, we need to set this.
-  programs.tmux.extraConfig = ''
-    set -ag terminal-overrides ",alacritty:RGB,xterm-256color-italic:RGB"
-'';
+  # TODO: does not seem to be necessary
+  #  programs.tmux.extraConfig = ''
+  #    set -ag terminal-overrides ",alacritty:RGB,xterm-256color-italic:RGB"
+  #'';
 }

@@ -31,6 +31,19 @@ in {
         sorting = {dir-grouping = "first";};
       };
     };
+    fzf = {
+      enable = true;
+      defaultCommand = "rg";
+    };
+    ripgrep = {
+      enable = true;
+      arguments = [
+        "--smart-case"
+        "--hidden"
+        "--glob"
+        "  !.git"
+      ];
+    };
     ssh = {
       enable = true;
       extraConfig = "IdentityAgent /Users/ramon/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh";

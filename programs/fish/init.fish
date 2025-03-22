@@ -55,7 +55,6 @@ set -gx BAT_THEME "Monokai Extended"
 # see https://fishshell.com/docs/current/interactive.html#vi-mode
 set -gx fish_cursor_insert block
 
-# TODO: that token's probably expired, but I'm leaving this here as an example on how to read out the keychain.
 set -gx GITHUB_PRIVATE_TOKEN (security find-generic-password -a "$USER" -s "GitHub Token" -w)
 
 set -gx SSH_AUTH_SOCK "$HOME/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh"
