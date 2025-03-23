@@ -42,7 +42,7 @@
           {
             home-manager = {
               useGlobalPkgs = true;
-              users.ramon = import ./hosts/user.nix;
+              users.ramon = import ./hosts/work/user.nix;
               extraSpecialArgs = {work_toggle = "enabled";};
             };
 
@@ -63,7 +63,7 @@
             home-manager = {
               useGlobalPkgs = true;
               extraSpecialArgs = {work_toggle = "disabled";};
-              users.ramon = import ./hosts/user.nix;
+              users.ramon = import ./hosts/private/user.nix;
             };
 
             # overwrite / add some packages to pkgs from unstable.
