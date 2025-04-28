@@ -28,6 +28,7 @@
       snyk = unstable.legacyPackages.${system}.snyk;
       fish = unstable.legacyPackages.${system}.fish;
       protobuf = unstable.legacyPackages.${system}.protobuf;
+      autokbisw = unstable.legacyPackages.${system}.autokbisw;
     };
   in {
     darwinConfigurations = {

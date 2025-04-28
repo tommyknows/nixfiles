@@ -53,9 +53,9 @@
     mergiraf # git merge driver that's AST-aware.
     mockgen
     neovim
-    nodePackages_latest.markdownlint-cli
     nodePackages.prettier
-    nodejs-slim
+    nodePackages_latest.markdownlint-cli
+    nodejs_23
     open-policy-agent
     pam-reattach
     postgresql

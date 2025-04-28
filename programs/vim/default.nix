@@ -44,6 +44,7 @@ in {
       auto-pairs
       camelcasemotion
       coc-diagnostic
+      coc-go
       coc-git
       coc-json
       coc-markdownlint
