@@ -48,16 +48,15 @@
     kubernetes-helm
     krew
     kustomize
-    loc
+    tokei
     lz4
     mergiraf # git merge driver that's AST-aware.
     mockgen
     neovim
     nodePackages.prettier
     nodePackages_latest.markdownlint-cli
-    nodejs_23
+    nodejs_24
     open-policy-agent
-    pam-reattach
     postgresql
     python310
     pre-commit
@@ -74,9 +73,9 @@
     slack
     skopeo
     snyk
+    teleport
     terraform
     terraform-ls
-    teleport
     tilt
     translate-shell
     universal-ctags

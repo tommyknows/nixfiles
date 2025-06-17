@@ -3,7 +3,9 @@
   config,
   ...
 }: {
-  fonts.packages = [(pkgs.nerdfonts.override {fonts = ["SourceCodePro"];})];
+  fonts.packages = [
+    pkgs.nerd-fonts.sauce-code-pro
+  ];
   system = {
     stateVersion = 4;
     defaults = {
@@ -60,14 +62,10 @@
   };
 
   security = {
-    # https://github.com/LnL7/nix-darwin/pull/228
-    # replace with below for 24.11 -> 25.05 upgrade.
-    # should also be possible to remove the pam_reattach package.
-    pam.enableSudoTouchIdAuth = true;
-    #pam.services.sudo_local = {
-    #  touchIdAuth = true;
-    #  reattach = true;
-    #};
+    pam.services.sudo_local = {
+      touchIdAuth = true;
+      reattach = true;
+    };
   };
 
   # never not going to have an ARM Mac

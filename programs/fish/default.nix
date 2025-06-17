@@ -36,10 +36,6 @@
       dps = "docker ps --format \"table {{.ID}}\t{{.Image}}\t{{.Command}}\t{{.Ports}}\t{{.Status}}\"";
       grb = "git pull origin (default_branch) --rebase";
       l = "lsd -l --group-dirs first";
-      la = "lsd -a";
-      lla = "lsd -la";
-      ls = "lsd";
-      lt = "lsd --tree";
       mv = "mv -v";
       rm = "rm";
       s = "sclone";

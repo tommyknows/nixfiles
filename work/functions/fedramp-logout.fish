@@ -1,0 +1,3 @@
+functions -e kubectl
+
+tkctx
