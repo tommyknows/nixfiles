@@ -1,5 +1,4 @@
 {pkgs, ...}: {
-  system.primaryUser = "ramon";
   nix = {
     # TODO: still needed?
     # https://github.com/NixOS/nix/issues/11002
