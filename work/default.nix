@@ -28,15 +28,10 @@
         # https://github.com/gravitational/teleport/issues/22326
         set -gx TELEPORT_ADD_KEYS_TO_AGENT no
 
-        set -gx SNYK_API_TOKEN (security find-generic-password -a "ramon.ruttimann@snyk.io" -s "Snyk API Token" -w)
-
         # and to install NPM packages
         set -gx NODE_PATH $HOME/.npm-packages/lib/node_modules
       '';
 
-      shellAbbrs = {
-        snykdev = "SNYK_API=https://app.polaris-pre-prod.snyk.io/ snyk";
-      };
       functions =
         lib.mapAttrs'
         (

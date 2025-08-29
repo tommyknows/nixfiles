@@ -5,9 +5,9 @@ fzf --ansi --multi --delimiter : \
   --with-nth=1,3 \
   --preview 'bat --style=numbers --color=always --highlight-line {2} {1}' \
   --preview-window +{2}-/2 |
-        string split : -f 1 -f 2)
+        string split : -f 1,2)
 
 if test -n "$selection[1]"
-  commandline (echo "$cmd $selection[1] +$selection[2]")
-  commandline -f execute
+    commandline (echo "$cmd $selection[1] +$selection[2]")
+    commandline -f execute
 end

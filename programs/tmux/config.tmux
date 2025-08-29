@@ -7,8 +7,11 @@ bind k select-pane -U
 bind x select-pane -R
 bind h kill-pane
 
-is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
-    | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|n?vim?x?)(diff)?$'"
+# https://github.com/christoomey/vim-tmux-navigator/issues/417
+#is_vim="ps -o tty= -o state= -o comm= | \
+#    grep -iqE '^#{s|/dev/||:pane_tty} +[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
+is_vim="ps -o state= -o comm= -t '#{pane_tty}' | \
+grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|l?n?vim?x?|fzf)(diff)?$'"
 bind-key -n C-q if-shell "$is_vim" "send-keys C-q" "select-pane -L"
 bind-key -n C-j if-shell "$is_vim" "send-keys C-j" "select-pane -D"
 bind-key -n C-k if-shell "$is_vim" "send-keys C-k" "select-pane -U"
