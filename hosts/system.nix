@@ -9,7 +9,8 @@
     ../darwin/autokbisw.nix
   ];
 
-  nix.settings.experimental-features = ["nix-command" "flakes"];
+  # disable nix as it's installed and managed through determinate.
+  nix.enable = false;
   nixpkgs.config.allowUnfree = true;
 
   system.primaryUser = "ramon";

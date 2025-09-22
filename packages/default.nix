@@ -19,7 +19,6 @@
     # docker installed through docker desktop
     fd
     fish-lsp
-    fnm
     ffmpeg
     gh
     git-absorb
@@ -59,11 +58,11 @@
     nodejs_24
     open-policy-agent
     postgresql
-    python310
     pre-commit
-    protoc-gen-go
     protobuf
+    protoc-gen-go
     pstree
+    python310
     qemu
     qrencode
     rancher
@@ -73,7 +72,6 @@
     shfmt
     slack
     skopeo
-    snyk
     teleport
     terraform
     terraform-ls
