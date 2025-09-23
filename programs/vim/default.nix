@@ -54,7 +54,6 @@ in {
       coc-rust-analyzer
       coc-sh
       coc-snippets
-      coc-yaml
       fzf-vim
       indentLine
       markdown-preview-nvim

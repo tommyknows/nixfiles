@@ -42,45 +42,46 @@ if !isdirectory("/tmp/vim-undo")
     call mkdir("/tmp/vim-undo", "", 0777)
 endif
 
+" see default.nix - we use a custom color scheme that matches our shell & tmux config.
 colorscheme material-monokai
 
 set runtimepath+=~/.config/vim
 
 let mapleader=","
 let maplocalleader="."
-set fillchars=fold:\ ,               " how folding is displayed
-set foldlevel=99                 " Open all folds on open file
-set autoread                   " Reload file when they change on disk
-set backspace=indent,eol,start           " allow backspacing over everything in insert mode
+set fillchars=fold:\ ,          " how folding is displayed
+set foldlevel=99                " Open all folds on open file
+set autoread                    " Reload file when they change on disk
+set backspace=indent,eol,start  " allow backspacing over everything in insert mode
 set breakindent
-set copyindent                   " copy the previous indentation on autoindenting
-set encoding=utf-8                 " use UTF-8 to correctly display all characters
-set fillchars=fold:\ ,               " how folding is displayed
-set foldlevel=99                 " Open all folds on open file
-set hlsearch                   " highlight search terms
-set incsearch                  " show search matches as you type
-set laststatus=2                 " Always show statusline / airline
+set copyindent                  " copy the previous indentation on autoindenting
+set encoding=utf-8              " use UTF-8 to correctly display all characters
+set fillchars=fold:\ ,          " how folding is displayed
+set foldlevel=99                " Open all folds on open file
+set hlsearch                    " highlight search terms
+set incsearch                   " show search matches as you type
+set laststatus=2                " Always show statusline / airline
 set linebreak
-set list                     " Display invisible characters (tabs, spaces)
-set listchars=tab:>.,trail:.,extends:#,nbsp:.  " Display tabs as '>...', trailing spaces as '.', '#' when line continues at end of display, '.' also for 'no-breakable characters'
-set nocompatible                 " do not use compatible mode, we do not need it
-set noerrorbells                 " don't beep
-set pyxversion=3                 " use python 3
-set scrolloff=5                  " Keep 5 lines visible when scrolling
-set shiftround                   " use multiple of shiftwidth when indenting with '<' and '>'
-set showmatch                  " set show matching parenthesis
-set smarttab                   " insert tabs on the start of a line according to shiftwidth, not tabstop
-set splitbelow                   " open split screen below existing one
-set splitright                   " open split screen on the right
-set title                    " change the terminal's title
+set list                        " Display invisible characters (tabs, spaces)
+set listchars=tab:>.,trail:.,extends:#,nbsp:. " Display tabs as '>...', trailing spaces as '.', '#' when line continues at end of display, '.' also for 'no-breakable characters'
+set nocompatible                " do not use compatible mode, we do not need it
+set noerrorbells                " don't beep
+set pyxversion=3                " use python 3
+set scrolloff=5                 " Keep 5 lines visible when scrolling
+set shiftround                  " use multiple of shiftwidth when indenting with '<' and '>'
+set showmatch                   " set show matching parenthesis
+set smarttab                    " insert tabs on the start of a line according to shiftwidth, not tabstop
+set splitbelow                  " open split screen below existing one
+set splitright                  " open split screen on the right
+set title                       " change the terminal's title
 set titlestring=%(\v\i\m\ (%{expand(\"%:t\")})%) " set the title for screen, set's it to 'vim ($filename)'
 set undofile
-set undolevels=1000                " use many muchos levels of undo
-set visualbell                 " don't beep
-set wildignore=*.swp,*.bak             " Ignore these files when expanding wildcards
-set wrap                     " wrap lines
-set textwidth=120                " sane for most things, can be overwritten per language
-set colorcolumn=120                " sane for most things, can be overwritten per language
+set undolevels=1000             " use many muchos levels of undo
+set visualbell                  " don't beep
+set wildignore=*.swp,*.bak      " Ignore these files when expanding wildcards
+set wrap                        " wrap lines
+set textwidth=120               " sane for most things, can be overwritten per language
+set colorcolumn=120             " sane for most things, can be overwritten per language
 set wrapmargin=2
 set shell=zsh
 set updatetime=300
@@ -105,47 +106,11 @@ if has("autocmd")
     au BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 endif
 
-" Options for ALE Linting
-" Hide loclist but show (automatically) quickfix window
-"let g:ale_set_loclist = 0
-"let g:ale_set_quickfix = 1
-"let g:ale_open_list = 0
-"" Define format of messages
-"let g:ale_echo_msg_error_str = 'E'
-"let g:ale_echo_msg_warning_str = 'W'
-"let g:ale_echo_msg_format = '[%linter%] %s [%severity%]'
-"" Error and warning signs.
-"let g:ale_sign_error = '⤫'
-"let g:ale_sign_warning = '⚠'
-
-" for go, only use golangci-lint. gopls would be an option too,
-" but then we have duplicate messages. golangci shows more than
-" gopls, so we use that.
-" for tex, disable / do not use lacheck. chktex is enough.
-"# , 'golangci-lint'],
-"let g:ale_linters = {
-            "\ 'go': ['gopls'],
-            "\ 'gomod': ['gomod'],
-            "\ 'tex': ['chktex'],
-            "\ }
-"let g:ale_fixers = {
-            "\ '*': ['remove_trailing_lines', 'trim_whitespace'],
-            "\ 'go': ['goimports'],
-            "\ 'terraform': ['terraform'],
-            "\ 'rust': ['rustfmt'],
-            "\ }
-"" Lint files only on save
-"let g:ale_fix_on_save = 1
-"let g:ale_lint_on_save = 1
-"let g:ale_lint_on_text_changed = 0
-"let g:ale_lint_on_enter = 0
-
 " Automatically close quickfix list on exit
 aug QFClose
     au!
     au WinEnter * if winnr('$') == 1 && getbufvar(winbufnr(winnr()), "&buftype") == "quickfix"|q|endif
 aug END
-" End Linting Options
 
 " tagbar options
 " open tagbar to the right side of the *current* window
@@ -214,15 +179,6 @@ let g:coc_snippet_next = '<tab>'
 let g:coc_node_path = '/Users/ramon/.nix-profile/bin/node'
 
 let g:coc_config_home = "~/.config/vim"
-
-
-
-" Use <TAB> for both expand and jump (make expand higher priority.)
-"imap <S-TAB> <Plug>(coc-snippets-prev)
-"vmap <S-TAB> <Plug>(coc-snippets-prev)
-
-"always open the quickfix list
-"let g:ale_open_list = 1
 
 " autodetect go present slides as markdown
 autocmd BufNewFile,BufRead *.slide set filetype=markdown

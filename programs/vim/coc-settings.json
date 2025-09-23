@@ -1,67 +1,92 @@
 {
-  "cSpell.enabled": false,
-  "cSpell.userWords": [
-    "CPEs",
-    "Serializers",
-    "distro",
-    "elems",
-    "godoc",
-    "monokai",
-    "pino",
-    "recognise",
-    "resliced",
-    "serialisers",
-    "structs",
-    "unbuffered",
-    "vuln",
-    "vulns"
-  ],
-  "typescript.format.enabled": false,
-  "coc.preferences.bracketEnterImprove": true,
-  "coc.preferences.formatOnSave": true,
-  "yaml.schemaStore.enable": true,
-  "go.goplsOptions": {
-    "completeUnimported": true,
-    "local": "github.com/snyk/issue-policies",
-    "buildFlags": ["-tags", "integration,e2e"]
-  },
-  "go.tags": {
-    "skipUnexported": true
-  },
-  "tslint.autoFixOnSave": true,
-  "diagnostic-languageserver.filetypes": {
-    // lint `sh` (includes `bash`) files
-    "sh": "shellcheck"
-  },
-  "diagnostic-languageserver.formatFiletypes": {
-    // format `sh` (includes `bash`) files using formatter defined below
-    "sh": "shfmt"
-  },
-  "diagnostic-languageserver.formatters": {
-    // define our formatter so that we can reference it from
-    // `diagnostic-languageserver.formatFiletypes`
-    "shfmt": {
-      "command": "shfmt"
-    }
-  },
-  "languageserver": {
-    "terraform": {
-      "command": "terraform-ls",
-      "args": ["serve"],
-      "filetypes": ["terraform", "tf"],
-      "initializationOptions": {},
-      "settings": {}
+    "cSpell.enabled": false,
+    "cSpell.userWords": [
+        "CPEs",
+        "Serializers",
+        "distro",
+        "elems",
+        "godoc",
+        "monokai",
+        "pino",
+        "recognise",
+        "resliced",
+        "serialisers",
+        "structs",
+        "unbuffered",
+        "vuln",
+        "vulns"
+    ],
+    "typescript.format.enabled": false,
+    "coc.preferences.bracketEnterImprove": true,
+    "coc.preferences.formatOnSave": true,
+    "prettier.disableLanguages": [
+        // I'm surprised this works??
+        // But it seems to also not touch yaml anymore (which might be fine too.)
+        "helm"
+    ],
+    "yaml.schemaStore.enable": true,
+    "go.goplsOptions": {
+        "completeUnimported": true,
+        "local": "github.com/snyk/issue-policies",
+        "buildFlags": [
+            "-tags",
+            "integration,e2e"
+        ]
     },
-    "tiltfile": {
-      "command": "tilt",
-      "args": ["lsp", "start", "--verbose"],
-      "filetypes": ["tiltfile"],
-      "rootPatterns": [".git"]
+    "go.tags": {
+        "skipUnexported": true
     },
-    "fish-lsp": {
-      "command": "fish-lsp",
-      "filetypes": ["fish"],
-      "args": ["start"]
+    "tslint.autoFixOnSave": true,
+    "diagnostic-languageserver.filetypes": {
+        // lint `sh` (includes `bash`) files
+        "sh": "shellcheck"
+    },
+    "diagnostic-languageserver.formatFiletypes": {
+        // format `sh` (includes `bash`) files using formatter defined below
+        "sh": "shfmt"
+    },
+    "diagnostic-languageserver.formatters": {
+        // define our formatter so that we can reference it from
+        // `diagnostic-languageserver.formatFiletypes`
+        "shfmt": {
+            "command": "shfmt"
+        }
+    },
+    "languageserver": {
+        "terraform": {
+            "command": "terraform-ls",
+            "args": [
+                "serve"
+            ],
+            "filetypes": [
+                "terraform",
+                "tf"
+            ],
+            "initializationOptions": {},
+            "settings": {}
+        },
+        "tiltfile": {
+            "command": "tilt",
+            "args": [
+                "lsp",
+                "start",
+                "--verbose"
+            ],
+            "filetypes": [
+                "tiltfile"
+            ],
+            "rootPatterns": [
+                ".git"
+            ]
+        },
+        "fish-lsp": {
+            "command": "fish-lsp",
+            "filetypes": [
+                "fish"
+            ],
+            "args": [
+                "start"
+            ]
+        }
     }
-  }
 }
