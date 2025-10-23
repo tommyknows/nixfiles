@@ -312,3 +312,7 @@ omap asa <Plug>(textobj-sandwich-auto-a)
 
 nmap <silent> tt :TestNearest<CR>
 nmap <silent> tf :TestFile<CR>
+
+" :DBUI - auto-execute the 'table-helpers' that for example list columns.
+let g:db_ui_auto_execute_table_helpers = 1
+

@@ -6,7 +6,6 @@
   imports = [
     ../darwin/system.nix
     ../darwin/user.nix
-    ../darwin/autokbisw.nix
   ];
 
   # disable nix as it's installed and managed through determinate.

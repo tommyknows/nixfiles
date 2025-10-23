@@ -9,6 +9,8 @@
     aws-vault
     babelfish
     bat
+    # Ideally this would be in darwin/bluesnooze.nix...
+    bluesnooze
     coreutils
     ctlptl
     cmake
@@ -52,10 +54,10 @@
     lz4
     mergiraf # git merge driver that's AST-aware.
     mockgen
-    neovim
+    ngrok
     nodePackages.prettier
     nodePackages_latest.markdownlint-cli
-    nodejs_24
+    nodejs_22
     open-policy-agent
     postgresql
     pre-commit
@@ -78,12 +80,12 @@
     tilt
     translate-shell
     universal-ctags
-    velero
-    wireguard-tools
+    vlc-bin
     wireguard-go
+    wireguard-tools
     xz
-    yq
     yarn
+    yq
     nodePackages.ts-node
     nodePackages.typescript
     nodePackages.cspell

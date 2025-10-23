@@ -1,4 +1,8 @@
 {pkgs, ...}: {
+  imports = [
+    ./autokbisw.nix
+    ./bluesnooze.nix
+  ];
   users.users.ramon = {
     createHome = true;
     home = "/Users/ramon";

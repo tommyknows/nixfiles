@@ -33,7 +33,7 @@
       ccat = "bat --style snip";
       cat = "bat";
       cp = "cp -v";
-      dps = "docker ps --format \"table {{.ID}}\t{{.Image}}\t{{.Command}}\t{{.Ports}}\t{{.Status}}\"";
+      dps = ''docker ps --format "table {{printf \"%.25s\" .Names}}	{{.ID}}	{{.Image}}	{{.Command}}	{{.Ports}}	{{.Status}}"'';
       grb = "git pull origin (default_branch) --rebase";
       l = "lsd -l --group-dirs first";
       mv = "mv -v";
@@ -43,6 +43,7 @@
     };
     shellAbbrs = {
       b = "bazel";
+      d = "docker";
       g = "git";
       gtv = "go test -v .";
       gt = "go test ./...";
@@ -67,6 +68,7 @@
       rebuild = "darwin-rebuild switch --flake ~/.nixpkgs";
       tat = "tmux a -t";
       tan = "tmux new -s";
+      tf = "terraform";
       untar = "tar -xvf";
     };
     # reads in all functions from :/fish/functions and registers them given their file name.

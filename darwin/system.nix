@@ -21,7 +21,6 @@
             "/System/Applications/Maps.app"
             "/System/Applications/Calendar.app"
             "/Applications/Signal.app"
-            "/Applications/WhatsApp.app"
             "/Applications/Emby.app"
           ]
           ++ map (hmApp: "/Users/ramon/Applications/Home Manager Apps/${hmApp}.app") hmApps;

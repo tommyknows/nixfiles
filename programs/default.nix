@@ -32,7 +32,6 @@ in {
     };
     fzf = {
       enable = true;
-      defaultCommand = "rg";
     };
     ripgrep = {
       enable = true;

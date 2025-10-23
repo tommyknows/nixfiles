@@ -44,16 +44,19 @@ in {
       auto-pairs
       camelcasemotion
       coc-diagnostic
-      coc-go
+      vim-dadbod-completion
       coc-git
+      coc-go
+      coc-jest
       coc-json
       coc-markdownlint
       coc-nvim
       coc-prettier
-      coc-jest
       coc-rust-analyzer
       coc-sh
       coc-snippets
+      coc-tsserver
+      coc-yaml
       fzf-vim
       indentLine
       markdown-preview-nvim
@@ -65,6 +68,7 @@ in {
       vim-airline-themes
       vim-bufkill
       vim-cue
+      vim-dadbod-ui
       vim-fish
       vim-fugitive
       vim-gh-line

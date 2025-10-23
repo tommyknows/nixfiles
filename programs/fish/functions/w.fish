@@ -17,14 +17,14 @@ EXAMPLES
 `w https://github.com/snyk/cli/pull/4959` checks out the branch of PR #4959 in the CLI repo.
 "
 
-argparse 'h/help' -- $argv
+argparse h/help -- $argv
 
 if set --query _flag_help
     printf '%b' $helptext
     return
 end
 
-set -l workdir "/Users/ramon/Documents/work"
+set -l workdir /Users/ramon/Documents/work
 
 if ! set -q argv[1]
     cd $workdir
@@ -45,7 +45,7 @@ if string match -q '*github.com/*' $argv[1]
             # get the branch name for the PR
             set branch origin/(curl -L --silent \
                 -H "Accept: application/vnd.github+json" \
-                -H "Authorization: Bearer $GITHUB_PRIVATE_TOKEN"\
+                -H "Authorization: Bearer $GITHUB_TOKEN"\
                 -H "X-GitHub-Api-Version: 2022-11-28" \
                 https://api.github.com/repos/$owner/$repo/pulls/$pr | jq .head.ref -r)
         # check if the URL is a reference to an object in the tree, and extract both branch and subdir.

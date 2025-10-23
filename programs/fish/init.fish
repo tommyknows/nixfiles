@@ -59,7 +59,7 @@ set -gx fish_cursor_insert block
 # I've set this as a universal variable now, which however means
 # it won't be updated automatically.
 # Ideally, we'd refresh this asynchronously on a specific interval.
-#set -gx GITHUB_PRIVATE_TOKEN (security find-generic-password -a "$USER" -s "GitHub Token" -w)
+#set -gx GITHUB_TOKEN (security find-generic-password -a "$USER" -s "GitHub Token" -w)
 
 set -gx SSH_AUTH_SOCK "$HOME/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh"
 

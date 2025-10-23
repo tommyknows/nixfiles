@@ -25,6 +25,7 @@
       # add mappings for unstable packages here. For example:
       gopls = unstable.legacyPackages.${system}.gopls;
       golangci-lint = unstable.legacyPackages.${system}.golangci-lint;
+      tailscale = unstable.legacyPackages.${system}.tailscale;
       snyk = unstable.legacyPackages.${system}.snyk;
       fish = unstable.legacyPackages.${system}.fish;
       protobuf = unstable.legacyPackages.${system}.protobuf;
