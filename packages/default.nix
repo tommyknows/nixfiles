@@ -54,6 +54,7 @@
     lz4
     mergiraf # git merge driver that's AST-aware.
     mockgen
+    mpv
     ngrok
     nodePackages.prettier
     nodePackages_latest.markdownlint-cli
