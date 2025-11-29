@@ -52,6 +52,10 @@
         Clicking = true;
         TrackpadThreeFingerDrag = true;
       };
+      dock = {
+        # do not rearrange spaces based on most-recent use.
+        mru-spaces = false;
+      };
     };
 
     keyboard = {

@@ -1,3 +1,4 @@
+set expandtab
 setlocal shiftwidth=2
 setlocal tabstop=2
 " Default of prettier, it will format the code automatically.

@@ -22,7 +22,8 @@
   "prettier.disableLanguages": [
     // I'm surprised this works??
     // But it seems to also not touch yaml anymore (which might be fine too.)
-    "helm"
+    "helm",
+    "shell"
   ],
   "yaml.schemaStore.enable": true,
   "yaml.schemas": {

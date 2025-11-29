@@ -1,6 +1,5 @@
 {
   pkgs,
-  unstable,
   lib,
   ...
 }: {
@@ -29,7 +28,7 @@
   # Or do we just not care about root? ;)
   programs.fish = {
     enable = true;
-    package = pkgs.fish;
+    package = pkgs.unstable.fish;
     shellAliases = {
       # copycat - "cat-style" output for copying stuff.
       ccat = "bat --style snip";
@@ -67,7 +66,7 @@
       #};
       k = "kubectl";
       kctx = "kubectl ctx";
-      rebuild = "darwin-rebuild switch --flake ~/.nixpkgs";
+      rebuild = "sudo nix run nix-darwin -- switch --flake ~/Documents/nixfiles/main/.nixpkgs";
       tat = "tmux a -t";
       tan = "tmux new -s";
       tf = "terraform";

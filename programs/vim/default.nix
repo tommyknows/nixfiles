@@ -29,7 +29,6 @@ in {
     settings = {
       background = "dark";
       copyindent = true;
-      expandtab = true;
       hidden = true;
       history = 1000;
       ignorecase = true;
@@ -45,6 +44,8 @@ in {
       camelcasemotion
       coc-diagnostic
       vim-dadbod-completion
+      # manually installed since it's not in repos.
+      #coc-buf-lint
       coc-git
       coc-go
       coc-jest

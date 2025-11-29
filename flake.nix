@@ -14,23 +14,18 @@
 
   outputs = {
     nixpkgs,
-    unstable,
     nix-darwin,
     home-manager,
     ...
   } @ inputs: let
     system = "aarch64-darwin";
-    # define all the unstable packages we use in a single place.
-    unstablePackages = final: prev: {
-      # add mappings for unstable packages here. For example:
-      gopls = unstable.legacyPackages.${system}.gopls;
-      golangci-lint = unstable.legacyPackages.${system}.golangci-lint;
-      tailscale = unstable.legacyPackages.${system}.tailscale;
-      snyk = unstable.legacyPackages.${system}.snyk;
-      fish = unstable.legacyPackages.${system}.fish;
-      protobuf = unstable.legacyPackages.${system}.protobuf;
-      autokbisw = unstable.legacyPackages.${system}.autokbisw;
-    };
+
+    allowed-unfree-packages = [
+      "ngrok"
+      "slack"
+      "terraform"
+      "crush"
+    ];
   in {
     darwinConfigurations = {
       work-laptop = nix-darwin.lib.darwinSystem {
@@ -47,11 +42,12 @@
               users.ramon = import ./hosts/work/user.nix;
               extraSpecialArgs = {work_toggle = "enabled";};
             };
-
-            # overwrite / add some packages to pkgs from unstable.
-            nixpkgs.overlays = [unstablePackages];
           }
         ];
+        specialArgs = {
+          inherit allowed-unfree-packages;
+          unstable = inputs.unstable;
+        };
       };
       private-laptop = nix-darwin.lib.darwinSystem {
         modules = [
@@ -67,11 +63,12 @@
               extraSpecialArgs = {work_toggle = "disabled";};
               users.ramon = import ./hosts/private/user.nix;
             };
-
-            # overwrite / add some packages to pkgs from unstable.
-            nixpkgs.overlays = [unstablePackages];
           }
         ];
+        specialArgs = {
+          inherit allowed-unfree-packages;
+          unstable = inputs.unstable;
+        };
       };
     };
   };

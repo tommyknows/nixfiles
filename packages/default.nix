@@ -1,35 +1,37 @@
 {
   pkgs,
-  unstable,
   ...
 }: {
   home.packages = with pkgs; [
     alejandra # nix formatter
+    amazon-ecr-credential-helper
     awscli2
     aws-vault
     babelfish
     bat
     # Ideally this would be in darwin/bluesnooze.nix...
     bluesnooze
+    buf
     coreutils
     ctlptl
     cmake
     circleci-cli
+    unstable.crush
     diffutils
     b3sum
     delve
     # docker installed through docker desktop
     fd
-    fish-lsp
+    unstable.fish-lsp
     ffmpeg
     gh
     git-absorb
     gitleaks
     glab
-    golangci-lint
+    unstable.golangci-lint
     google-cloud-sdk
     google-cloud-sql-proxy
-    gopls
+    unstable.gopls
     gotags
     gotestsum
     # things like present, godoc, goimports...
@@ -50,6 +52,7 @@
     kubernetes-helm
     krew
     kustomize
+    k9s
     tokei
     lz4
     mergiraf # git merge driver that's AST-aware.
@@ -59,10 +62,10 @@
     nodePackages.prettier
     nodePackages_latest.markdownlint-cli
     nodejs_22
-    open-policy-agent
+    #open-policy-agent
     postgresql
     pre-commit
-    protobuf
+    unstable.protobuf
     protoc-gen-go
     pstree
     python310
@@ -87,6 +90,7 @@
     xz
     yarn
     yq
+    zed-editor
     nodePackages.ts-node
     nodePackages.typescript
     nodePackages.cspell

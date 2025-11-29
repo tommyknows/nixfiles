@@ -1,6 +1,5 @@
 {
   pkgs,
-  unstable,
   ...
 }: {
   programs.tmux = {
@@ -8,7 +7,7 @@
     clock24 = true;
     keyMode = "vi";
     terminal = "xterm-256color";
-    shell = "${pkgs.fish}/bin/fish";
+    shell = "${pkgs.unstable.fish}/bin/fish";
     sensibleOnTop = true;
     escapeTime = 1;
     baseIndex = 1;
