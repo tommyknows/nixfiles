@@ -5,25 +5,16 @@ Contains all my Nixfiles & Dotfiles.
 Assumes Darwin / MacOS, and a working installation of Nix and nix-darwin. That
 should probably be it.
 
+Some functions expect this repo to be cloned into `~/Documents/nixfiles/main`.
+
+
 ## Is This Really Everything?
 
 Pretty much - there's no `brew` installed, so all packages come from either Nix,
 or installed through a programming language's toolchain (`go`, `cargo` etc...).
-Some exceptions are documented in the `darwin-configuration.nix` package list.
-
-Additionally, one detail is `SauceCodePro Nerd Font`. Although it's possible to
-install fonts with Nix, this font is missing and can be found
-[here](https://github.com/Bo-Fone/Liga-Sauce-Code-Pro-Nerd-Font).
 
 And no "Internet Accounts", as MacOS calls them. You'll need to setup your own
 accounts ;-)
-
-When setting up your new machine, you'll need to symlink the `nix-channels` file
-into your home directory:
-
-```bash
-ln -s $(realpath ./nix-channels) ~/.nix-channels
-```
 
 That should hopefully be it, but I'll update this once I need to setup a new
 laptop...

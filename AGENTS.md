@@ -2,29 +2,40 @@
 
 ## Overview
 
-This repository contains a complete macOS (Darwin) system configuration using Nix, nix-darwin, and home-manager. It manages system settings, packages, dotfiles, and program configurations for two machines: a work laptop and a private laptop. The configuration is heavily optimized for CLI-based workflows using vim, tmux, fish shell, and alacritty.
+This repository contains a complete macOS (Darwin) system configuration using
+Nix, nix-darwin, and home-manager. It manages system settings, packages,
+dotfiles, and program configurations for two machines: a work laptop and a
+private laptop. The configuration is heavily optimized for CLI-based workflows
+using vim, tmux, fish shell, and alacritty.
 
-**Platform:** macOS (darwin), aarch64 architecture only  
-**Package Manager:** Nix with flakes  
+**Platform:** macOS (darwin), aarch64 architecture only
+**Package Manager:** Nix with flakes
 **Configuration Manager:** nix-darwin + home-manager
+**Repository Location:** `~/Documents/nixfiles/main`
 
 ## Essential Commands
 
 ### Building and Applying Configuration
 
 ```bash
-# Rebuild and switch system configuration
-darwin-rebuild switch --flake ~/.nixpkgs
+# Rebuild and switch system configuration (from repository directory)
+sudo nix run nix-darwin -- switch --flake .
+
+# Or use the fish abbreviation from anywhere
+rebuild
 
 # Build without switching (testing)
-darwin-rebuild build --flake ~/.nixpkgs
+sudo nix run nix-darwin -- build --flake ~/Documents/nixfiles/main
 
 # Build specific host configuration
-darwin-rebuild switch --flake ~/.nixpkgs#work-laptop
-darwin-rebuild switch --flake ~/.nixpkgs#private-laptop
+sudo nix run nix-darwin -- switch \
+  --flake ~/Documents/nixfiles/main#work-laptop
+sudo nix run nix-darwin -- switch \
+  --flake ~/Documents/nixfiles/main#private-laptop
 ```
 
-**Note:** The `rebuild` abbreviation is set in fish config: `abbr rebuild "darwin-rebuild switch --flake ~/.nixpkgs"`
+**Note:** The `rebuild` abbreviation is set in fish config and expands to
+`sudo nix run nix-darwin -- switch --flake ~/Documents/nixfiles/main`
 
 ### Nix Formatting
 
@@ -35,11 +46,16 @@ alejandra .
 
 ### Testing Configuration Changes
 
-After modifying any `.nix` files, you must rebuild the configuration. Changes to:
-- System settings (darwin/*.nix, hosts/system.nix) require rebuild + restart/logout for some settings
-- Programs (programs/**/*.nix) require rebuild, then restart the terminal/program
+After modifying any `.nix` files, you must rebuild the configuration. Changes
+to:
+
+- System settings (darwin/\*.nix, hosts/system.nix) require rebuild +
+  restart/logout for some settings
+- Programs (programs/\*\*/\*.nix) require rebuild, then restart the
+  terminal/program
 - Packages (packages/default.nix) require rebuild
-- Fish functions (programs/fish/functions/*.fish) are automatically picked up on next shell restart
+- Fish functions (programs/fish/functions/\*.fish) are automatically picked up
+  on next shell restart
 
 ## Project Structure
 
@@ -80,29 +96,37 @@ After modifying any `.nix` files, you must rebuild the configuration. Changes to
 
 ### Flake Structure
 
-The flake defines two Darwin configurations (`work-laptop` and `private-laptop`), both using:
+The flake defines two Darwin configurations (`work-laptop` and
+`private-laptop`), both using:
+
 - Same nixpkgs version (nixpkgs-25.05-darwin)
-- Unstable channel for specific packages (gopls, golangci-lint, tailscale, snyk, fish, protobuf, autokbisw, crush)
-- Overlay system to pull packages from unstable: defined in `unstablePackages` overlay
+- Unstable channel for specific packages (gopls, golangci-lint, tailscale,
+  snyk, fish, protobuf, autokbisw, crush)
+- Overlay system to pull packages from unstable: defined in `unstablePackages`
+  overlay
 - Allowlist for unfree packages: ngrok, slack, terraform, crush
 
 ### Module Imports
 
 The configuration uses a hierarchical import structure:
+
 1. `flake.nix` → defines hosts with modules
 2. Host-specific files (`hosts/work/work.nix`) → minimal, mostly empty
 3. `hosts/system.nix` → imports `darwin/system.nix` and `darwin/user.nix`
 4. `hosts/user.nix` → imports `packages/` and `programs/`
-5. Program-specific imports use `work_toggle` special arg to conditionally load work configs
+5. Program-specific imports use `work_toggle` special arg to conditionally load
+   work configs
 
 ### Work Toggle Pattern
 
 Work-specific configurations are conditionally loaded using `extraSpecialArgs`:
+
 ```nix
 extraSpecialArgs = {work_toggle = "enabled";};  # or "disabled" for private
 ```
 
 In `programs/default.nix`:
+
 ```nix
 work = {
   "enabled" = [(import ../work/default.nix)];
@@ -113,11 +137,14 @@ imports = [...] ++ (work.${work_toggle} or []);
 
 ## Git Worktree Workflow (Critical)
 
-**This configuration is built around git worktrees.** Understanding this is essential.
+**This configuration is built around git worktrees.** Understanding this is
+essential.
 
 ### Core Concept
 
-Instead of checking out branches in the same directory, each branch lives in its own subdirectory:
+Instead of checking out branches in the same directory, each branch lives in
+its own subdirectory:
+
 ```
 repository/
 ├── .git/              # Bare git directory
@@ -131,35 +158,45 @@ repository/
 #### `w [PROJECT] [BRANCH] [COMMIT]`
 
 Switches to work repositories (`/Users/ramon/Documents/work`):
+
 - `w` - go to work directory
 - `w snyk-docker-plugin` - clone if needed, cd to main/master branch
-- `w snyk-docker-plugin my-feature` - create/switch to my-feature branch worktree
-- `w snyk-docker-plugin my-feature abc123` - checkout my-feature at commit abc123
+- `w snyk-docker-plugin my-feature` - create/switch to my-feature branch
+  worktree
+- `w snyk-docker-plugin my-feature abc123` - checkout my-feature at commit
+  abc123
 - `w https://github.com/org/repo/pull/123` - clone repo, checkout PR branch
 
 **Autocompletion:**
+
 - Tab on first arg: lists repos
-- Tab on second arg: local branches (prefix `o` for origin branches, `v` for tags)
+- Tab on second arg: local branches (prefix `o` for origin branches, `v` for
+  tags)
 - Tab on third arg: interactive commit picker (fzf)
 
-**Environment variable:** `WORK_GITHUB_USER` (set to "infracost" for work config)
+**Environment variable:** `WORK_GITHUB_USER` (set to "infracost" for work
+config)
 
 #### `c [BRANCH] [COMMIT]`
 
 Checkout/switch branches in current repository:
+
 - `c` - switch to default branch (main/master)
 - `c my-feature` - create/switch to my-feature branch
 - `c my-feature abc123` - checkout my-feature at commit abc123
 - `c origin/remote-branch` - track and checkout remote branch locally
 
 **Options:**
-- `-j TICKET` or `--jira=TICKET` - store Jira ticket in git notes for the branch
+
+- `-j TICKET` or `--jira=TICKET` - store Jira ticket in git notes for the
+  branch
 
 **Autocompletion:** same pattern as `w`
 
 #### `default_branch`
 
 Returns the default branch name (main or master) for the current repository:
+
 ```bash
 git pull origin (default_branch) --rebase
 ```
@@ -174,6 +211,7 @@ git pull origin (default_branch) --rebase
 ### Prompt Behavior
 
 The fish prompt (bobthefish theme with custom fork):
+
 - Hides branch name if on main/master
 - Hides directory name (since it matches branch name)
 - Shows branch name for non-default branches
@@ -211,7 +249,7 @@ gdm         # git diff origin/(default_branch)...
 gds         # git diff --stat
 k           # kubectl
 kctx        # kubectl ctx
-rebuild     # darwin-rebuild switch --flake ~/.nixpkgs
+rebuild     # sudo nix run nix-darwin -- switch --flake ~/Documents/nixfiles/main
 tat         # tmux a -t
 tan         # tmux new -s
 tf          # terraform
@@ -225,7 +263,7 @@ Ctrl+O (insert)     # fzf directory search
 Ctrl+R (insert)     # fzf command history (custom _rzf)
 Ctrl+E (insert)     # kubectl fzf autocomplete
 Alt+Backspace       # backward-kill-word
-Alt+Left            # prevd-or-backward-word (changed from Fish 4.0 token behavior)
+Alt+Left            # prevd-or-backward-word (Fish 4.0 token behavior)
 Alt+Right           # nextd-or-forward-word
 groot (anywhere)    # expands to git root path at cursor
 ```
@@ -234,23 +272,56 @@ groot (anywhere)    # expands to git root path at cursor
 
 - `z` (jethrokuan/z) - directory jumping
 - `fzf.fish` (PatrickF1) - fzf integration
-- `bobthefish` (custom fork: tommyknows/theme-bobthefish) - prompt theme with worktree support
+- `bobthefish` (custom fork: tommyknows/theme-bobthefish) - prompt theme with
+  worktree support
 - `autopair` - auto-close brackets/quotes
-- `docker-autocompletions` - docker completions (noted as not working perfectly)
+- `docker-autocompletions` - docker completions (noted as not working
+  perfectly)
 
 ### Functions Location
 
-All fish functions are automatically loaded from `programs/fish/functions/*.fish` and registered by name. The configuration uses `lib.mapAttrs'` to read all `.fish` files and register them.
+All fish functions are automatically loaded from
+`programs/fish/functions/*.fish` and registered by name. The configuration uses
+`lib.mapAttrs'` to read all `.fish` files and register them.
 
-Work-specific functions are in `work/functions/*.fish` and loaded conditionally.
+Work-specific functions are in `work/functions/*.fish` and loaded
+conditionally.
+
+### Notable Fish Functions
+
+- `bb [COMMAND]` - "byebye" - runs command in background, redirecting all
+  output to /dev/null
+- `boop` - plays sound effect based on last command's exit status (0 =
+  good.ogg, non-zero = bad.ogg)
+- `notify [TITLE] [DESCRIPTION]` - sends macOS notification using osascript
+- `scratch` - opens temporary file in vim
+- `sfx [NAME]` - plays sound effect from `~/.config/sfx/[NAME].ogg` using mpv
+- `tmp` - changes to a new temporary directory
+- `c [BRANCH] [COMMIT]` - checkout/create git worktree branches
+- `w [PROJECT] [BRANCH] [COMMIT]` - switch to work repositories with worktree
+  support
+- `default_branch` - returns main or master for current repo
+- `clone OWNER/REPO [PATH]` - clones repo with worktree structure
+- `git-pick-commit` - interactive commit picker with fzf
+- `git-fix` - git absorb helper
+
+### Work-Specific Functions
+
+Available when `work_toggle = "enabled"`:
+
+- `aws-console` - opens AWS SSO console URL from `~/.aws/config`
+- `sync-crds` - syncs CRDs (work-specific)
+- `validate-chart` - validates Helm charts (work-specific)
 
 ## Git Configuration
 
 ### Commit Signing
 
 - Uses SSH signing (not GPG)
-- Signing key configured via Secretive app: `com.maxgoedjen.Secretive.SecretAgent`
-- Different email/key for work vs private (conditional on `gitdir:~/Documents/work/`)
+- Signing key configured via Secretive app:
+  `com.maxgoedjen.Secretive.SecretAgent`
+- Different email/key for work vs private (conditional on
+  `gitdir:~/Documents/work/`)
 - Work email: `ramon.ruttimann@infracost.io`
 - Private email: `me@ramonr.ch`
 
@@ -301,7 +372,8 @@ git pick-commit     # calls fish git-pick-commit function
 
 ### Plugin Manager
 
-Uses nix-managed vim plugins (not vim-plug or similar). Plugins defined in `programs/vim/default.nix`.
+Uses nix-managed vim plugins (not vim-plug or similar). Plugins defined in
+`programs/vim/default.nix`.
 
 ### Key Plugins
 
@@ -321,16 +393,18 @@ Uses nix-managed vim plugins (not vim-plug or similar). Plugins defined in `prog
 
 ### Settings
 
-- `shiftwidth=4`, `tabstop=4`
+- `shiftwidth=4`, `tabstop=4` (default)
 - `number=true` (line numbers)
 - `mouse=a` (mouse enabled)
 - `ignorecase=true`, `smartcase=true`
 - `background=dark`
 - `undodir=/tmp/vim-undo`
+- TypeScript files: `expandtab`, `shiftwidth=2`, `tabstop=2`
 
 ### Configuration Files
 
 All vim config is in `programs/vim/`:
+
 - `default.nix` - plugin and settings management
 - `vimrc` - additional vim configuration
 - `coc-settings.json` - CoC configuration
@@ -356,6 +430,7 @@ All vim config is in `programs/vim/`:
 ### Status Bar
 
 Custom status bar with:
+
 - Session name (left)
 - Window list
 - Battery percentage and icon
@@ -369,7 +444,8 @@ Custom status bar with:
 
 - **Go:** gopls, golangci-lint, delve, gotags, gotestsum, gotools, mockgen
 - **Rust:** rustup, rust-vim
-- **Node:** nodejs_22, yarn, npm packages (prettier, markdownlint-cli, ts-node, typescript, cspell)
+- **Node:** nodejs_22, yarn, npm packages (prettier, markdownlint-cli, ts-node,
+  typescript, cspell)
 - **Python:** python310
 
 ### Cloud/DevOps
@@ -388,7 +464,8 @@ Custom status bar with:
 - `bat` (cat) - with syntax highlighting
 - `lsd` (ls) - modern ls with colors
 - `fd` (find) - fast file finder
-- `ripgrep` (grep) - fast text search (configured with --smart-case, --hidden, --glob !.git)
+- `ripgrep` (grep) - fast text search (configured with --smart-case, --hidden,
+  --glob !.git)
 - `sd` (sed) - modern sed
 - `fzf` - fuzzy finder
 
@@ -447,7 +524,8 @@ Configured in `darwin/system.nix`:
 
 ### Global
 
-- Disable automatic capitalization, dash/period/quote substitution, spell correction
+- Disable automatic capitalization, dash/period/quote substitution, spell
+  correction
 - Hide menu bar
 - Expanded save dialogs by default
 - Tap to click enabled
@@ -461,7 +539,8 @@ Configured in `darwin/system.nix`:
 
 ## Font Requirements
 
-The configuration expects **SauceCodePro Nerd Font** (now managed via nix: `pkgs.nerd-fonts.sauce-code-pro`).
+The configuration expects **SauceCodePro Nerd Font** (now managed via nix:
+`pkgs.nerd-fonts.sauce-code-pro`).
 
 Fallback: [Liga Sauce Code Pro Nerd Font](https://github.com/Bo-Fone/Liga-Sauce-Code-Pro-Nerd-Font)
 
@@ -469,21 +548,25 @@ Fallback: [Liga Sauce Code Pro Nerd Font](https://github.com/Bo-Fone/Liga-Sauce-
 
 When setting up a new machine:
 
-1. Install Nix (Determinate Systems installer recommended, based on `nix.enable = false` in config)
+1. Install Nix (Determinate Systems installer recommended, based on
+   `nix.enable = false` in config)
 2. Install nix-darwin
-3. Symlink nix-channels:
+3. Clone repository to `~/Documents/nixfiles/main`
+4. Symlink nix-channels:
    ```bash
    ln -s $(realpath ./nix-channels) ~/.nix-channels
    ```
-4. Run initial rebuild:
+5. Run initial rebuild:
    ```bash
-   darwin-rebuild switch --flake ~/.nixpkgs#work-laptop
+   sudo nix run nix-darwin -- switch \
+     --flake ~/Documents/nixfiles/main#work-laptop
    # or
-   darwin-rebuild switch --flake ~/.nixpkgs#private-laptop
+   sudo nix run nix-darwin -- switch \
+     --flake ~/Documents/nixfiles/main#private-laptop
    ```
-5. Setup "Internet Accounts" (not managed by Nix)
-6. Install Docker Desktop manually (not in Nix)
-7. Set GITHUB_TOKEN as universal fish variable:
+6. Setup "Internet Accounts" (not managed by Nix)
+7. Install Docker Desktop manually (not in Nix)
+8. Set GITHUB_TOKEN as universal fish variable:
    ```bash
    set -Ux GITHUB_TOKEN "your-token"
    ```
@@ -492,22 +575,26 @@ When setting up a new machine:
 
 ### Nix Management
 
-- **Nix is NOT managed by nix-darwin** (`nix.enable = false`) - it's installed via Determinate Systems installer
+- **Nix is NOT managed by nix-darwin** (`nix.enable = false`) - it's installed
+  via Determinate Systems installer
 - Always use flake commands with `--flake` flag
-- Config expects to be at `~/.nixpkgs` (or adjust flake commands)
+- Repository should be at `~/Documents/nixfiles/main`
 - Unfree packages must be in allowlist (`allowed-unfree-packages` in flake.nix)
 
 ### Git Worktree Structure
 
 - **NEVER** `git checkout` in the root directory (where `.git` lives)
 - Each branch has its own directory: `repo/branch-name/`
-- The `.git` directory is in the repository root (parent of all branch directories)
+- The `.git` directory is in the repository root (parent of all branch
+  directories)
 - Use `c` or `w` commands exclusively for branch switching
-- Symlinks are created between worktrees for local config files: `config.local.json`, `.local-dev-deps`, `tools/node_modules`, `tools/.bin`
+- Symlinks are created between worktrees for local config files:
+  `config.local.json`, `.local-dev-deps`, `tools/node_modules`, `tools/.bin`
 
 ### Fish Function Patterns
 
-- Functions that need to modify shell state (like `cd`) MUST be fish functions, not scripts
+- Functions that need to modify shell state (like `cd`) MUST be fish functions,
+  not scripts
 - Autocompletion scripts are separate files in `programs/fish/completions/`
 - Functions automatically registered by filename (no manual sourcing needed)
 - Use `(command_in_subshell)` syntax for command substitution in fish
@@ -515,6 +602,7 @@ When setting up a new machine:
 ### Path Configuration
 
 Go workspace is at `~/Documents/go` (not `~/go`), configured via:
+
 ```nix
 programs.go.goPath = "Documents/go";
 ```
@@ -524,6 +612,7 @@ Work directory for repositories: `/Users/ramon/Documents/work`
 ### SSH Configuration
 
 SSH agent uses Secretive app:
+
 ```
 SSH_AUTH_SOCK = ~/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh
 ```
@@ -535,12 +624,13 @@ Git hooks path is set to: `/Users/ramon/.nixpkgs/programs/git/hooks`
 ### Clipboard Integration
 
 - tmux ↔ vim: working
-- tmux ↔ system: working  
+- tmux ↔ system: working
 - vim ↔ system: **NOT working yet** (TODO in README)
 
 ### Ripgrep Configuration
 
 Ripgrep is configured globally with:
+
 - `--smart-case` (case-insensitive unless pattern has uppercase)
 - `--hidden` (search hidden files)
 - `--glob !.git` (exclude .git directories)
@@ -552,7 +642,8 @@ These settings are always active when using `rg`.
 ### After Configuration Changes
 
 1. Format nix files: `alejandra .`
-2. Rebuild: `darwin-rebuild switch --flake ~/.nixpkgs`
+2. Rebuild: `rebuild` or `sudo nix run nix-darwin -- switch --flake
+   ~/Documents/nixfiles/main`
 3. Check for errors in output
 4. For program changes: restart terminal or reload config
 5. For system changes: some require logout/restart
@@ -561,9 +652,11 @@ These settings are always active when using `rg`.
 
 - **"infinite recursion"**: usually circular imports or incorrect overlay
 - **"unfree package"**: add package to `allowed-unfree-packages` in flake.nix
-- **Programs not found after rebuild**: check PATH in fish, may need terminal restart
+- **Programs not found after rebuild**: check PATH in fish, may need terminal
+  restart
 - **Git signing fails**: verify Secretive app is running and key is accessible
-- **Worktree commands fail**: ensure you're in a git repository with proper structure
+- **Worktree commands fail**: ensure you're in a git repository with proper
+  structure
 
 ## References and Documentation
 
@@ -577,6 +670,7 @@ These settings are always active when using `rg`.
 ## Work-Specific Configuration
 
 When `work_toggle = "enabled"`:
+
 - Git email: `ramon.ruttimann@infracost.io`
 - Git signing key: work-specific key via Secretive
 - Additional fish functions from `work/functions/`:
@@ -593,7 +687,10 @@ From README and config comments:
 1. **Vim → Neovim migration**: Still using vim, not neovim
 2. **Vim ↔ System clipboard**: Not working yet
 3. **Docker autocompletions**: Not working perfectly (container ID completion)
-4. **GITHUB_TOKEN refresh**: Currently set as universal variable, could be async-refreshed
+4. **GITHUB_TOKEN refresh**: Currently set as universal variable, could be
+   async-refreshed
 5. **Kubebuilder package**: Not available (needs etcd, apiserver bundled)
-6. **Fish abbr groot**: Waiting for next home-manager release for `--set-cursor` support
-7. **Go GOFLAGS**: Waiting for next home-manager release, manually set with `go env -w GOFLAGS="-buildvcs=false"`
+6. **Fish abbr groot**: Waiting for next home-manager release for
+   `--set-cursor` support
+7. **Go GOFLAGS**: Waiting for next home-manager release, manually set with
+   `go env -w GOFLAGS="-buildvcs=false"`
