@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  hostname,
   ...
 }: {
   xdg.configFile = {
@@ -66,7 +67,7 @@
       #};
       k = "kubectl";
       kctx = "kubectl ctx";
-      rebuild = "sudo nix run nix-darwin -- switch --flake ~/Documents/nixfiles/main/.nixpkgs";
+      rebuild = "sudo nix run nix-darwin -- switch --flake ~/Documents/nixfiles/main#${hostname}";
       tat = "tmux a -t";
       tan = "tmux new -s";
       tf = "terraform";

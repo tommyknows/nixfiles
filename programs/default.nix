@@ -1,23 +1,15 @@
 {
-  work_toggle,
   pkgs,
   unstable,
   ...
-}: let
-  work = {
-    "enabled" = [(import ../work/default.nix)];
-    "disabled" = [];
-  };
-in {
-  imports =
-    [
-      ./alacritty
-      ./fish/default.nix
-      ./git
-      ./tmux
-      ./vim
-    ]
-    ++ (work.${work_toggle} or []);
+}: {
+  imports = [
+    ./alacritty
+    ./fish/default.nix
+    ./git
+    ./tmux
+    ./vim
+  ];
 
   programs = {
     go = {

@@ -26,50 +26,42 @@
       "terraform"
       "crush"
     ];
-  in {
-    darwinConfigurations = {
-      work-laptop = nix-darwin.lib.darwinSystem {
-        modules = [
-          # Host configuration, non-home-manager stuff.
-          ./hosts/work/work.nix
-          ./hosts/system.nix
-          # base home-manager to get it installed
-          home-manager.darwinModules.home-manager
-          # expression for all home-manager specific things.
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              users.ramon = import ./hosts/work/user.nix;
-              extraSpecialArgs = {work_toggle = "enabled";};
-            };
-          }
-        ];
-        specialArgs = {
-          inherit allowed-unfree-packages;
-          unstable = inputs.unstable;
-        };
-      };
-      private-laptop = nix-darwin.lib.darwinSystem {
-        modules = [
-          # Host configuration, non-home-manager stuff.
-          ./hosts/private/private.nix
-          ./hosts/system.nix
-          # base home-manager to get it installed
-          home-manager.darwinModules.home-manager
-          # expression for all home-manager specific things.
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              extraSpecialArgs = {work_toggle = "disabled";};
-              users.ramon = import ./hosts/private/user.nix;
-            };
-          }
-        ];
-        specialArgs = {
-          inherit allowed-unfree-packages;
-          unstable = inputs.unstable;
-        };
-      };
+
+    # define the hosts and extra modules we want to include.
+    hosts = {
+      work = [./work/default.nix];
+      private = [];
     };
+  in {
+    darwinConfigurations =
+      builtins.mapAttrs (
+        hostname: extraModules:
+          nix-darwin.lib.darwinSystem {
+            modules = [
+              # Host configuration, non-home-manager stuff.
+              (./hosts + "/${hostname}/${hostname}.nix")
+              ./hosts/system.nix
+              # base home-manager to get it installed
+              home-manager.darwinModules.home-manager
+              # expression for all home-manager specific things.
+              {
+                home-manager = {
+                  useGlobalPkgs = true;
+                  users.ramon = {
+                    imports = [(./hosts + "/${hostname}/user.nix")] ++ extraModules;
+                  };
+                  extraSpecialArgs = {
+                    inherit hostname;
+                  };
+                };
+              }
+            ];
+            specialArgs = {
+              inherit allowed-unfree-packages;
+              unstable = inputs.unstable;
+            };
+          }
+      )
+      hosts;
   };
 }

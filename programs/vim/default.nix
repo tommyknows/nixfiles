@@ -74,6 +74,7 @@ in {
       vim-fugitive
       vim-gh-line
       vim-gopher
+      vim-helm
       vim-markdown
       vim-markdown-toc
       vim-material-monokai
