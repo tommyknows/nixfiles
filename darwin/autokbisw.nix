@@ -1,6 +1,5 @@
-{ pkgs, ... }:
-{
-  environment.systemPackages = [ pkgs.unstable.autokbisw ];
+{pkgs, ...}: {
+  environment.systemPackages = [pkgs.unstable.autokbisw];
 
   # Currently, giving autokbisw the ability to monitor keyboard input is a
   # manual step. I don't think nix-darwin supports this yet.

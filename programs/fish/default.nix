@@ -20,7 +20,7 @@
       end
     '';
 
-    "sfx" = { source = ../../sfx; };
+    "sfx" = {source = ../../sfx;};
   };
 
   # TODO: this is used as home-manager config, but maybe we can also set this as the toplevel
