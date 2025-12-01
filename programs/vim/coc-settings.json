@@ -77,6 +77,19 @@
       "command": "fish-lsp",
       "filetypes": ["fish"],
       "args": ["start"]
+    },
+    "helm": {
+      "command": "helm_ls",
+      "args": ["serve"],
+      "filetypes": ["helm"],
+      "rootPatterns": ["Chart.yaml"],
+      "settings": {
+        "helm-ls": {
+          "valuesFiles": {
+            "additionalValuesFilesGlobPattern": "*.yaml"
+          }
+        }
+      }
     }
   }
 }

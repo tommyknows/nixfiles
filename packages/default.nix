@@ -36,6 +36,7 @@
     gnupg
     graphviz
     # harlequin # Good lookin' CLI SQL Editor, but not available in repos.
+    unstable.helm-ls
     hyperfine
     jekyll
     jless
