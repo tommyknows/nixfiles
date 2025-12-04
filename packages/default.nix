@@ -4,6 +4,7 @@
     amazon-ecr-credential-helper
     awscli2
     aws-vault
+    b3sum
     babelfish
     bat
     # Ideally this would be in darwin/bluesnooze.nix...
@@ -15,7 +16,6 @@
     circleci-cli
     unstable.crush
     diffutils
-    b3sum
     delve
     # docker installed through docker desktop
     fd

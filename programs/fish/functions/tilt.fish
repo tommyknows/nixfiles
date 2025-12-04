@@ -1,6 +1,6 @@
 if test "$theme_display_k8s_context" = no
-    tkctx docker-desktop
-else if [ (kubectl config current-context) != "docker-desktop" ]
-    kubectl ctx docker-desktop
+    tkctx orbstack
+else if [ (kubectl config current-context) != orbstack ]
+    kubectl ctx orbstack
 end
 command tilt $argv

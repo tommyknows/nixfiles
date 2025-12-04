@@ -41,6 +41,8 @@
         NSAutomaticSpellingCorrectionEnabled = false;
         NSNavPanelExpandedStateForSaveMode = true;
         NSNavPanelExpandedStateForSaveMode2 = true;
+        # Move Windows by Ctrl+Cmd-dragging them.
+        NSWindowShouldDragOnGesture = true;
         _HIHideMenuBar = true;
       };
       finder = {
