@@ -2,13 +2,13 @@
   description = "Nix System Config";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-25.05-darwin";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-25.11-darwin";
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    home-manager.url = "github:nix-community/home-manager/release-25.05";
+    home-manager.url = "github:nix-community/home-manager/release-25.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-    nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-25.05";
+    nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-25.11";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
   };
 
@@ -18,8 +18,6 @@
     home-manager,
     ...
   } @ inputs: let
-    system = "aarch64-darwin";
-
     allowed-unfree-packages = [
       "ngrok"
       "slack"
@@ -38,6 +36,7 @@
         hostname: extraModules:
           nix-darwin.lib.darwinSystem {
             modules = [
+              {nixpkgs.hostPlatform = "aarch64-darwin";}
               # Host configuration, non-home-manager stuff.
               (./hosts + "/${hostname}/${hostname}.nix")
               ./hosts/system.nix

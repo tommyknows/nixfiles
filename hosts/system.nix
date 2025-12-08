@@ -22,7 +22,7 @@
     overlays = [
       (final: prev: {
         unstable = import unstable {
-          system = prev.system;
+          system = prev.stdenv.hostPlatform.system;
           config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) allowed-unfree-packages;
         };
       })

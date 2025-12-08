@@ -72,7 +72,4 @@
       reattach = true;
     };
   };
-
-  # never not going to have an ARM Mac
-  nixpkgs.hostPlatform = "aarch64-darwin";
 }

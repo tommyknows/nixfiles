@@ -89,7 +89,6 @@
     yarn
     yq
     zed-editor
-    nodePackages.ts-node
     nodePackages.typescript
     nodePackages.cspell
   ];

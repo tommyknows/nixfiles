@@ -80,7 +80,7 @@
         name: _:
           lib.nameValuePair
           (builtins.head (builtins.split ".fish" name))
-          (builtins.readFile (./. + ("/functions/" + name)))
+          {body = builtins.readFile (./. + ("/functions/" + name));}
       ) (lib.attrsets.filterAttrs (n: v: v == "regular") (builtins.readDir ./functions));
     plugins = [
       {

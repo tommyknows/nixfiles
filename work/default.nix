@@ -1,7 +1,6 @@
 {lib, ...}: {
   programs = {
-    # TODO: next home-manager release moves this to go.env.GOPRIVATE.
-    go.goPrivate = ["github.com/infracost"];
+    go.env.GOPRIVATE = "github.com/infracost";
 
     git.includes = [
       {
@@ -26,7 +25,7 @@
           name: _:
             lib.nameValuePair
             (builtins.head (builtins.split ".fish" name))
-            (builtins.readFile (./. + ("/functions/" + name)))
+            {body = builtins.readFile (./. + ("/functions/" + name));}
         ) (lib.attrsets.filterAttrs (n: v: v == "regular") (builtins.readDir ./functions));
     };
   };
