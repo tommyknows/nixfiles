@@ -63,7 +63,7 @@ set incsearch                   " show search matches as you type
 set laststatus=2                " Always show statusline / airline
 set linebreak
 set list                        " Display invisible characters (tabs, spaces)
-set listchars=tab:>.,trail:.,extends:#,nbsp:. " Display tabs as '>...', trailing spaces as '.', '#' when line continues at end of display, '.' also for 'no-breakable characters'
+set listchars=tab:>\ ,trail:.,extends:#,nbsp:. " Display tabs as '>...', trailing spaces as '.', '#' when line continues at end of display, '.' also for 'no-breakable characters'
 set nocompatible                " do not use compatible mode, we do not need it
 set noerrorbells                " don't beep
 set pyxversion=3                " use python 3
