@@ -62,5 +62,3 @@ set -gx fish_cursor_insert block
 #set -gx GITHUB_TOKEN (security find-generic-password -a "$USER" -s "GitHub Token" -w)
 
 set -gx SSH_AUTH_SOCK "$HOME/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh"
-
-abbr -a groot --position anywhere --function __groot --set-cursor=!

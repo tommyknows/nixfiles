@@ -52,19 +52,19 @@
       "gt." = "go test .";
       gb = "go build ./...";
       "gb." = "go build .";
-      "gd" = "go doc -all";
+      gd = "go doc -all";
+      gr = "git restore";
+      grs = "git restore --staged";
       # three-dot syntax to compare against merge-base, not actual tip.
       # This makes it more similar to Github's diff view that will not
       # show updates to the main branch that aren't in the PR yet.
       gdm = "git diff origin/(default_branch)...";
       gds = "git diff --stat";
-      # TODO: Remove line from init.fish. At time of writing,
-      # this wasn't available in the latest release.
-      #groot = {
-      #position = "anywhere";
-      #function = "__groot";
-      #set-cursor = "!";
-      #};
+      groot = {
+        position = "anywhere";
+        function = "__groot";
+        setCursor = true;
+      };
       k = "kubectl";
       kctx = "kubectl ctx";
       rebuild = "sudo nix run nix-darwin -- switch --flake ~/Documents/nixfiles/main#${hostname}";

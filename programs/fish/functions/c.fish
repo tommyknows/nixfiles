@@ -114,7 +114,7 @@ end
 
 echo "Symlinking files & directories..."
 # TODO: copy other config files?
-for fileOrDir in "config.local.json" ".local-dev-deps" "tools/node_modules" "tools/.bin"
+for fileOrDir in "config.local.json" ".local-dev-deps" "tools/node_modules" "tools/.bin" "AGENTS.md"
     if [ -e $groot/$default_branch/$fileOrDir -a ! -f $dir_name/$fileOrDir ]
         ln -s $groot/$default_branch/$fileOrDir $dir_name/$fileOrDir
     end

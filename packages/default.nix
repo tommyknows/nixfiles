@@ -18,6 +18,7 @@
     diffutils
     delve
     # docker installed through docker desktop
+    envsubst
     fd
     unstable.fish-lsp
     ffmpeg
@@ -81,6 +82,7 @@
     terraform-ls
     tilt
     translate-shell
+    typescript-language-server
     universal-ctags
     vlc-bin
     wireguard-go

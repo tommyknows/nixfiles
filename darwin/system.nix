@@ -11,6 +11,8 @@
     defaults = {
       dock = {
         autohide = true;
+        # do not rearrange spaces based on most-recent use.
+        mru-spaces = false;
 
         persistent-apps = let
           hmApps = ["Alacritty"];
@@ -54,10 +56,15 @@
         Clicking = true;
         TrackpadThreeFingerDrag = true;
       };
-      dock = {
-        # do not rearrange spaces based on most-recent use.
-        mru-spaces = false;
+      CustomUserPreferences = {
+        # Disable personalized ads
+        "com.apple.AdLib" = {
+          allowApplePersonalizedAdvertising = false;
+        };
       };
+
+      # Show battery percentage in the menu bar
+      controlcenter.BatteryShowPercentage = true;
     };
 
     keyboard = {

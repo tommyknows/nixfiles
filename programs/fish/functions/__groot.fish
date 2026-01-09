@@ -1,1 +1,1 @@
-echo (realpath --relative-to=(pwd) (git root))/!
+echo (realpath --relative-to=(pwd) (git root))/%
