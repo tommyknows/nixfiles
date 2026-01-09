@@ -10,6 +10,8 @@
 
     nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-25.11";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
+
+    nix-ai-tools.url = "github:numtide/nix-ai-tools";
   };
 
   outputs = {
@@ -58,6 +60,7 @@
             specialArgs = {
               inherit allowed-unfree-packages;
               unstable = inputs.unstable;
+              nix-ai-tools = inputs.nix-ai-tools;
             };
           }
       )

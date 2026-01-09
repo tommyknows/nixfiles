@@ -4,6 +4,7 @@
   lib,
   allowed-unfree-packages,
   unstable,
+  nix-ai-tools,
   ...
 }: {
   imports = [
@@ -25,6 +26,7 @@
           system = prev.stdenv.hostPlatform.system;
           config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) allowed-unfree-packages;
         };
+        nix-ai-tools = nix-ai-tools.packages.${prev.stdenv.hostPlatform.system};
       })
     ];
   };

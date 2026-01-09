@@ -14,7 +14,7 @@
     ctlptl
     cmake
     circleci-cli
-    unstable.crush
+    nix-ai-tools.crush
     diffutils
     delve
     # docker installed through docker desktop
