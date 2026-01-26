@@ -5,8 +5,9 @@
   ...
 }: {
   imports = [
-    ./alacritty
-    ./fish/default.nix
+    ./alacritty.nix
+    ./autokbisw.nix
+    ./fish
     ./git
     ./tmux
     ./vim

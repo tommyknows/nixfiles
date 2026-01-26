@@ -60,7 +60,7 @@
     ngrok
     nodePackages.prettier
     nodePackages_latest.markdownlint-cli
-    nodejs_22
+    nodejs_24
     #open-policy-agent
     postgresql
     pre-commit
@@ -90,7 +90,7 @@
     xz
     yarn
     yq
-    zed-editor
+    unstable.zed-editor
     nodePackages.typescript
     nodePackages.cspell
   ];

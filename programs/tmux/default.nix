@@ -8,7 +8,11 @@
     sensibleOnTop = true;
     escapeTime = 1;
     baseIndex = 1;
-    extraConfig = builtins.readFile ./config.tmux;
+    extraConfig =
+      builtins.replaceStrings
+      ["<titlescript.sh>"]
+      ["${pkgs.writeShellScript "tmux-title" (builtins.readFile ./title.sh)}"]
+      (builtins.readFile ./config.tmux);
     plugins = with pkgs.tmuxPlugins; [
       vim-tmux-navigator
       {

@@ -34,9 +34,7 @@
   system.primaryUser = "ramon";
 
   environment = {
-    systemPackages = with pkgs; [
-      home-manager
-    ];
+    systemPackages = with pkgs; [home-manager];
     shells = [pkgs.fish];
   };
 }
