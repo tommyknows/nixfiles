@@ -39,6 +39,16 @@
           nix-darwin.lib.darwinSystem {
             modules = [
               {nixpkgs.hostPlatform = "aarch64-darwin";}
+              # Override fish to use unstable and provide 'sphinx' as a build-input to ensure docs are being built.
+              {
+                nixpkgs.overlays = [
+                  (final: prev: {
+                    fish = inputs.unstable.legacyPackages.${prev.system}.fish.overrideAttrs (old: {
+                      nativeBuildInputs = (old.nativeBuildInputs or []) ++ [inputs.unstable.legacyPackages.${prev.system}.python3Packages.sphinx];
+                    });
+                  })
+                ];
+              }
               # Host configuration, non-home-manager stuff.
               (./hosts + "/${hostname}/${hostname}.nix")
               ./hosts/system.nix

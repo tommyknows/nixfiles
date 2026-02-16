@@ -33,7 +33,7 @@
   # Or do we just not care about root? ;)
   programs.fish = {
     enable = true;
-    package = pkgs.unstable.fish;
+    package = pkgs.fish;
     shellAliases = {
       # copycat - "cat-style" output for copying stuff.
       ccat = "bat --style snip";

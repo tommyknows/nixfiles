@@ -63,7 +63,7 @@
       };
       terminal = {
         shell = {
-          program = "${pkgs.unstable.fish}/bin/fish";
+          program = "${pkgs.fish}/bin/fish";
         };
       };
     };
