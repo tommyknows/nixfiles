@@ -44,7 +44,9 @@
       signing = {
         signByDefault = true;
       };
+      hooks = builtins.mapAttrs (name: _: ./hooks + "/${name}") (builtins.readDir ./hooks);
       ignores = [
+        "AGENTS.md"
         "node_modules"
         ".DS_Store"
         ".AppleDouble"
@@ -112,9 +114,6 @@
         };
         "url \"ssh://git@github.com/\"" = {
           insteadOf = "https://github.com/";
-        };
-        "core" = {
-          "hooksPath" = "/Users/ramon/.nixpkgs/programs/git/hooks";
         };
         "merge \"mergiraf\"" = {
           name = "mergiraf";

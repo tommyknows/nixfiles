@@ -14,6 +14,10 @@
       source = ./conf.d;
       recursive = true;
     };
+    #"fish/themes" = {
+    #source = ./themes;
+    #recursive = true;
+    #};
     # adds the load-scripts to bobthefish's init files. Else they're not loaded for some reason.
     "fish/conf.d/plugin-bobthefish.fish".text = lib.mkAfter ''
       for f in $plugin_dir/*.fish
@@ -46,6 +50,10 @@
     shellAbbrs = {
       b = "bazel";
       d = "docker";
+      "de" = {
+        command = "kubectl";
+        expansion = "describe";
+      };
       g = "git";
       gtv = "go test -v .";
       gt = "go test ./...";
@@ -66,7 +74,6 @@
         setCursor = true;
       };
       k = "kubectl";
-      kctx = "kubectl ctx";
       rebuild = "sudo nix run nix-darwin -- switch --flake ~/Documents/nixfiles/main#${hostname}";
       tat = "tmux a -t";
       tan = "tmux new -s";

@@ -7,6 +7,9 @@ if [[ -z "$COMMIT_SOURCE" && "$(realpath "$COMMIT_MSG_FILE")" =~ "/Users/ramon/D
   branch=$(git rev-parse --abbrev-ref HEAD)
   hint=$(cat "$COMMIT_MSG_FILE")
   ticket=$(git config branch."$branch".note)
-  echo -e "\n\n[$ticket]" > "$COMMIT_MSG_FILE"
+  if [ -z "$ticket" ]; then
+    ticket="PIP-"
+  fi
+  echo -e "\n\n$ticket" > "$COMMIT_MSG_FILE"
   echo "$hint" >> "$COMMIT_MSG_FILE"
 fi

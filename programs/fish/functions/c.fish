@@ -23,10 +23,10 @@ shown ('v' for the 'v0.0.0' prefix).
 
 The following options are available:
 
--j or --jira
-      Stores a Jira Ticket (in the form [ABC-123]) in git notes for later extraction
+-t or --ticket
+      Stores a ticket reference (in the form [ABC-123]) in git notes for later extraction
       when \"git commit\"ing. Only valid if a new branch / worktree is being created.
-      If the currently checked out branch already specifies a Jira Ticket and this
+      If the currently checked out branch already specifies a ticket and this
       flag is not set, the value will be copied from the current branch.
 
 -h or --help
@@ -37,10 +37,10 @@ EXAMPLES
 `c new-branch a12346` checks out `new-branch` at the commit SHA `a12346`.
 `c feat/my-branch` checks out `feat/my-branch`, and will ensure a sane directory name without slashes.
 `c origin/hello` checks out the remote branch `hello` in a new local branch named `hello`.
-`c -j PROJ-2048 my-feature` will create a branch `my-feature` corresponding to the Jira Ticket `PROJ-2048`.
+`c -t PROJ-2048 my-feature` will create a branch `my-feature` corresponding to the ticket `PROJ-2048`.
 "
 
-argparse 'j/jira=' 'h/help' -- $argv
+argparse 't/ticket=' h/help -- $argv
 
 if set --query _flag_help
     printf '%b' $helptext
@@ -56,7 +56,7 @@ if test "$local_branch_name" != "$argv[1]"
     set checkout_target "$argv[1]"
     set track_upstream true
 end
-set -l jira_ticket "$_flag_jira"
+set -l ticket_ref "$_flag_ticket"
 
 # invoking only 'c' without a branch name should switch to the default branch.
 if test -z $argv[1]
@@ -71,7 +71,6 @@ if test -n "$argv[2]" && test -z "$checkout_target"
     end
     set checkout_target "$argv[2]"
 end
-
 
 # the "groot" (git root) is the parent directory of all worktrees, where the .git dir resides.
 set -l groot (__bobthefish_dirname (realpath (git rev-parse --git-common-dir 2>/dev/null)))
@@ -95,7 +94,7 @@ end
 if "$track_upstream"
     # Fetch potential changes from the remote.
     echo "Checking out remote branch, pulling changes from remote..."
-    git fetch origin $local_branch_name &> /dev/null
+    git fetch origin $local_branch_name &>/dev/null
 else if test -n "$checkout_target" && ! git cat-file -e $checkout_target
     echo "Checkout target doesn't exist, trying to pull changes from remote..."
     git fetch origin $checkout_target
@@ -104,7 +103,7 @@ end
 set -l create_branch_flag
 # if the branch doesn't exist yet, use `-b` to create it.
 if ! git rev-parse --verify --quiet $local_branch_name &>/dev/null
-    set create_branch_flag "-b"
+    set create_branch_flag -b
 end
 
 if ! git worktree add -q $dir_name $create_branch_flag $local_branch_name $checkout_target
@@ -114,19 +113,19 @@ end
 
 echo "Symlinking files & directories..."
 # TODO: copy other config files?
-for fileOrDir in "config.local.json" ".local-dev-deps" "tools/node_modules" "tools/.bin" "AGENTS.md"
+for fileOrDir in "config.local.json" ".local-dev-deps" tools/node_modules "tools/.bin" "AGENTS.md"
     if [ -e $groot/$default_branch/$fileOrDir -a ! -f $dir_name/$fileOrDir ]
         ln -s $groot/$default_branch/$fileOrDir $dir_name/$fileOrDir
     end
 end
 
-if test -z "$jira_ticket" 
+if test -z "$ticket_ref"
     # this might also return an empty string, which is fine.
-    set jira_ticket (git config branch.(git rev-parse --abbrev-ref HEAD).note)
+    set ticket_ref (git config branch.(git rev-parse --abbrev-ref HEAD).note)
 end
 
-if test -n "$jira_ticket"
-    git config branch.$local_branch_name.note $jira_ticket
+if test -n "$ticket_ref"
+    git config branch.$local_branch_name.note $ticket_ref
 end
 
 cd $dir_name
@@ -134,4 +133,3 @@ cd $dir_name
 if "$track_upstream"
     git branch --set-upstream-to=origin/$local_branch_name
 end
-

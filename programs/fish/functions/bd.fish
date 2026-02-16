@@ -18,8 +18,8 @@ else
     git pull origin
 end
 
-git worktree remove $dir_name
-# with detached heads, we don't want to delete anything.
-if [ $branch_name != "HEAD" ]
-    git branch -D $branch_name
-end
+# We need the if-check in there as with detached heads, we don't want to delete anything
+bb "git worktree remove $dir_name
+    and if test $branch_name != HEAD
+        git branch -D $branch_name
+    end"
