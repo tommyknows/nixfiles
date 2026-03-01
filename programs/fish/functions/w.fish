@@ -28,6 +28,7 @@ set -l workdir /Users/ramon/Documents/work
 
 if ! set -q argv[1]
     cd $workdir
+    return
 end
 
 set commit $argv[3]
@@ -48,7 +49,7 @@ if string match -q '*github.com/*' $argv[1]
                 -H "Authorization: Bearer $GITHUB_TOKEN"\
                 -H "X-GitHub-Api-Version: 2022-11-28" \
                 https://api.github.com/repos/$owner/$repo/pulls/$pr | jq .head.ref -r)
-        # check if the URL is a reference to an object in the tree, and extract both branch and subdir.
+            # check if the URL is a reference to an object in the tree, and extract both branch and subdir.
         else if set -l tree_info (string match -r '(tree|blob)/(.[^/]*)(?:/(.*))?' -g $pull_info[3])
             # check if the ref is a commit sha or a branch name by rev-parsing, which returns the full commit sha.
             if string match -q "$tree_info[2]*" (git rev-parse --verify -q "$tree_info[2]")
@@ -59,10 +60,10 @@ if string match -q '*github.com/*' $argv[1]
             end
 
             # if we got a tree-ref, we only have a directory
-            if test $tree_info[1] = "tree"
+            if test $tree_info[1] = tree
                 set subdir $tree_info[2]
-            # with a blob-ref, we have a commit, and need to compute a branch-name (unless one was given)
-            else if test $tree_info[1] = "blob" 
+                # with a blob-ref, we have a commit, and need to compute a branch-name (unless one was given)
+            else if test $tree_info[1] = blob
                 # try extracting the directory / filename and a potential line number.
                 set -l res (string split '#L' $tree_info[3])
                 set filename $res[1]

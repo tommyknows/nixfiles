@@ -1,6 +1,7 @@
 nmap <leader>x :wa<CR>:!go run .<CR>
-nmap <leader>t :wa<CR>:!go test ./...<CR>
-nmap <leader>tv :wa<CR>:!go test -v ./...<CR>
+nmap <leader>t :wa<CR>:echo system('go test ' . expand('%:p:h'))<CR>
+nmap <leader>tv :wa<CR>:echo system('go test -v ' . expand('%:p:h'))<CR>
+nmap <leader>ta :wa<CR>:echo system('go test ./...')<CR>
 nmap <leader>c :GoCoverage toggle<CR>
 
 " wide lines in Go

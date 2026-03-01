@@ -43,9 +43,7 @@
               {
                 nixpkgs.overlays = [
                   (final: prev: {
-                    fish = inputs.unstable.legacyPackages.${prev.system}.fish.overrideAttrs (old: {
-                      nativeBuildInputs = (old.nativeBuildInputs or []) ++ [inputs.unstable.legacyPackages.${prev.system}.python3Packages.sphinx];
-                    });
+                    fish = inputs.unstable.legacyPackages.${prev.system}.fish;
                   })
                 ];
               }

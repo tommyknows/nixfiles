@@ -14,8 +14,13 @@ end
 if test "$old_ctx" = orbstack
     fish -c "orbctl stop k8s >/dev/null" &
     disown
-else if test (command kubectl ctx -c) = orbstack
-    echo "Starting local k8s cluster..."
-    fish -c "orbctl start k8s >/dev/null 2>&1 && sleep 2 && notify 'Orbstack cluster is running' || notify 'Orbstack cluster failed to come up'" &
-    disown
+else
+    switch (command kubectl ctx -c)
+        case orbstack
+            echo "Starting local k8s cluster..."
+            fish -c "orbctl start k8s >/dev/null 2>&1 && sleep 2 && notify 'Orbstack cluster is running' || notify 'Orbstack cluster failed to come up'" &
+            disown
+        case development production
+            aws-login
+    end
 end
