@@ -12,6 +12,11 @@
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
     nix-ai-tools.url = "github:numtide/nix-ai-tools";
+
+    ic = {
+      url = "git+ssh://git@github.com/infracost/ic";
+      flake = false;
+    };
   };
 
   outputs = {
@@ -64,7 +69,7 @@
                   };
                   extraSpecialArgs = {
                     inherit hostname;
-                  };
+                  } // (if hostname == "work" then {ic = inputs.ic;} else {});
                 };
               }
             ];

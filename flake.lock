@@ -101,6 +101,22 @@
         "type": "github"
       }
     },
+    "ic": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1773853068,
+        "narHash": "sha256-SbDxFkfxUB4fkZRhYR7ry+CMbPuSwpswF/tjBL+DFhk=",
+        "ref": "refs/heads/master",
+        "rev": "aeeff23a78ac2e0b472f833f1063db6a5b9a6f4a",
+        "revCount": 211,
+        "type": "git",
+        "url": "ssh://git@github.com/infracost/ic"
+      },
+      "original": {
+        "type": "git",
+        "url": "ssh://git@github.com/infracost/ic"
+      }
+    },
     "import-tree": {
       "locked": {
         "lastModified": 1763762820,
@@ -195,6 +211,7 @@
     "root": {
       "inputs": {
         "home-manager": "home-manager",
+        "ic": "ic",
         "nix-ai-tools": "nix-ai-tools",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs_2",

@@ -1,4 +1,28 @@
-{lib, ...}: {
+{
+  lib,
+  pkgs,
+  ic,
+  ...
+}: let
+  ic-cli = pkgs.buildGoModule {
+    pname = "ic";
+    version = ic.shortRev or "dev";
+    src = ic;
+    subPackages = ["cmd/ic"];
+    vendorHash = "sha256-baScParmfr1uNlyyrwUCaC2ssuTZm5tTyF8RuRbz8OY=";
+    ldflags = [
+      "-s"
+      "-w"
+      "-X github.com/infracost/ic/internal/version.version=${ic.shortRev or "dev"}"
+      "-X github.com/infracost/ic/internal/version.commit=${ic.rev or "dirty"}"
+      "-X github.com/infracost/ic/internal/version.date=${ic.lastModifiedDate or "unknown"}"
+      "-X github.com/infracost/ic/internal/version.builder=nix"
+    ];
+    flags = ["--trimpath"];
+    env.CGO_ENABLED = "0";
+  };
+in {
+  home.packages = [ic-cli];
   programs = {
     go.env.GOPRIVATE = "github.com/infracost";
 
