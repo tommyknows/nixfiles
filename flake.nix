@@ -24,6 +24,7 @@
       "ngrok"
       "slack"
       "terraform"
+      "claude-code"
       "crush"
     ];
 
@@ -44,6 +45,8 @@
                 nixpkgs.overlays = [
                   (final: prev: {
                     fish = inputs.unstable.legacyPackages.${prev.system}.fish;
+                    git-absorb = inputs.unstable.legacyPackages.${prev.system}.git-absorb;
+                    claude-code = inputs.unstable.legacyPackages.${prev.system}.claude-code;
                   })
                 ];
               }

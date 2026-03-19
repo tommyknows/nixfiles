@@ -37,7 +37,6 @@
   },
   "go.goplsOptions": {
     "completeUnimported": true,
-    "local": "github.com/snyk/issue-policies",
     "buildFlags": ["-tags", "integration,e2e"]
   },
   "go.tags": {

@@ -46,6 +46,7 @@
       };
       hooks = builtins.mapAttrs (name: _: ./hooks + "/${name}") (builtins.readDir ./hooks);
       ignores = [
+        ".claude"
         "AGENTS.md"
         "node_modules"
         ".DS_Store"
