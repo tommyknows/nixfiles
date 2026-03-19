@@ -1,4 +1,5 @@
 set default_branch (default_branch)
+set -l _groot (path dirname (realpath (git rev-parse --git-common-dir 2>/dev/null)))
 
 if test (count $argv) -ne 0
     set branch_name $argv[1]
@@ -23,3 +24,5 @@ bb "git worktree remove $dir_name
     and if test $branch_name != HEAD
         git branch -D $branch_name
     end"
+
+rm -f ~/.claude/projects/(string replace -a / - $_groot/$dir_name)

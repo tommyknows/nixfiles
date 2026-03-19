@@ -1,18 +1,14 @@
-set CONTAINER_NAME petdb
+set CONTAINER_NAME petls
 switch $argv[1]
     case start
         if docker inspect $CONTAINER_NAME &>/dev/null
             docker start $CONTAINER_NAME
         else
-            docker run -d -p 5432:5432 --env POSTGRES_HOST_AUTH_METHOD=trust --name $CONTAINER_NAME --restart always postgres:18
+            docker run -d -p 4566:4566 --name $CONTAINER_NAME --restart always localstack/localstack:4.14.0
         end
-        set -Ux DB_URL "postgres://postgres@localhost:5432/dashboard_test"
-        set -Ux TEST_DB_URL "postgres://postgres@localhost:5432/dashboard_test"
-        set -Ux REPLAY_DB_URL "postgres://postgres@localhost:5432"
+        set -Ux REPLAY_LOCALSTACK_ENDPOINT "http://localhost:4566"
     case stop
-        set -Ue DB_URL
-        set -Ue TEST_DB_URL
-        set -Ue REPLAY_DB_URL
+        set -Ue REPLAY_LOCALSTACK_ENDPOINT
         docker stop $CONTAINER_NAME
     case reset
         petdb stop

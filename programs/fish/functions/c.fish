@@ -73,7 +73,7 @@ if test -n "$argv[2]" && test -z "$checkout_target"
 end
 
 # the "groot" (git root) is the parent directory of all worktrees, where the .git dir resides.
-set -l groot (__bobthefish_dirname (realpath (git rev-parse --git-common-dir 2>/dev/null)))
+set -l groot (path dirname (realpath (git rev-parse --git-common-dir 2>/dev/null)))
 
 # if the branch name contains a slash, don't make the dir name annoying.
 set dir_name $groot/(string replace -a "/" "_" "$local_branch_name")
@@ -111,12 +111,21 @@ if ! git worktree add -q $dir_name $create_branch_flag $local_branch_name $check
     return
 end
 
+mkdir -p $dir_name/.claude
+
 echo "Symlinking files & directories..."
 # TODO: copy other config files?
-for fileOrDir in "config.local.json" ".local-dev-deps" tools/node_modules "tools/.bin" "AGENTS.md"
+for fileOrDir in "config.local.json" ".local-dev-deps" tools/node_modules "tools/.bin"
     if [ -e $groot/$default_branch/$fileOrDir -a ! -f $dir_name/$fileOrDir ]
         ln -s $groot/$default_branch/$fileOrDir $dir_name/$fileOrDir
     end
+end
+
+set -l _claude_canonical ~/.claude/projects/(string replace -a / - $groot)
+set -l _claude_link ~/.claude/projects/(string replace -a / - $dir_name)
+mkdir -p $_claude_canonical
+if test ! -e $_claude_link; and test ! -L $_claude_link
+    ln -s $_claude_canonical $_claude_link
 end
 
 if test -z "$ticket_ref"
