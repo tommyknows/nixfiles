@@ -91,6 +91,7 @@ repo/
 - **Go workspace** is `~/Documents/go` (not `~/go`).
 - **SSH agent** uses Secretive: `~/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh`
 - **Git signing** uses SSH via Secretive, not GPG.
+- When adding new files, they need to be added to git staging (`git add`) to be picked up by a rebuild.
 
 ## Initial Setup (New Machine)
 

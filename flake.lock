@@ -104,11 +104,11 @@
     "ic": {
       "flake": false,
       "locked": {
-        "lastModified": 1773853068,
-        "narHash": "sha256-SbDxFkfxUB4fkZRhYR7ry+CMbPuSwpswF/tjBL+DFhk=",
+        "lastModified": 1774004272,
+        "narHash": "sha256-brZc70Bp7Ta/w0+eqikb1ltTVaOdjZz2xcmkdKXTnfc=",
         "ref": "refs/heads/master",
-        "rev": "aeeff23a78ac2e0b472f833f1063db6a5b9a6f4a",
-        "revCount": 211,
+        "rev": "c655c186888bc52433ed3a827458a5c916c79a05",
+        "revCount": 212,
         "type": "git",
         "url": "ssh://git@github.com/infracost/ic"
       },

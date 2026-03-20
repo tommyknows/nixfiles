@@ -48,10 +48,10 @@
               # Override fish to use unstable and provide 'sphinx' as a build-input to ensure docs are being built.
               {
                 nixpkgs.overlays = [
-                  (final: prev: {
-                    fish = inputs.unstable.legacyPackages.${prev.system}.fish;
-                    git-absorb = inputs.unstable.legacyPackages.${prev.system}.git-absorb;
-                    claude-code = inputs.unstable.legacyPackages.${prev.system}.claude-code;
+                  (final: _prev: {
+                    fish = final.unstable.fish;
+                    git-absorb = final.unstable.git-absorb;
+                    claude-code = final.unstable.claude-code;
                   })
                 ];
               }

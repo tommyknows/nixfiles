@@ -7,6 +7,7 @@
   imports = [
     ./alacritty.nix
     ./autokbisw.nix
+    ./claude
     ./fish
     ./git
     ./tmux

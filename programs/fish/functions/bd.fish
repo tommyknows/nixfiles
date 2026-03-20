@@ -4,7 +4,7 @@ set -l _groot (path dirname (realpath (git rev-parse --git-common-dir 2>/dev/nul
 if test (count $argv) -ne 0
     set branch_name $argv[1]
     set dir_name (string replace -a "/" "_" "$branch_name")
-    # if the branch to delete is the same branch as we're currently on, switch to 
+    # if the branch to delete is the same branch as we're currently on, switch to
     # the default branch dir first.
     if [ (basename (git rev-parse --show-toplevel)) = $dir_name ]
         c $default_branch
@@ -20,7 +20,8 @@ else
 end
 
 # We need the if-check in there as with detached heads, we don't want to delete anything
-bb "git worktree remove $dir_name
+bb "cd $_groot
+    and git worktree remove $dir_name
     and if test $branch_name != HEAD
         git branch -D $branch_name
     end"

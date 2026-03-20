@@ -9,7 +9,7 @@
     version = ic.shortRev or "dev";
     src = ic;
     subPackages = ["cmd/ic"];
-    vendorHash = "sha256-baScParmfr1uNlyyrwUCaC2ssuTZm5tTyF8RuRbz8OY=";
+    vendorHash = "sha256-QPM965BbMl2l8tzQTWk2eQacgPj65CxMHm4v9On0i7s=";
     ldflags = [
       "-s"
       "-w"

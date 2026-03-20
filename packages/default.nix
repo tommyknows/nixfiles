@@ -14,7 +14,6 @@
     ctlptl
     cmake
     circleci-cli
-    unstable.claude-code
     nix-ai-tools.crush
     diffutils
     delve

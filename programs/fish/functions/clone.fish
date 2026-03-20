@@ -31,3 +31,4 @@ echo "Creating default worktree \"$default_branch\""
 git worktree add $default_branch $default_branch 2&> /dev/null
 
 cd $default_branch
+repo-init
