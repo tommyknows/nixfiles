@@ -11,8 +11,33 @@ set -l _groot (path dirname (realpath $_git_common))
 function _cl_invoke --no-scope-shadowing
     set -l _dir $argv[1]
     set -l _rest $argv[2..]
+
+    # If no extra args, check for a pending subagent prompt
+    if test (count $_rest) -eq 0
+        set -l _prompts_dir $_dir/.claude/subagent-prompts
+        set -l _pending
+        if test -d $_prompts_dir
+            for f in $_prompts_dir/*
+                test -f $f; and set -a _pending $f
+            end
+        end
+        if test (count $_pending) -eq 1
+            set -l _pname (basename $_pending[1] .md)
+            claude --name (string join ': ' (basename $_dir) $_pname) "@$_pending[1]"
+            rm -f $_pending[1]
+            return
+        else if test (count $_pending) -gt 1
+            echo "cl: multiple pending prompts in $_prompts_dir:"
+            for f in $_pending
+                echo "  "(basename $f .md)
+            end
+            echo "run manually: claude (cat $_prompts_dir/<name>.md)"
+            return 1
+        end
+    end
+
     if set -q _flag_attach; and test -f $_dir/.claude/session; and not string match -q -- '--resume*' $_rest
-        subagent-attach $_dir $_rest
+        exec claude --resume (string trim <$_dir/.claude/session) $_rest
     else
         claude $_rest
     end

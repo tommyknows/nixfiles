@@ -85,3 +85,13 @@ set -as terminal-features ",*:RGB"
 # This unsets the option, so that we don't have the default-command anymore. reattach-to-user-namespace isn't needed
 # anymore in more recent versions of tmux.
 set -gu default-command
+
+# When the tmux server starts it captures the full environment of the launching shell.
+# New panes inherit this snapshot, which causes stale values to shadow Fish universal
+# variables (e.g. GITHUB_TOKEN updated via `set -Ux` after tmux started).
+# Fix: clear all exported Fish universals from tmux's env table at startup so Fish
+# can apply the authoritative values itself in each new pane.
+# update-environment is also disabled — it refreshes vars on attach, which is useless
+# on macOS where SSH sockets (Secretive) and other session vars are fixed.
+set-option -g update-environment ""
+run-shell "<clearuniversals.sh>"

@@ -11,9 +11,9 @@ switch $argv[1]
         set -Ue REPLAY_LOCALSTACK_ENDPOINT
         docker stop $CONTAINER_NAME
     case reset
-        petdb stop
+        petls stop
         docker rm $CONTAINER_NAME
-        petdb start
+        petls start
     case status
         set STATUS (docker container inspect --format='{{.State.Status}}' $CONTAINER_NAME 2>/dev/null | string trim)
         if test -z "$STATUS"

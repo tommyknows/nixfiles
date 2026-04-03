@@ -27,9 +27,8 @@
         "Bash(git log*)"
         "Write(**/.claude/context.md)"
         "Write(**/.claude/session)"
-        "Write(**/.claude/pid)"
         "Write(**/.claude/subagent-prompts/**)"
-        "Bash(fish -c 'spawn-subagent*')"
+        "Bash(fish -c 'prepare-subagent*')"
       ];
     };
   };

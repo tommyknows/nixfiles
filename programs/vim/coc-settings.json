@@ -35,6 +35,11 @@
     "http://json.schemastore.org/chart": "Chart.{yml,yaml}",
     "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "*docker-compose*.{yml,yaml}"
   },
+  // gopls needs to be *compiled* with a specific version of Go to support it's features.
+  // We're installing gopls through unstable, which means it's built with the Go version
+  // in unstable too. `coc-go` would build gopls with our locally installed version of Go,
+  // which is from stable, ergo older.
+  "go.goplsPath": "/Users/ramon/.nix-profile/bin/gopls",
   "go.goplsOptions": {
     "completeUnimported": true,
     "buildFlags": ["-tags", "integration,e2e"]

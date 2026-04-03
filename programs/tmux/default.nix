@@ -10,8 +10,16 @@
     baseIndex = 1;
     extraConfig =
       builtins.replaceStrings
-      ["<titlescript.sh>"]
-      ["${pkgs.writeShellScript "tmux-title" (builtins.readFile ./title.sh)}"]
+      ["<titlescript.sh>" "<clearuniversals.sh>"]
+      [
+        "${pkgs.writeShellScript "tmux-title" (builtins.readFile ./title.sh)}"
+        "${pkgs.writeShellScript "tmux-clear-universals" ''
+          ${pkgs.fish}/bin/fish -c 'set --names --export --universal' \
+            | while read -r var; do
+                tmux set-environment -gu "$var"
+              done
+        ''}"
+      ]
       (builtins.readFile ./config.tmux);
     plugins = with pkgs.tmuxPlugins; [
       vim-tmux-navigator

@@ -56,20 +56,19 @@ Manual flow for amending a commit in `wt-1`:
 
 ## Spawning subagents
 
-Always spawn subagents via the `spawn-subagent` Fish function, **not** the Agent tool:
+To spawn a subagent, write the prompt to a file and call `prepare-subagent`. Use the `/prepare-subagent` slash command which handles this automatically.
 
-```bash
-fish -c 'spawn-subagent /path/to/worktree "prompt text"'
-```
+The prompt file must live in `<worktree>/.claude/subagent-prompts/`. `prepare-subagent` validates the file and prints the `cl` command the user should run in a new terminal window. When they run it, `cl` detects the pending prompt and starts an interactive claude session automatically.
 
-Print the attach commands for the user after spawning:
-- Same repo: `cl <worktree-dirname> -a`
-- Different repo: `cl <repo> <branch> -a` (e.g. `cl nixfiles main -a`)
+The `-a` flag resumes a completed session: `cl <branch> -a` (same repo) or `cl <repo> <branch> -a`.
 
 ## Scripting conventions
 
 - **Scripts** (CI, automation): Bash
 - **Shell functions / interactive use**: Fish (default shell)
+- **Never write ad-hoc Python scripts** — use CLI tooling instead.
+- **Prefer CLI tools** for data wrangling and code manipulation: `jq`, `yq`, `goimports`, `gomvpkg`, etc.
+- **If a CLI tool isn't available**, run it via a temporary nix shell rather than reimplementing it: `nix-shell -p <pkgName> --run '<cmd>'`.
 
 ## Global config changes
 
