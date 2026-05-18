@@ -67,6 +67,7 @@
           email = "me@ramonr.ch";
           name = "Ramon Rüttimann";
         };
+        credential.helper = "!gh auth git-credential";
         alias = {
           br = "branch";
           c = "commit -S";
@@ -112,9 +113,6 @@
         };
         "remote.origin" = {
           prune = true;
-        };
-        "url \"ssh://git@github.com/\"" = {
-          insteadOf = "https://github.com/";
         };
         "merge \"mergiraf\"" = {
           name = "mergiraf";

@@ -6,9 +6,9 @@ switch $argv[1]
         else
             docker run -d -p 4566:4566 --name $CONTAINER_NAME --restart always localstack/localstack:4.14.0
         end
-        set -Ux REPLAY_LOCALSTACK_ENDPOINT "http://localhost:4566"
+        set -Ux TEST_LOCALSTACK_ENDPOINT "http://localhost:4566"
     case stop
-        set -Ue REPLAY_LOCALSTACK_ENDPOINT
+        set -Ue TEST_LOCALSTACK_ENDPOINT
         docker stop $CONTAINER_NAME
     case reset
         petls stop

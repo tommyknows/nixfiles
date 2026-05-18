@@ -3,6 +3,8 @@ setlocal ts=2 sts=2 sw=2 expandtab
 let g:indentLine_enabled = 1
 
 " Strip trailing whitespace on save
-"autocmd BufWritePre <buffer> :%s/\s\+$//e
+autocmd BufWritePre <buffer> :%s/\s\+$//e
+" Disable format-on-save for yaml files (breaks Helm templates {{ }})
+let b:coc_format_on_save = 0
 
 " TODO: set up sigs.k8s.io/yaml/yamlfmt -o kyaml as standard.

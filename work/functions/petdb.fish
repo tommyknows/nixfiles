@@ -6,13 +6,12 @@ switch $argv[1]
         else
             docker run -d -p 5432:5432 --env POSTGRES_HOST_AUTH_METHOD=trust --name $CONTAINER_NAME --restart always postgres:18
         end
-        set -Ux DB_URL "postgres://postgres@localhost:5432/dashboard_test"
-        set -Ux TEST_DB_URL "postgres://postgres@localhost:5432/dashboard_test"
-        set -Ux REPLAY_DB_URL "postgres://postgres@localhost:5432"
+        #set -Ux DB_URL "postgres://postgres@localhost:5432/dashboard_test"
+        # TODO: this clashes between two repos (one of them expects "/dashboard_test"...)
+        set -Ux TEST_DB_URL "postgres://postgres@localhost:5432"
     case stop
-        set -Ue DB_URL
+        #set -Ue DB_URL
         set -Ue TEST_DB_URL
-        set -Ue REPLAY_DB_URL
         docker stop $CONTAINER_NAME
     case reset
         petdb stop

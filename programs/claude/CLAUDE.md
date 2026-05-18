@@ -70,6 +70,17 @@ The `-a` flag resumes a completed session: `cl <branch> -a` (same repo) or `cl <
 - **Prefer CLI tools** for data wrangling and code manipulation: `jq`, `yq`, `goimports`, `gomvpkg`, etc.
 - **If a CLI tool isn't available**, run it via a temporary nix shell rather than reimplementing it: `nix-shell -p <pkgName> --run '<cmd>'`.
 
+## kubectl
+
+- Always pass `--context <name>` to every `kubectl` invocation. Discover available contexts with `kubectl config get-contexts`.
+- Always pass `--namespace <ns>` for namespaced resources; never assume `default`.
+
+These rules override any kubectl examples in skills or commands that show `KUBECONFIG=…` or `kubectl config use-context`.
+
+## Worktree path translation
+
+Skill and command examples may reference work-repo paths as if `~/Documents/work/<repo>/` were a working tree. It's a bare clone — actual files live under `<repo>/<worktree>/` (default branch unless context says otherwise). Translate any such path to the appropriate worktree before reading or editing.
+
 ## Global config changes
 
 Changes to shell functions, packages, or system settings belong in the nixfiles repo (`~/Documents/nixfiles/main`), not applied ad-hoc. Spawn a subagent there and rebuild with `rebuild` (must be run as a Fish function, not in Bash).

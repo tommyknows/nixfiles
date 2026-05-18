@@ -1,12 +1,29 @@
-" SpellCheck in Markdown files. Hover over a word and press zg to add word
-" to spell list
-" `set nospell` to disable
-setlocal spell
-"set spelllang=
-setlocal spelllang=en,de
-setlocal conceallevel=2
-let g:vim_markdown_fenced_languages = ['html', 'python', 'bash=sh', 'go', 'tf=terraform']
-set textwidth=80
-set colorcolumn=80
+" Prose writing environment for Markdown
+" Uses vim-pencil (soft wrap), vim-lexical, vim-litecorrect, vim-textobj-sentence
 
-autocmd BufWritePre *.md :%s/\s\+$//e
+" Soft wrap — no hard breaks inserted, visual wrapping only
+call pencil#init({'wrap': 'soft'})
+
+" Spell + dictionary + thesaurus
+call lexical#init({
+    \ 'spell': 1,
+    \ 'spelllang': ['en', 'de'],
+    \ })
+
+" Lightweight autocorrect (teh -> the, etc.)
+call litecorrect#init()
+
+" Better sentence text objects and motions
+call textobj#sentence#init()
+
+" Trim trailing whitespace on save without moving cursor or clobbering search
+function! s:TrimWhitespace()
+    let l:save = winsaveview()
+    keeppatterns %s/\s\+$//e
+    call winrestview(l:save)
+endfunction
+autocmd BufWritePre <buffer> call s:TrimWhitespace()
+
+setlocal conceallevel=2
+setlocal colorcolumn=
+let g:vim_markdown_fenced_languages = ['html', 'python', 'bash=sh', 'go', 'tf=terraform']

@@ -1,1 +1,1 @@
-autocmd BufRead Tiltfile set=tiltfile
+set syntax=python

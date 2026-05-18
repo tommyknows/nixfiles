@@ -44,7 +44,6 @@ sfx/                      # good.ogg / bad.ogg for boop/sfx functions
 
 - `nixpkgs`: nixpkgs-25.11-darwin
 - `unstable`: nixos-unstable (fish, gopls, golangci-lint, claude-code, zed, etc.)
-- `nix-ai-tools`: numtide/nix-ai-tools (crush)
 - `ic`: infracost internal CLI, built from source (work host only)
 
 ### Work Toggle

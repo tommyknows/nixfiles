@@ -7,7 +7,6 @@ should probably be it.
 
 Some functions expect this repo to be cloned into `~/Documents/nixfiles/main`.
 
-
 ## Is This Really Everything?
 
 Pretty much - there's no `brew` installed, so all packages come from either Nix,
@@ -86,8 +85,7 @@ directory anymore.
     and yes, it has autocompletion. This means if you press "tab", a function
     will be called that allows you to visually and with fuzzy-search enabled,
     select a specific commit to check out. This commit-selection is also
-    available under the name `git-pick-commit` or as a git alias `git
-pick-commit`.
+    available under the name `git-pick-commit` or as a git alias `git pick-commit`.
 
 Additionally, as these layers are...layers, the second layer is simply a
 second command, `c` for checkout. I haven't yet needed the `git-pick-commit`

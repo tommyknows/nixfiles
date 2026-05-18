@@ -19,6 +19,24 @@ let
       sha256 = "WNU6ZZT9a5tyKcqLYvcXi7v39xdYoS84C+93UqEub9Q=";
     };
   };
+  vim-litecorrect = pkgs.vimUtils.buildVimPlugin {
+    name = "vim-litecorrect";
+    src = pkgs.fetchFromGitHub {
+      owner = "preservim";
+      repo = "vim-litecorrect";
+      rev = "a914b1240c2ad35f9a11c0211c15b9199a9af73a";
+      sha256 = "Iw0TXlkDTR/PbOEfP1yrfzEG7KLjreqivAbvgUiIrgY=";
+    };
+  };
+  vim-textobj-sentence = pkgs.vimUtils.buildVimPlugin {
+    name = "vim-textobj-sentence";
+    src = pkgs.fetchFromGitHub {
+      owner = "preservim";
+      repo = "vim-textobj-sentence";
+      rev = "c5dd562aff2c389dfc8cd55e6499854d352a80b8";
+      sha256 = "T8Uyxtf0ETOI9oonGbo0gSuwSpu6DxydKpR+jwzDhno=";
+    };
+  };
 in {
   xdg.configFile.vim = {
     source = ./.;
@@ -75,11 +93,16 @@ in {
       vim-gh-line
       vim-gopher
       vim-helm
+      vim-lexical
+      vim-litecorrect
       vim-markdown
       vim-markdown-toc
       vim-material-monokai
       vim-sandwich
+      vim-pencil
       vim-terraform
+      vim-textobj-sentence
+      vim-textobj-user
       vim-test
       vim-tmux
       vim-tmux-clipboard

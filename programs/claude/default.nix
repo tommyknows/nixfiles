@@ -1,4 +1,4 @@
-{...}: {
+{pkgs, ...}: {
   programs.claude-code = {
     enable = true;
 
@@ -7,6 +7,17 @@
     commandsDir = ./commands;
 
     settings = {
+      hooks.PreToolUse = [
+        {
+          matcher = "Bash";
+          hooks = [
+            {
+              type = "command";
+              command = "${pkgs.unstable.rtk}/bin/rtk hook claude";
+            }
+          ];
+        }
+      ];
       enabledPlugins = {
         "infracost@infracost" = true;
         "gopls-lsp@claude-plugins-official" = true;
@@ -25,6 +36,7 @@
         "Bash(gofmt*)"
         "Bash(git diff*)"
         "Bash(git log*)"
+        "Read(**/.claude/skills/**)"
         "Write(**/.claude/context.md)"
         "Write(**/.claude/session)"
         "Write(**/.claude/subagent-prompts/**)"

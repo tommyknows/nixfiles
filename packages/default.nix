@@ -10,11 +10,11 @@
     # Ideally this would be in darwin/bluesnooze.nix...
     bluesnooze
     buf
+    bun
     coreutils
     ctlptl
     cmake
     circleci-cli
-    nix-ai-tools.crush
     diffutils
     delve
     # docker installed through docker desktop
@@ -58,6 +58,7 @@
     mockgen
     mpv
     ngrok
+    nil # nix language server
     nodePackages.prettier
     nodePackages_latest.markdownlint-cli
     nodejs_24
@@ -71,6 +72,7 @@
     qemu
     qrencode
     rancher
+    unstable.rtk
     rustup
     sd
     shellcheck

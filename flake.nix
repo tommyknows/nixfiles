@@ -11,10 +11,20 @@
     nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-25.11";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
-    nix-ai-tools.url = "github:numtide/nix-ai-tools";
-
     ic = {
       url = "git+ssh://git@github.com/infracost/ic";
+      flake = false;
+    };
+    infracost_cli = {
+      url = "git+ssh://git@github.com/infracost/cli";
+      flake = false;
+    };
+    cloud-data = {
+      url = "git+ssh://git@github.com/infracost/cloud-data?ref=refs/tags/api/gen/go/v0.0.25";
+      flake = false;
+    };
+    internal-skills = {
+      url = "git+ssh://git@github.com/infracost/internal-skills";
       flake = false;
     };
   };
@@ -67,16 +77,24 @@
                   users.ramon = {
                     imports = [(./hosts + "/${hostname}/user.nix")] ++ extraModules;
                   };
-                  extraSpecialArgs = {
-                    inherit hostname;
-                  } // (if hostname == "work" then {ic = inputs.ic;} else {});
+                  extraSpecialArgs =
+                    {inherit hostname;}
+                    // (
+                      if hostname == "work"
+                      then {
+                        ic = inputs.ic;
+                        infracost_cli = inputs.infracost_cli;
+                        cloud-data = inputs.cloud-data;
+                        internal-skills = inputs.internal-skills;
+                      }
+                      else {}
+                    );
                 };
               }
             ];
             specialArgs = {
               inherit allowed-unfree-packages;
               unstable = inputs.unstable;
-              nix-ai-tools = inputs.nix-ai-tools;
             };
           }
       )
