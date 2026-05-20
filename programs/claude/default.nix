@@ -1,4 +1,6 @@
 {pkgs, ...}: {
+  imports = [./sandbox.nix];
+
   programs.claude-code = {
     enable = true;
 

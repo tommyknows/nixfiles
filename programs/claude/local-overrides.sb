@@ -1,0 +1,67 @@
+;; ---------------------------------------------------------------------------
+;; Machine-Local Overrides (ramon)
+;; Appended after all built-in Safehouse profiles via --append-profile.
+;; Later rules win, so anything here can broaden OR narrow earlier policy.
+;; Source: programs/claude/local-overrides.sb (managed by nix)
+;; ---------------------------------------------------------------------------
+
+;; -- Nix store / system + user profiles -----------------------------------
+;; nix-darwin and home-manager install every binary under /nix/store and
+;; expose them through symlink profiles. Without these grants, `exec()` of
+;; any nix-managed tool (claude, git, node, …) fails to resolve through the
+;; symlink chain (~/.nix-profile -> ~/.local/state/nix/profiles/profile ->
+;; /nix/store/<hash>-...) and PATH lookup returns ENOENT.
+
+(allow file-read-metadata
+    (literal "/nix")                                                ;; Ancestor traversal toward /nix/store.
+    (literal "/run")                                                ;; Ancestor traversal toward /run/current-system.
+    (home-literal "/.local/state")                                  ;; Ancestor traversal toward ~/.local/state/nix.
+)
+
+(allow file-read*
+    (subpath "/nix/store")                                          ;; All nix-installed binaries and their dynamic library dependencies (content-addressed, world-readable by design).
+    (subpath "/run/current-system")                                 ;; nix-darwin active system profile (system-wide binaries and config).
+    (home-subpath "/.nix-profile")                                  ;; home-manager user profile entry point (symlinks into /nix/store).
+    (home-subpath "/.local/state/nix")                              ;; Underlying nix profiles directory targeted by ~/.nix-profile.
+)
+
+;; -- Secretive SSH agent ----------------------------------------------------
+;; Secretive stores its socket and public keys under
+;; ~/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/, which is
+;; outside the paths covered by Safehouse's --enable=ssh profile.
+;; Required for:
+;;   - SSH-format commit signing (gpg.format=ssh, commit.gpgsign=true)
+;;   - SSH-based git remote operations (fetch/push)
+;; Secretive prompts on the user's screen for every signature use, so this
+;; grant does not give the sandbox unattended key access.
+
+(allow file-read-metadata
+    (home-literal "/Library")                                       ;; Ancestor traversal toward the Secretive container.
+    (home-literal "/Library/Containers")                            ;; Ancestor traversal toward the Secretive container.
+    (home-literal "/Library/Containers/com.maxgoedjen.Secretive.SecretAgent")
+    (home-literal "/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data")
+)
+
+(allow file-read*
+    (home-literal "/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh")  ;; Socket file metadata + open() before connect().
+    (home-subpath "/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/PublicKeys")  ;; Public key files referenced by user.signingkey.
+)
+
+(allow network-outbound
+    (remote unix-socket
+        (path-regex (string-append "^" HOME_DIR "/Library/Containers/com\\.maxgoedjen\\.Secretive\\.SecretAgent/Data/socket\\.ssh$"))
+    )
+)
+
+;; -- Explicit denies (belt-and-suspenders) ---------------------------------
+;; These paths are already covered by Safehouse's deny-by-default baseline.
+;; The explicit denies here guarantee they stay denied even if a future
+;; --enable=<feature> or --add-dirs grant inadvertently broadens access.
+
+(deny file-read* file-write*
+    (home-subpath "/.aws")                                          ;; AWS credentials/config; would be opened by --enable=cloud-credentials.
+    (home-subpath "/.ic")                                           ;; Work internal-CLI tokens; not known to any built-in profile.
+    (home-subpath "/.gnupg")                                        ;; GPG keyring (unused by current signing setup, but block anyway).
+    (home-subpath "/.ollama")                                       ;; Local model state and API config.
+    (home-subpath "/.terraform.d")                                  ;; Terraform Cloud credentials (credentials.tfrc.json).
+)
