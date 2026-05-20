@@ -79,7 +79,12 @@ These rules override any kubectl examples in skills or commands that show `KUBEC
 
 ## Worktree path translation
 
-Skill and command examples may reference work-repo paths as if `~/Documents/work/<repo>/` were a working tree. It's a bare clone — actual files live under `<repo>/<worktree>/` (default branch unless context says otherwise). Translate any such path to the appropriate worktree before reading or editing.
+Skill and command examples may reference work-repo paths as if `$CODE_DIR/<repo>/` (i.e. `~/Documents/work/<repo>/`) were a working tree. It's a bare clone — actual files live under `$CODE_DIR/<repo>/<worktree>/...`. The worktree segment **always comes immediately after the repo name**, before any further subpath. Defaults: `dashboard` and `infra` → `master`; `runner` and `technical-docs` → `main`. Use a different worktree only when context says so.
+
+Examples:
+- `$CODE_DIR/dashboard/api/prisma/schema.prisma` → `$CODE_DIR/dashboard/master/api/prisma/schema.prisma`
+- `$CODE_DIR/infra/prod/kubeconfig_prod` → `$CODE_DIR/infra/master/prod/kubeconfig_prod` (`prod` is a subdir, not a worktree)
+- `cd $CODE_DIR/runner` → `cd $CODE_DIR/runner/main`
 
 ## Global config changes
 

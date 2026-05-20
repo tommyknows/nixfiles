@@ -9,8 +9,7 @@
   cloudDataReplaceModule = "github.com/infracost/cloud-data/api/gen/go@v0.0.25";
   ic-cli = (pkgs.buildGoModule.override {go = pkgs.go_1_26;}) {
     pname = "ic";
-    # default to 2.0.0 because the infracost skills require at least 2.0.0.
-    version = ic.shortRev or "2.0.0-dev";
+    version = ic.shortRev or "dev";
     src = ic;
     subPackages = ["cmd/ic"];
     vendorHash = "sha256-uMQGlqMbZzNV5Q6XhBljtFpFqe5o8HBl08aK582CuUc=";
@@ -40,7 +39,12 @@
     src = infracost_cli;
     subPackages = ["."];
     vendorHash = "sha256-3NI0XpXOsd0O8U2LBaQ3SuB+mScEIzxBZNXjW+0LCW0=";
-    ldflags = ["-s" "-w"];
+    ldflags = [
+      "-s"
+      "-w"
+      # default to 2.0.0 because the infracost skills require at least 2.0.0.
+      "-X github.com/infracost/cli/version.Version=2.0.0"
+    ];
     flags = ["--trimpath"];
     env.CGO_ENABLED = "0";
     nativeCheckInputs = [pkgs.git];
@@ -70,6 +74,7 @@ in {
     fish = {
       shellInit = ''
         set -gx WORK_GITHUB_USER "infracost"
+        set -gx CODE_DIR "$HOME/Documents/work"
       '';
 
       functions =
