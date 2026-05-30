@@ -17,6 +17,7 @@
     circleci-cli
     diffutils
     delve
+    deno
     # docker installed through docker desktop
     envsubst
     fd
@@ -61,7 +62,7 @@
     nil # nix language server
     nodePackages.prettier
     nodePackages_latest.markdownlint-cli
-    nodejs_24
+    unstable.nodejs_25
     #open-policy-agent
     postgresql
     pre-commit

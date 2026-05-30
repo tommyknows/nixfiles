@@ -73,11 +73,11 @@
     "internal-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1779190749,
-        "narHash": "sha256-x+gMQ6cMQKlV8fFz3pHD6yr7OGNO/rJvBPTGSpW66VY=",
+        "lastModified": 1779359433,
+        "narHash": "sha256-0vhsSABmtbWR/2PUyGrhCcXmUIxMgi33JgdwtSKfs8s=",
         "ref": "refs/heads/master",
-        "rev": "46a236c47644a5e1ea78ddaeef4077184530aa4b",
-        "revCount": 26,
+        "rev": "9167f1a332ea619fefc5f647140da5f49033d52c",
+        "revCount": 27,
         "type": "git",
         "url": "ssh://git@github.com/infracost/internal-skills"
       },

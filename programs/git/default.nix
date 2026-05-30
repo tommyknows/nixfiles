@@ -78,10 +78,10 @@
           msg = "log --format=\"%B\" -n 1";
           mrnotes = "!git log --reverse --format='%n%n**%s**%n%n%b' origin/HEAD..HEAD | pbcopy";
           plomr = "!fish -c \"git pull origin (default_branch) -r\"";
-          pu = "push -u";
-          puf = "push -u --force";
+          pu = "push";
+          puf = "push --force";
           put = "push --tags";
-          pum = "push -u -o merge_request.create -o merge_request.remove_source_branch";
+          pum = "push -o merge_request.create -o merge_request.remove_source_branch";
           st = "status";
           lg = "log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --all";
           # git doesn't "find" the git-fix command, so let's alias it here.
@@ -99,7 +99,10 @@
         };
         commit = {verbose = true;};
         help = {autocorrect = "prompt";};
-        push = {default = "current";};
+        push = {
+          default = "current";
+          autoSetupRemote = true;
+        };
         pull = {rebase = true;};
         rebase = {updateRefs = true;};
         init = {defaultBranch = "main";};

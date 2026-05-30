@@ -94,6 +94,19 @@ let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 " Disable indentLine per default, enabled in yaml filetype
 let g:indentLine_enabled = 0
 
+" NERDcommenter: skip default mappings (they squat the whole <leader>c* range)
+" and bind only the one we actually use.
+let g:NERDCreateDefaultMappings = 0
+nmap <leader>cc <Plug>NERDCommenterToggle
+xmap <leader>cc <Plug>NERDCommenterToggle
+
+" Fugitive: vertical diff against the index for the current buffer.
+nnoremap <leader>gd :Gvdiffsplit<CR>
+" Fugitive: vertical diff against the upstream branch (handy for PR review).
+nnoremap <leader>gD :Gvdiffsplit @{u}<CR>
+" coc-git: floating popup with the diff hunk under the cursor.
+nnoremap <leader>gh :CocCommand git.chunkInfo<CR>
+
 " In insert mode, absolute numbers, in command mode relative / hybrid ones
 set number
 augroup numbertoggle

@@ -1,6 +1,7 @@
 # completions for "cl" - claude launcher with worktree/repo awareness.
 
 complete --command cl --short-option a --long-option attach --description 'Resume session from .claude/session'
+complete --command cl --short-option n --long-option no-sandbox --description 'Run claude without the agent-safehouse sandbox'
 
 # 1st positional arg: branches in current repo + work dirs + nixfiles
 complete --command cl --exclusive \

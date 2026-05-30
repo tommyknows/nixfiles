@@ -23,18 +23,7 @@
 in {
   home.packages = [agent-safehouse];
 
-  # Machine-local appended profile sourced by `safe-claude` (and any other
-  # safehouse invocation that passes --append-profile).
+  # Machine-local appended profile sourced by the `cl` fish function (and any
+  # other safehouse invocation that passes --append-profile).
   xdg.configFile."agent-safehouse/local-overrides.sb".source = ./local-overrides.sb;
-
-  programs.fish.functions.safe-claude = {
-    description = "Run claude under agent-safehouse (--dangerously-skip-permissions)";
-    body = ''
-      safehouse \
-          --add-dirs=$HOME/Documents/go:$HOME/Library/Caches/go-build \
-          --add-dirs-ro=$HOME/Documents/work:$HOME/Documents/nixfiles \
-          --append-profile=$HOME/.config/agent-safehouse/local-overrides.sb \
-          -- claude --dangerously-skip-permissions $argv
-    '';
-  };
 }

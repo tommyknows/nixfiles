@@ -23,8 +23,15 @@
     // I'm surprised this works??
     // But it seems to also not touch yaml anymore (which might be fine too.)
     "helm",
-    "shell"
+    "shell",
+    // prose reflow swallows/rejoins lines on save — keep markdown untouched
+    "markdown"
   ],
+  "git.addedSign.text": "▎",
+  "git.changedSign.text": "▎",
+  "git.removedSign.text": "▎",
+  "git.topRemovedSign.text": "▔",
+  "git.changeRemovedSign.text": "▎",
   "yaml.schemaStore.enable": true,
   "yaml.schemas": {
     "kubernetes": "*.yaml",

@@ -25,6 +25,22 @@
     (home-subpath "/.local/state/nix")                              ;; Underlying nix profiles directory targeted by ~/.nix-profile.
 )
 
+;; -- rtk state ------------------------------------------------------------
+;; rtk (token-killing proxy hooked into claude via PreToolUse) persists its
+;; sqlite tracking DB, hook-warn rate-limit timestamp, and `tee` output dumps
+;; under ~/Library/Application Support/rtk/. Without write access here, rtk
+;; fails to initialize its DB and the rate-limit timestamp can't update, so
+;; the "No hook installed" warning fires on every command instead of once
+;; per day.
+
+(allow file-read-metadata
+    (home-literal "/Library/Application Support")                   ;; Ancestor traversal toward rtk state dir.
+)
+
+(allow file-read* file-write*
+    (home-subpath "/Library/Application Support/rtk")               ;; rtk state: history.db, .hook_warn_last, tee/.
+)
+
 ;; -- Secretive SSH agent ----------------------------------------------------
 ;; Secretive stores its socket and public keys under
 ;; ~/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/, which is
@@ -51,6 +67,68 @@
     (remote unix-socket
         (path-regex (string-append "^" HOME_DIR "/Library/Containers/com\\.maxgoedjen\\.Secretive\\.SecretAgent/Data/socket\\.ssh$"))
     )
+)
+
+;; -- tilt state -----------------------------------------------------------
+;; tilt persists its local config, analytics opt-in, and per-project state
+;; under ~/.tilt-dev/. Without write access here, `tilt up`/`tilt ci` aborts
+;; during initialization when it tries to create token/analytics files.
+;; Docker and Kubernetes access remain gated by --enable=docker/--enable=kubectl.
+
+(allow file-read-metadata
+    (home-literal "/.tilt-dev")                                     ;; Ancestor traversal toward tilt state dir.
+    (home-literal "/Library/Caches")                                ;; Ancestor traversal toward macOS-style cache dir below.
+    (home-literal "/Library/Preferences")                           ;; Ancestor traversal toward macOS-style prefs dir below.
+)
+
+(allow file-read* file-write*
+    (home-subpath "/.tilt-dev")                                     ;; tilt state: config, analytics, token, per-project caches.
+    (home-subpath "/Library/Caches/tilt-dev")                       ;; tilt build/image/api cache (macOS XDG_CACHE_HOME location).
+    (home-subpath "/Library/Application Support/tilt-dev")          ;; tilt persistent state (macOS XDG_DATA_HOME location).
+    (home-subpath "/Library/Preferences/astro")                     ;; tilt-dev/wmclient telemetry preferences (stored under "astro").
+)
+
+;; -- OrbStack bundled CLIs ------------------------------------------------
+;; Safehouse's --enable=docker profile grants the Orbstack daemon socket and
+;; the app's completions dir, but NOT the bundled CLI binaries under
+;; /Applications/OrbStack.app/Contents/MacOS/xbin. /usr/local/bin/docker is
+;; a symlink into that path; PATH lookups hit a sandbox deny on the target
+;; and child processes exit 127 ("docker: command not found"). Tilt builds
+;; rely on `docker` (and sometimes `buildx`) being callable, so grant read
+;; on the xbin dir. Frameworks/ is included because OrbStack's CLIs are
+;; dynamically linked against dylibs shipped there.
+
+(allow file-read*
+    (subpath "/Applications/OrbStack.app/Contents/MacOS/xbin")      ;; docker, kubectl, helm, buildx — OrbStack-bundled CLIs.
+    (subpath "/Applications/OrbStack.app/Contents/Frameworks")      ;; Shared libraries the bundled CLIs link against.
+)
+
+;; -- Scoped kubeconfig (tilt/k8s) -----------------------------------------
+;; When `cl` detects a Tiltfile in the active worktree it appends
+;; `--enable=docker --env-pass=KUBECONFIG` and sets KUBECONFIG to the file
+;; below. We intentionally do NOT use safehouse's --enable=kubectl, which
+;; would expose all of ~/.kube and ~/.krew — instead we whitelist exactly
+;; one kubeconfig file. That file should inline CA, client cert, and client
+;; key as *-data fields so this single read grant is the only credential
+;; surface in the sandbox.
+;;
+;; Apiserver network access rides on safehouse's wide-open 20-network
+;; baseline; for a local cluster (Orbstack/Docker Desktop) traffic stays
+;; on 127.0.0.1. Cache writes below are not sensitive — they hold the
+;; discovery/HTTP response cache kubectl maintains across runs.
+
+(allow file-read-metadata
+    (home-literal "/.kube")                                         ;; Ancestor traversal toward configs/ and cache dirs.
+    (home-literal "/.kube/configs")                                 ;; Ancestor traversal toward the scoped kubeconfig file.
+)
+
+(allow file-read*
+    (home-literal "/.kube/configs/tilt")                            ;; Scoped single-context kubeconfig consumed via KUBECONFIG.
+)
+
+(allow file-read* file-write*
+    (home-subpath "/.kube/cache")                                   ;; kubectl discovery cache (group/version metadata).
+    (home-subpath "/.kube/http-cache")                              ;; kubectl HTTP response cache.
 )
 
 ;; -- Explicit denies (belt-and-suspenders) ---------------------------------
