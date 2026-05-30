@@ -100,6 +100,10 @@ let g:NERDCreateDefaultMappings = 0
 nmap <leader>cc <Plug>NERDCommenterToggle
 xmap <leader>cc <Plug>NERDCommenterToggle
 
+" See programs/vim/plugin/claude_ask.vim.
+nmap <leader>cl <Plug>(ClaudeAsk)
+xmap <leader>cl <Plug>(ClaudeAsk)
+
 " Fugitive: vertical diff against the index for the current buffer.
 nnoremap <leader>gd :Gvdiffsplit<CR>
 " Fugitive: vertical diff against the upstream branch (handy for PR review).

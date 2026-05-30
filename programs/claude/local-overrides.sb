@@ -131,6 +131,29 @@
     (home-subpath "/.kube/http-cache")                              ;; kubectl HTTP response cache.
 )
 
+;; -- tmux IPC socket ------------------------------------------------------
+;; tmux client commands (e.g. `tmux set-option`) communicate with the tmux
+;; server via a UNIX socket under $TMPDIR/tmux-<uid>/default. Used by the
+;; SessionStart hook to stamp the active session id onto the current pane
+;; (consumed by title.sh and vim's claude-ask plugin). $TMPDIR on macOS is
+;; per-user under /var/folders/<hash>/T/, so we match by regex.
+
+(allow file-read-metadata
+    (regex #"^/private/var/folders/[^/]+/T/tmux-[0-9]+$")
+    (regex #"^/var/folders/[^/]+/T/tmux-[0-9]+$")
+)
+
+(allow file-read* file-write*
+    (regex #"^/private/var/folders/[^/]+/T/tmux-[0-9]+/.*$")
+    (regex #"^/var/folders/[^/]+/T/tmux-[0-9]+/.*$")
+)
+
+(allow network-outbound
+    (remote unix-socket
+        (path-regex #"^/private/var/folders/[^/]+/T/tmux-[0-9]+/default$")
+    )
+)
+
 ;; -- Explicit denies (belt-and-suspenders) ---------------------------------
 ;; These paths are already covered by Safehouse's deny-by-default baseline.
 ;; The explicit denies here guarantee they stay denied even if a future

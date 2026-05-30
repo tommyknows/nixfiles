@@ -27,7 +27,9 @@ function _cl_make_cmd --no-scope-shadowing
         --append-profile=$HOME/.config/agent-safehouse/local-overrides.sb \
         --env-pass=GITHUB_TOKEN \
         --env-pass=TEST_DB_URL \
-        --env-pass=TEST_LOCALSTACK_ENDPOINT
+        --env-pass=TEST_LOCALSTACK_ENDPOINT \
+        --env-pass=TMUX \
+        --env-pass=TMUX_PANE
     set -l _env_prefix
     if test -n "$_cl_tilt"
         set _safehouse_args $_safehouse_args --enable=docker --env-pass=KUBECONFIG
@@ -35,6 +37,22 @@ function _cl_make_cmd --no-scope-shadowing
         echo "cl: Tiltfile detected — enabling docker socket + scoped kubeconfig (~/.kube/configs/tilt)" >&2
     end
     set _claude_cmd $_env_prefix safehouse $_safehouse_args -- claude --dangerously-skip-permissions
+end
+
+# Run claude with a tmux pane marker so vim's <leader>cl can find this
+# session and inject prompts via tmux paste-buffer. Marker is the cwd
+# (= worktree); cleared after claude exits. Stale markers can survive
+# `exec` or kill -9 — vim cross-checks before pasting.
+function _cl_marked_run --no-scope-shadowing
+    if set -q TMUX
+        tmux set-option -p @claude-session (pwd) 2>/dev/null
+        $_claude_cmd $argv
+        set -l _rc $status
+        tmux set-option -p -u @claude-session 2>/dev/null
+        tmux set-option -p -u @claude-id 2>/dev/null
+        return $_rc
+    end
+    $_claude_cmd $argv
 end
 
 set -l _cl_tilt
@@ -45,7 +63,7 @@ set -l _git_common (git rev-parse --git-common-dir 2>/dev/null)
 if test $status -ne 0
     _cl_detect_tilt (pwd)
     _cl_make_cmd
-    $_claude_cmd $argv
+    _cl_marked_run $argv
     return
 end
 
@@ -66,7 +84,7 @@ function _cl_invoke --no-scope-shadowing
         end
         if test (count $_pending) -eq 1
             set -l _pname (basename $_pending[1] .md)
-            claude --name (string join ': ' (basename $_dir) $_pname) "@$_pending[1]"
+            _cl_marked_run --name (string join ': ' (basename $_dir) $_pname) "@$_pending[1]"
             rm -f $_pending[1]
             return
         else if test (count $_pending) -gt 1
