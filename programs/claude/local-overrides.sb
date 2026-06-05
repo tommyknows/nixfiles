@@ -11,16 +11,26 @@
 ;; any nix-managed tool (claude, git, node, …) fails to resolve through the
 ;; symlink chain (~/.nix-profile -> ~/.local/state/nix/profiles/profile ->
 ;; /nix/store/<hash>-...) and PATH lookup returns ENOENT.
+;;
+;; /etc/static is nix-darwin's mechanism for exposing system config under /etc
+;; (~/etc/ssh/sshd_config, ~/etc/ssl/certs/ca-certificates.crt, etc.) as
+;; symlinks into the nix store. Without read access to it, e.g. nix-built Node
+;; can't resolve /etc/ssl/certs/ca-certificates.crt -> /etc/static/... and TLS
+;; handshakes fail with UNABLE_TO_GET_ISSUER_CERT_LOCALLY.
 
 (allow file-read-metadata
     (literal "/nix")                                                ;; Ancestor traversal toward /nix/store.
     (literal "/run")                                                ;; Ancestor traversal toward /run/current-system.
+    (literal "/etc/static")                                         ;; nix-darwin static-files symlink (target lives in /nix/store).
+    (literal "/private/etc/static")                                 ;; macOS realpath form of /etc/static.
     (home-literal "/.local/state")                                  ;; Ancestor traversal toward ~/.local/state/nix.
 )
 
 (allow file-read*
     (subpath "/nix/store")                                          ;; All nix-installed binaries and their dynamic library dependencies (content-addressed, world-readable by design).
     (subpath "/run/current-system")                                 ;; nix-darwin active system profile (system-wide binaries and config).
+    (subpath "/etc/static")                                         ;; nix-managed /etc files (CA bundles, ssh config, …) via static-symlink layer.
+    (subpath "/private/etc/static")                                 ;; macOS realpath form of /etc/static.
     (home-subpath "/.nix-profile")                                  ;; home-manager user profile entry point (symlinks into /nix/store).
     (home-subpath "/.local/state/nix")                              ;; Underlying nix profiles directory targeted by ~/.nix-profile.
 )
@@ -154,6 +164,33 @@
     )
 )
 
+;; -- Go env (read-only) ---------------------------------------------------
+;; home-manager's `programs.go.env` writes ~/Library/Application Support/go/env
+;; on macOS (Go's native config location there, not ~/.config/go/env). Without
+;; read access, `go build` inside the sandbox loses GOFLAGS=-buildvcs=false and
+;; hits the bare-clone+worktree VCS detection bug (Go walks past the worktree's
+;; .git *file* and lands at the bare .git/ directory → `git status` exits 128).
+
+(allow file-read*
+    (home-subpath "/Library/Application Support/go")                ;; go env file (GOPATH, GOFLAGS, …).
+)
+
+;; -- ic CLI state (read-only) ---------------------------------------------
+;; The work-internal `ic` CLI caches its GitHub token under ~/.ic/. Sandboxed
+;; tools (e.g. claude invoking `ic ...`) need to *read* the cached token but
+;; should never mutate it — token refresh happens in unsandboxed shells.
+;; LocateGithubToken does a MkdirAll on ~/.ic before reading; granting
+;; read-metadata on the dir lets that no-op succeed when the dir already
+;; exists (created outside the sandbox).
+
+(allow file-read-metadata
+    (home-literal "/.ic")                                           ;; MkdirAll's stat() before it short-circuits on existing dir.
+)
+
+(allow file-read*
+    (home-subpath "/.ic")                                           ;; ic CLI state: GitHub token cache.
+)
+
 ;; -- Explicit denies (belt-and-suspenders) ---------------------------------
 ;; These paths are already covered by Safehouse's deny-by-default baseline.
 ;; The explicit denies here guarantee they stay denied even if a future
@@ -161,7 +198,6 @@
 
 (deny file-read* file-write*
     (home-subpath "/.aws")                                          ;; AWS credentials/config; would be opened by --enable=cloud-credentials.
-    (home-subpath "/.ic")                                           ;; Work internal-CLI tokens; not known to any built-in profile.
     (home-subpath "/.gnupg")                                        ;; GPG keyring (unused by current signing setup, but block anyway).
     (home-subpath "/.ollama")                                       ;; Local model state and API config.
     (home-subpath "/.terraform.d")                                  ;; Terraform Cloud credentials (credentials.tfrc.json).

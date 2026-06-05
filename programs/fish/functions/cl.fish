@@ -1,5 +1,25 @@
-argparse --ignore-unknown a/attach n/no-sandbox -- $argv
+argparse --ignore-unknown a/attach n/no-sandbox 'wt=+' -- $argv
 or return
+
+# --wt=<dir> (repeatable): grant the sandbox RW access to a worktree. If <dir>
+# is a linked git worktree, its git-common-dir (the bare .git/) is added too —
+# otherwise git ops fail because per-worktree state lives outside the worktree.
+# Falls back to a plain RW grant for non-git paths.
+if set -q _flag_wt
+    set -l _expanded
+    for d in $_flag_wt
+        # Fish doesn't expand `~/` mid-word (e.g. in --wt=~/foo), so do it here.
+        set d (string replace -r '^~/' "$HOME/" -- $d)
+        test -e $d; or continue
+        set d (realpath $d)
+        set -a _expanded $d
+        # If <d> is a linked git worktree, also grant RW to its common dir.
+        set -l _gc (git -C $d rev-parse --git-common-dir 2>/dev/null); or continue
+        string match -q '/*' $_gc; or set _gc $d/$_gc
+        set _gc (realpath $_gc 2>/dev/null); and set -a _expanded $_gc
+    end
+    set _flag_wt $_expanded
+end
 
 # Sets _cl_tilt to "1" if any argument dir contains a Tiltfile.
 # Trips the docker + scoped-kubeconfig path inside _cl_make_cmd.
@@ -20,7 +40,7 @@ function _cl_make_cmd --no-scope-shadowing
         set _claude_cmd claude
         return
     end
-    set -l _rw $HOME/Documents/go $HOME/Library/Caches/go-build $argv
+    set -l _rw $HOME/Documents/go $HOME/Library/Caches/go-build $argv $_flag_wt
     set -l _safehouse_args \
         --add-dirs=(string join : $_rw) \
         --add-dirs-ro=$HOME/Documents/work:$HOME/Documents/nixfiles \
