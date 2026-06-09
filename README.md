@@ -117,7 +117,3 @@ Additionally, `ls` has been mapped to `lsd` as well.
 
 This still configures `vim`, not `neovim`: I so far haven't had the patience to
 translate my config.
-
-Additionally,there's a shared clipboard for tmux and vim. And tmux and the
-system clipboard. But not for vim and system clipboard, yet :(. This would be a
-nice fix.

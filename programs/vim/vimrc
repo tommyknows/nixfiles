@@ -91,6 +91,31 @@ set termguicolors
 let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
 let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
 
+" Share clipboard with macOS pasteboard via +clipboard_provider.
+" Routes the '*' and '+' registers through pbcopy/pbpaste; combined with
+" clipboard=unnamed,unnamedplus this makes plain y/p use the system pasteboard.
+if has('clipboard_provider') && executable('pbcopy') && executable('pbpaste')
+  function! s:PbCopy(reg, type, str) abort
+    let l:payload = join(a:str, "\n") . (a:type ==# 'V' ? "\n" : '')
+    call system('pbcopy', l:payload)
+  endfunction
+
+  function! s:PbPaste(reg) abort
+    let l:out = system('pbpaste')
+    let l:linewise = l:out =~# '\n$'
+    let l:lines = split(substitute(l:out, '\n$', '', ''), "\n", 1)
+    return [l:linewise ? 'V' : 'v', l:lines]
+  endfunction
+
+  let v:clipproviders['pbcopy'] = {
+    \ 'available': {-> v:true},
+    \ 'copy':  {'+': function('s:PbCopy'),  '*': function('s:PbCopy')},
+    \ 'paste': {'+': function('s:PbPaste'), '*': function('s:PbPaste')},
+    \ }
+  set clipmethod^=pbcopy
+  set clipboard=unnamed,unnamedplus
+endif
+
 " Disable indentLine per default, enabled in yaml filetype
 let g:indentLine_enabled = 0
 

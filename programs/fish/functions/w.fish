@@ -97,6 +97,13 @@ end
 
 c $branch $commit
 
+# `c` cd'd from the bare repo into the worktree, which left the bare repo on
+# top of `$dirprev`. Drop it so Alt-Left jumps straight back to the caller's
+# original directory instead of stopping at the (useless) bare repo.
+if test (count $dirprev) -gt 0; and test "$dirprev[-1]" = "$dir"
+    set --global --erase dirprev[-1]
+end
+
 if [ -n "$subdir" ]
     cd "$subdir"
 else if [ -n "$filename" ]

@@ -105,7 +105,6 @@ in {
       vim-textobj-user
       vim-test
       vim-tmux
-      vim-tmux-clipboard
       vim-tmux-focus-events
       vim-tmux-navigator
       vim-vinegar

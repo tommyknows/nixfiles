@@ -175,6 +175,18 @@
     (home-subpath "/Library/Application Support/go")                ;; go env file (GOPATH, GOFLAGS, …).
 )
 
+;; -- staticcheck cache ----------------------------------------------------
+;; staticcheck (honnef.co/go/tools) caches package analysis results via
+;; os.UserCacheDir() → ~/Library/Caches/staticcheck on macOS. Without write
+;; access the linter either falls back to a full re-analysis on every run
+;; (very slow on large modules) or aborts when it can't persist its cache.
+;; Note: ~/Library/Caches ancestor traversal is already granted in the tilt
+;; section above; only the subpath grant is needed here.
+
+(allow file-read* file-write*
+    (home-subpath "/Library/Caches/staticcheck")                    ;; staticcheck package analysis cache.
+)
+
 ;; -- ic CLI state (read-only) ---------------------------------------------
 ;; The work-internal `ic` CLI caches its GitHub token under ~/.ic/. Sandboxed
 ;; tools (e.g. claude invoking `ic ...`) need to *read* the cached token but

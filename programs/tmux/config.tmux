@@ -46,12 +46,12 @@ bind c new-window -c "#{pane_current_path}"
 bind Tab last-window
 
 bind-key [ copy-mode
-bind-key ] paste-buffer
+# Paste the system pasteboard so Cmd+C in any app feeds Prefix+].
+bind-key ] run-shell "pbpaste | tmux load-buffer - && tmux paste-buffer"
 
 bind-key -T copy-mode-vi v send-keys -X begin-selection
-bind-key -T copy-mode-vi y send-keys -X copy-pipe "reattach-to-user-namespace pbcopy"
-bind-key -T copy-mode-vi Enter
-bind-key -T copy-mode-vi Enter send-keys -X copy-pipe "reattach-to-user-namespace pbcopy"
+bind-key -T copy-mode-vi y send-keys -X copy-pipe-and-cancel "pbcopy"
+bind-key -T copy-mode-vi Enter send-keys -X copy-pipe-and-cancel "pbcopy"
 
 set-option -g status-interval 1
 
