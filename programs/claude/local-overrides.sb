@@ -35,6 +35,74 @@
     (home-subpath "/.local/state/nix")                              ;; Underlying nix profiles directory targeted by ~/.nix-profile.
 )
 
+;; -- Fish shell config / state -------------------------------------------
+;; ~/.config/fish is a symlink chain into /nix/store managed by home-manager;
+;; without read access here, fish can't load user functions (c, w,
+;; prepare-subagent, …) so worktree management from inside the sandbox is
+;; impossible. Read on /nix/store is already granted, so this is effectively
+;; the same exposure as the existing nix store grant.
+;;
+;; ~/.local/share/fish holds fish_history and generated_completions/. Granting
+;; r/w lets sandboxed fish sessions read and append to the shared history. The
+;; macOS sandbox has no append-only primitive, so this is full r/w — accepted
+;; on the basis that command history is not where this user stores secrets
+;; (tokens go through env files / Secretive / 1Password, not inline args).
+
+(allow file-read-metadata
+    (home-literal "/.config")                                       ;; Ancestor traversal toward fish config.
+    (home-literal "/.local")                                        ;; Ancestor traversal toward fish state.
+    (home-literal "/.local/share")                                  ;; Ancestor traversal toward fish state.
+)
+
+(allow file-read*
+    (home-subpath "/.config/fish")                                  ;; fish config, functions, abbrs, completions (symlinks into /nix/store).
+)
+
+(allow file-read* file-write*
+    (home-subpath "/.local/share/fish")                             ;; fish history + generated_completions cache.
+)
+
+;; -- Nix daemon (for nix-shell -p / nix run nixpkgs#…) --------------------
+;; The nix-daemon protocol lets clients realise derivations, query the store,
+;; and trigger downloads from substituters. Granting socket access enables
+;; ad-hoc tooling like `nix-shell -p <pkg>` and `nix run nixpkgs#<pkg>` from
+;; inside the sandbox.
+;;
+;; Trust boundary: the daemon runs as root, but its protocol does NOT expose
+;; system mutation operations — no /etc writes, no profile switch, no launchd
+;; modification. `darwin-rebuild switch` uses a separate sudo activation
+;; script, not the daemon protocol, so this grant cannot swap the active
+;; system. Builds run as `nixbld*` users inside the daemon's own build
+;; sandbox (/private/tmp/nix-build-*), so derivation execution is real code
+;; execution but isolated from our user account. Profile mutation
+;; (`nix profile install …`) is blocked separately by the read-only grant on
+;; ~/.local/state/nix above.
+;;
+;; New risks added by this grant: arbitrary nixpkgs downloads (unbounded
+;; disk) and supply-chain exposure to substituters — the same risks accepted
+;; on every `rebuild`.
+
+(allow file-read-metadata
+    (literal "/nix/var")                                            ;; Ancestor traversal toward daemon socket.
+    (literal "/nix/var/nix")                                        ;; Ancestor traversal toward daemon socket.
+    (literal "/nix/var/nix/daemon-socket")                          ;; Ancestor traversal toward daemon socket.
+    (home-literal "/.cache")                                        ;; Ancestor traversal toward nix client caches.
+)
+
+(allow file-read*
+    (literal "/nix/var/nix/daemon-socket/socket")                   ;; Socket file metadata + open() before connect().
+)
+
+(allow network-outbound
+    (remote unix-socket
+        (literal "/nix/var/nix/daemon-socket/socket")
+    )
+)
+
+(allow file-read* file-write*
+    (home-subpath "/.cache/nix")                                    ;; nix client-side eval / fetcher caches consulted on `nix-shell` startup.
+)
+
 ;; -- rtk state ------------------------------------------------------------
 ;; rtk (token-killing proxy hooked into claude via PreToolUse) persists its
 ;; sqlite tracking DB, hook-warn rate-limit timestamp, and `tee` output dumps

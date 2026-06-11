@@ -167,8 +167,13 @@ if test (count $argv) -eq 1; and not string match -q -- '-*' "$argv[1]"
     end
 end
 
-# Mode 4 (default): add all sibling worktrees as --add-dir for claude AND as
-# safehouse --add-dirs (RW) so cross-tree edits keep working in global mode.
+# Mode 4 (default): add all sibling worktrees as --add-dir for claude AND
+# grant safehouse RW on the entire repo tree ($_groot) — bare .git/, every
+# sibling, and any not-yet-created sibling. This is what enables in-session
+# `c <branch>` / `prepare-subagent`: `git worktree add` needs writes on the
+# repo parent (mkdir) and bare .git/ (worktree + ref registration). Scoped
+# modes (cl ., cl <branch>, cl <repo> <branch>) deliberately keep the
+# narrower default grant and so can't create new worktrees.
 set -l _add_dirs
 set -l _siblings
 for dir in $_groot/*/
@@ -180,10 +185,6 @@ for dir in $_groot/*/
 end
 
 _cl_detect_tilt (pwd) $_siblings
-if test (count $_siblings) -gt 0
-    _cl_make_cmd $_siblings
-else
-    _cl_make_cmd
-end
+_cl_make_cmd $_groot
 
 _cl_invoke (pwd) $_add_dirs $argv

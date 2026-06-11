@@ -73,6 +73,12 @@
         function = "__groot";
         setCursor = true;
       };
+      groot-path = {
+        position = "anywhere";
+        regex = ":/\\S*";
+        function = "__groot_path";
+        setCursor = true;
+      };
       k = "kubectl";
       rebuild = "sudo nix run nix-darwin -- switch --flake ~/Documents/nixfiles/main#${hostname}";
       tat = "tmux a -t";
