@@ -42,18 +42,6 @@
     "http://json.schemastore.org/chart": "Chart.{yml,yaml}",
     "https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json": "*docker-compose*.{yml,yaml}"
   },
-  // gopls needs to be *compiled* with a specific version of Go to support it's features.
-  // We're installing gopls through unstable, which means it's built with the Go version
-  // in unstable too. `coc-go` would build gopls with our locally installed version of Go,
-  // which is from stable, ergo older.
-  "go.goplsPath": "/Users/ramon/.nix-profile/bin/gopls",
-  "go.goplsOptions": {
-    "completeUnimported": true,
-    "buildFlags": ["-tags", "integration,e2e"]
-  },
-  "go.tags": {
-    "skipUnexported": true
-  },
   "tslint.autoFixOnSave": true,
   "diagnostic-languageserver.filetypes": {
     // lint `sh` (includes `bash`) files
@@ -71,6 +59,36 @@
     }
   },
   "languageserver": {
+    // gopls needs to be *compiled* with a specific Go version to support its features,
+    // so we pin to the nix-installed binary (built against the Go in unstable) rather
+    // than whatever `gopls` resolves to on $PATH.
+    "gopls": {
+      "command": "/Users/ramon/.nix-profile/bin/gopls",
+      "filetypes": ["go", "gomod", "gosum"],
+      "rootPatterns": ["go.mod", ".git"],
+      "initializationOptions": {
+        "completeUnimported": true,
+        "buildFlags": ["-tags=integration,e2e"]
+      }
+    },
+    "tsserver": {
+      "command": "/Users/ramon/.nix-profile/bin/typescript-language-server",
+      "args": ["--stdio"],
+      "filetypes": [
+        "javascript",
+        "javascriptreact",
+        "javascript.jsx",
+        "typescript",
+        "typescriptreact",
+        "typescript.tsx"
+      ],
+      "rootPatterns": ["tsconfig.json", "jsconfig.json", "package.json", ".git"],
+      "initializationOptions": {
+        "tsserver": {
+          "path": "/Users/ramon/.nix-profile/bin/tsserver"
+        }
+      }
+    },
     "terraform": {
       "command": "terraform-ls",
       "args": ["serve"],

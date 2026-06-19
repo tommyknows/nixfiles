@@ -65,7 +65,6 @@ in {
       # manually installed since it's not in repos.
       #coc-buf-lint
       coc-git
-      coc-go
       coc-jest
       coc-json
       coc-markdownlint
@@ -74,7 +73,6 @@ in {
       coc-rust-analyzer
       coc-sh
       coc-snippets
-      coc-tsserver
       coc-yaml
       fzf-vim
       indentLine

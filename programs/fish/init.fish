@@ -13,6 +13,7 @@ fzf_configure_bindings --directory=\co
 set fzf_preview_file_cmd bat --line-range :50 --color=always --style=rule
 set fzf_preview_dir_cmd lsd --almost-all --long --total-size --color=always
 set fzf_dir_opts --height=50 --bind='ctrl-v:execute(vim {} &> /dev/tty)'
+set fzf_fd_opts --hidden --exclude .git
 
 bind \eo _kubectl_fzf_autocomplete
 bind -M insert \eo _kubectl_fzf_autocomplete

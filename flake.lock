@@ -3,16 +3,16 @@
     "cloud-data": {
       "flake": false,
       "locked": {
-        "lastModified": 1778154095,
-        "narHash": "sha256-InaUmiiAogCmBr/vkFjYfjiw7bDxkcFtheYPMKO/07A=",
-        "ref": "refs/tags/api/gen/go/v0.0.25",
-        "rev": "8bd386e32376c3daab9c2b78ec4f84c5d1527e59",
-        "revCount": 121,
+        "lastModified": 1779310279,
+        "narHash": "sha256-A/bkzdM1/EJ63qLQUUD/AlgohtVz7iGUDsCOyLI7zRk=",
+        "ref": "refs/tags/api/gen/go/v0.0.29",
+        "rev": "4e420f6521d02b1a11be1b0c1d4942b3b8de06c3",
+        "revCount": 191,
         "type": "git",
         "url": "ssh://git@github.com/infracost/cloud-data"
       },
       "original": {
-        "ref": "refs/tags/api/gen/go/v0.0.25",
+        "ref": "refs/tags/api/gen/go/v0.0.29",
         "type": "git",
         "url": "ssh://git@github.com/infracost/cloud-data"
       }
@@ -24,16 +24,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1774875830,
-        "narHash": "sha256-WPYlTmZvVa9dWlAziFkVjBdv1Z6giNIq40O1DxsBmiI=",
+        "lastModified": 1781124985,
+        "narHash": "sha256-hIaUkf6qalGk2xxNEkBMP2m2aPBq+qXvUPOIwwEDySI=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "7afd8cebb99e25a64a745765920e663478eb8830",
+        "rev": "d899b01766784bcc9a141ee13bad6dc689d47c37",
         "type": "github"
       },
       "original": {
         "owner": "nix-community",
-        "ref": "release-25.11",
+        "ref": "release-26.05",
         "repo": "home-manager",
         "type": "github"
       }
@@ -41,11 +41,11 @@
     "ic": {
       "flake": false,
       "locked": {
-        "lastModified": 1778674674,
-        "narHash": "sha256-m4gDf7xAt9BCaHmDBqchMKGtPEiJrvHTZVfjaCP3vPU=",
+        "lastModified": 1781814637,
+        "narHash": "sha256-eQXicY29BPijiyQze6Qysirmb5gVD+I1ELTJNd/hee8=",
         "ref": "refs/heads/master",
-        "rev": "9832176dafee99c80e45d93814fab365fb9871fe",
-        "revCount": 248,
+        "rev": "9d0ae6f83a21178bcfd3895b880a537578a90038",
+        "revCount": 283,
         "type": "git",
         "url": "ssh://git@github.com/infracost/ic"
       },
@@ -57,11 +57,11 @@
     "infracost_cli": {
       "flake": false,
       "locked": {
-        "lastModified": 1778250436,
-        "narHash": "sha256-u814cqdfUWz8x9ywOnquGZ6Aq+UE7BoiGoBcHi5lKMY=",
+        "lastModified": 1781004283,
+        "narHash": "sha256-34lhpU+BQj4vCPoIoJSNT3iPLoZnQMAElGjlWT07bNI=",
         "ref": "refs/heads/main",
-        "rev": "fb72c0e59e1d2fb2ebc92ef4c8ce23dd6e9ccdb0",
-        "revCount": 82,
+        "rev": "ff9582adb60a5c048ece42d66837478620e297e2",
+        "revCount": 117,
         "type": "git",
         "url": "ssh://git@github.com/infracost/cli"
       },
@@ -73,11 +73,11 @@
     "internal-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1779359433,
-        "narHash": "sha256-0vhsSABmtbWR/2PUyGrhCcXmUIxMgi33JgdwtSKfs8s=",
+        "lastModified": 1781118903,
+        "narHash": "sha256-Lu22ax2mVfJQ6tKc9TZcRmdLysmb1JZaqOCINOL0D+g=",
         "ref": "refs/heads/master",
-        "rev": "9167f1a332ea619fefc5f647140da5f49033d52c",
-        "revCount": 27,
+        "rev": "949bc41e62b0c2ef1c6e004a7f01f729427921d4",
+        "revCount": 33,
         "type": "git",
         "url": "ssh://git@github.com/infracost/internal-skills"
       },
@@ -93,32 +93,32 @@
         ]
       },
       "locked": {
-        "lastModified": 1772129556,
-        "narHash": "sha256-Utk0zd8STPsUJPyjabhzPc5BpPodLTXrwkpXBHYnpeg=",
+        "lastModified": 1780789116,
+        "narHash": "sha256-+/LcDMJGYQVLp3ECZ1jBhj3GcQU+Yt+OTsDsQFz8cMs=",
         "owner": "LnL7",
         "repo": "nix-darwin",
-        "rev": "ebec37af18215214173c98cf6356d0aca24a2585",
+        "rev": "731951a251ca96cbd12a8e1bde63737e21947644",
         "type": "github"
       },
       "original": {
         "owner": "LnL7",
-        "ref": "nix-darwin-25.11",
+        "ref": "nix-darwin-26.05",
         "repo": "nix-darwin",
         "type": "github"
       }
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1778504458,
-        "narHash": "sha256-w6+HEdP1PoLAoqaFB/jTyXrFuqxuArJ6Lw1bOkecwP0=",
+        "lastModified": 1781088061,
+        "narHash": "sha256-ccyIWjP94eLTyvzTNXH91iXGd+AfGseTQtXAirxlogk=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "6c424a96762240034e0bcda0e1a50dd48e60ab9b",
+        "rev": "2262daccaac76e0319dc0590c2ef711a3c79c5bd",
         "type": "github"
       },
       "original": {
         "owner": "nixos",
-        "ref": "nixpkgs-25.11-darwin",
+        "ref": "nixpkgs-26.05-darwin",
         "repo": "nixpkgs",
         "type": "github"
       }
@@ -137,11 +137,11 @@
     },
     "unstable": {
       "locked": {
-        "lastModified": 1778443072,
-        "narHash": "sha256-zi7/fsqM/kFdNuED//4WOCUtezGtKKqRNORjMvfwjnA=",
+        "lastModified": 1780749050,
+        "narHash": "sha256-3av0pIjlOWQ6rDbNOmpUSvbNnJkGORQKKjb4LtCZsIY=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "da5ad661ba4e5ef59ba743f0d112cbc30e474f32",
+        "rev": "a799d3e3886da994fa307f817a6bc705ae538eeb",
         "type": "github"
       },
       "original": {

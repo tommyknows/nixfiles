@@ -1,6 +1,8 @@
 argparse --ignore-unknown a/attach n/no-sandbox 'wt=+' -- $argv
 or return
 
+set -l _claude_binary ~/Downloads/claude
+
 # --wt=<dir> (repeatable): grant the sandbox RW access to a worktree. If <dir>
 # is a linked git worktree, its git-common-dir (the bare .git/) is added too —
 # otherwise git ops fail because per-worktree state lives outside the worktree.
@@ -37,7 +39,7 @@ end
 # Defined as a helper so mode 4 can rebuild with extra RW paths for siblings.
 function _cl_make_cmd --no-scope-shadowing
     if set -q _flag_no_sandbox
-        set _claude_cmd claude
+        set _claude_cmd $_claude_binary
         return
     end
     set -l _rw $HOME/Documents/go $HOME/Library/Caches/go-build $argv $_flag_wt
@@ -56,7 +58,7 @@ function _cl_make_cmd --no-scope-shadowing
         set _env_prefix env KUBECONFIG=$HOME/.kube/configs/tilt
         echo "cl: Tiltfile detected — enabling docker socket + scoped kubeconfig (~/.kube/configs/tilt)" >&2
     end
-    set _claude_cmd $_env_prefix safehouse $_safehouse_args -- claude --dangerously-skip-permissions
+    set _claude_cmd $_env_prefix safehouse $_safehouse_args -- $_claude_binary --dangerously-skip-permissions
 end
 
 # Run claude with a tmux pane marker so vim's <leader>cl can find this

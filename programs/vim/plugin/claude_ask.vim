@@ -58,15 +58,35 @@ function! s:session_summary(jsonl_path) abort
   return l:first_user
 endfunction
 
+" Session ids (@claude-id) currently live in a pane of this tmux session,
+" as a set. The project dir is symlinked across all worktrees of a repo,
+" so the resume list below is repo-wide — without this, picking a session
+" that's already running in another worktree's pane would spawn a second
+" process on the same JSONL. (Cross-tmux-session panes are deliberately
+" invisible, so a session live elsewhere can't be guarded against here.)
+function! s:live_ids() abort
+  let l:out = systemlist('tmux list-panes -sF ' . shellescape('#{@claude-id}'))
+  if v:shell_error | return {} | endif
+  let l:ids = {}
+  for l:id in l:out
+    if !empty(l:id) | let l:ids[l:id] = 1 | endif
+  endfor
+  return l:ids
+endfunction
+
 " Top 5 most-recently-modified session JSONLs in the worktree's project
-" dir, within the last 7 days. Used when no live pane exists and we're
-" about to spawn — offer to resume instead of always starting fresh.
+" dir, within the last 7 days, excluding sessions already live in a pane.
+" Used when no live pane exists and we're about to spawn — offer to resume
+" instead of always starting fresh.
 function! s:recent_sessions(worktree) abort
   let l:dir = s:project_dir(a:worktree)
   if !isdirectory(l:dir) | return [] | endif
+  let l:live = s:live_ids()
   let l:cands = []
   for l:f in glob(l:dir . '/*.jsonl', 0, 1)
-    call add(l:cands, {'id': fnamemodify(l:f, ':t:r'), 'mtime': getftime(l:f), 'path': l:f})
+    let l:id = fnamemodify(l:f, ':t:r')
+    if has_key(l:live, l:id) | continue | endif
+    call add(l:cands, {'id': l:id, 'mtime': getftime(l:f), 'path': l:f})
   endfor
   call sort(l:cands, {a, b -> b.mtime - a.mtime})
   let l:cutoff = localtime() - (7 * 86400)
@@ -95,16 +115,42 @@ endfunction
 " unreliable (shows the deepest descendant — often bash when claude is
 " mid-tool-call), so we trust the marker instead. `cl` clears it on
 " return, so the only stale case is SIGKILL.
+"
+" The label must distinguish split panes in a single window — window_name
+" is identical across them. So we build it from the session title (resolved
+" from @claude-id like title.sh does) plus the window.pane location and an
+" active marker, all of which are pane-unique. The fields in l:fmt are
+" delimiter-safe (pane id, a path, a uuid, integers) — the human-readable
+" title is resolved in vim, never passed through the '|'-split.
 function! s:find_panes(worktree) abort
-  let l:fmt = '#{pane_id}|#{@claude-session}|#{window_name}'
+  let l:fmt = join([
+        \ '#{pane_id}',
+        \ '#{@claude-session}',
+        \ '#{@claude-id}',
+        \ '#{window_index}',
+        \ '#{pane_index}',
+        \ '#{?pane_active,*,}',
+        \ ], '|')
   let l:out = systemlist('tmux list-panes -sF ' . shellescape(l:fmt))
   if v:shell_error | return [] | endif
   let l:hits = []
   for l:line in l:out
     let l:p = split(l:line, '|', 1)
-    if len(l:p) < 3 | continue | endif
+    if len(l:p) < 6 | continue | endif
     if l:p[1] !=# a:worktree | continue | endif
-    call add(l:hits, {'id': l:p[0], 'label': l:p[2]})
+    let l:id = l:p[2]
+    let l:loc = printf('%s.%s', l:p[3], l:p[4])
+    let l:active = l:p[5] ==# '*' ? ' *' : ''
+    let l:summary = ''
+    if !empty(l:id)
+      let l:jsonl = s:project_dir(l:p[1]) . '/' . l:id . '.jsonl'
+      if filereadable(l:jsonl)
+        let l:summary = substitute(s:session_summary(l:jsonl), '\n.*', '', '')
+      endif
+    endif
+    if empty(l:summary) | let l:summary = empty(l:id) ? '(starting…)' : '(untitled)' | endif
+    if strlen(l:summary) > 60 | let l:summary = l:summary[:57] . '...' | endif
+    call add(l:hits, {'id': l:p[0], 'label': printf('[%s%s] %s', l:loc, l:active, l:summary)})
   endfor
   return l:hits
 endfunction
@@ -116,7 +162,11 @@ function! s:inject(pane_id, prompt) abort
   call system('tmux paste-buffer -p -d -t ' . shellescape(a:pane_id))
   if v:shell_error | call s:err('tmux paste-buffer failed') | return | endif
   call system('tmux send-keys -t ' . shellescape(a:pane_id) . ' Enter')
-  call system('tmux switch-client -t ' . shellescape(a:pane_id) . ' 2>/dev/null')
+  " Focus the pane within the current session: raise its window
+  " (cross-window — select-pane alone won't), then select the pane. We
+  " never switch tmux sessions — claude panes in other sessions are
+  " deliberately invisible to claude-ask (list-panes -s is session-scoped).
+  call system('tmux select-window -t ' . shellescape(a:pane_id) . ' 2>/dev/null')
   call system('tmux select-pane -t ' . shellescape(a:pane_id))
 endfunction
 

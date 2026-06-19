@@ -2,13 +2,13 @@
   description = "Nix System Config";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-25.11-darwin";
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-26.05-darwin";
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
-    home-manager.url = "github:nix-community/home-manager/release-25.11";
+    home-manager.url = "github:nix-community/home-manager/release-26.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
-    nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-25.11";
+    nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-26.05";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
     ic = {
@@ -20,7 +20,7 @@
       flake = false;
     };
     cloud-data = {
-      url = "git+ssh://git@github.com/infracost/cloud-data?ref=refs/tags/api/gen/go/v0.0.25";
+      url = "git+ssh://git@github.com/infracost/cloud-data?ref=refs/tags/api/gen/go/v0.0.29";
       flake = false;
     };
     internal-skills = {
@@ -41,6 +41,8 @@
       "terraform"
       "claude-code"
       "crush"
+      "vim-bufkill"
+      "vim-sandwich"
     ];
 
     # define the hosts and extra modules we want to include.

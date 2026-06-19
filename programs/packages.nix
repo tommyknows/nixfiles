@@ -26,7 +26,6 @@
     gh
     git-absorb
     gitleaks
-    glab
     unstable.golangci-lint
     google-cloud-sdk
     google-cloud-sql-proxy
@@ -42,6 +41,7 @@
     hyperfine
     jekyll
     jless
+    jujutsu
     jq
     kind
     # Kubebuilder needs additional tools (etcd, apiserver) which are currently not
@@ -60,16 +60,16 @@
     mpv
     ngrok
     nil # nix language server
-    nodePackages.prettier
-    nodePackages_latest.markdownlint-cli
-    unstable.nodejs_25
+    prettier
+    markdownlint-cli
+    unstable.nodejs_26
     #open-policy-agent
     postgresql
     pre-commit
     unstable.protobuf
     protoc-gen-go
     pstree
-    python310
+    python3
     qemu
     qrencode
     rancher
@@ -78,7 +78,6 @@
     sd
     shellcheck
     shfmt
-    slack
     skopeo
     teleport
     terraform
@@ -94,7 +93,7 @@
     yarn
     yq
     unstable.zed-editor
-    nodePackages.typescript
-    nodePackages.cspell
+    typescript
+    cspell
   ];
 }

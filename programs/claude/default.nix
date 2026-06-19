@@ -15,9 +15,19 @@ in {
   programs.claude-code = {
     enable = true;
 
-    memory.source = ./CLAUDE.md;
+    context = ./CLAUDE.md;
 
     commandsDir = ./commands;
+
+    # MCP servers are wrapped onto the claude binary via --mcp-config; the
+    # server definition is declarative, OAuth tokens are stored at runtime
+    # (via /mcp) in the credentials store, not here.
+    mcpServers = {
+      linear-server = {
+        type = "http";
+        url = "https://mcp.linear.app/mcp";
+      };
+    };
 
     settings = {
       autoMemoryEnabled = true;

@@ -37,4 +37,4 @@ command! -nargs=* -bang GoTest call go#test#Test(<bang>0, 0, <f-args>)
 command! -nargs=* -bang GoTestFunc call go#test#Func(<bang>0, <f-args>)
 command! -nargs=* -bang GoTestCompile call go#test#Test(<bang>0, 1, <f-args>)
 
-autocmd BufWritePre *.go :silent call CocAction('runCommand', 'editor.action.organizeImport')
+autocmd BufWritePre *.go :silent call CocAction('organizeImport')

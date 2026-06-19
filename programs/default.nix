@@ -1,14 +1,11 @@
-{
-  pkgs,
-  config,
-  ...
-}: {
+{config, ...}: {
   imports = [
     ./alacritty.nix
     ./autokbisw.nix
     ./claude
     ./fish
     ./git
+    ./packages.nix
     ./tmux
     ./vim
   ];
@@ -43,9 +40,9 @@
     ssh = {
       enable = true;
       enableDefaultConfig = false;
-      matchBlocks."*" = {
-        forwardAgent = false;
-        identityAgent = "/Users/ramon/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh";
+      settings."*" = {
+        ForwardAgent = false;
+        IdentityAgent = "/Users/ramon/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh";
       };
     };
   };
