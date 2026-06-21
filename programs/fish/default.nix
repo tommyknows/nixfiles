@@ -3,7 +3,17 @@
   lib,
   hostname,
   ...
-}: {
+}: let
+  # Our bobthefish fork: jj-aware prompt + bare-clone/worktree path display,
+  # rebuilt on upstream's feature/moar-perf. To update: reset the fork's master
+  # to new upstream, reapply the customizations, push, bump rev + sha256.
+  bobthefishSrc = pkgs.fetchFromGitHub {
+    owner = "tommyknows";
+    repo = "theme-bobthefish";
+    rev = "3a5bfbc6329e3c79b969094366527020e1c66008";
+    sha256 = "sha256-ZQfNdIXVockfTu4fV6PRhtp5ysoz8Via5Bv7FkN4U0k=";
+  };
+in {
   xdg.configFile = {
     # load all completions and configs for fish from the Dotfiles repo.
     "fish/completions" = {
@@ -18,9 +28,17 @@
     #source = ./themes;
     #recursive = true;
     #};
-    # adds the load-scripts to bobthefish's init files. Else they're not loaded for some reason.
-    "fish/conf.d/plugin-bobthefish.fish".text = lib.mkAfter ''
-      for f in $plugin_dir/*.fish
+    # Eagerly source every bobthefish function file. home-manager only adds the
+    # plugin's functions/ dir to $fish_function_path (lazy autoload by filename),
+    # but many bobthefish helpers are grouped into files named after a *different*
+    # function (e.g. __bobthefish_git_async_stop_poller lives inside
+    # __bobthefish_git_async_enabled.fish), so they can never autoload by name and
+    # error out when called. Sourcing functions/*.fish up front defines them all.
+    # NB: a unique filename — a "fish/conf.d/plugin-bobthefish.fish" entry here is
+    # silently shadowed by the one home-manager generates for the plugin. The
+    # "zzz-" prefix makes fish source this after that generated loader.
+    "fish/conf.d/zzz-bobthefish-load.fish".text = ''
+      for f in ${bobthefishSrc}/functions/*.fish
         source $f
       end
     '';
@@ -116,13 +134,9 @@
       }
       {
         name = "bobthefish";
-        src = pkgs.fetchFromGitHub {
-          # custom fork to fine-tune git worktree handling.
-          owner = "tommyknows";
-          repo = "theme-bobthefish";
-          sha256 = "miGpqrNub687ovCcN2qp3pzO+IDuwZ0stO88KMSt8t0=";
-          rev = "9d5046821ca4d9641a0bab3f18f41ee16d8439ee";
-        };
+        # Source files are also eagerly sourced via the conf.d entry above; see
+        # the bobthefishSrc binding at the top of this file.
+        src = bobthefishSrc;
       }
       {
         name = "autopair";
