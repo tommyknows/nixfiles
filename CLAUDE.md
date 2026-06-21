@@ -57,27 +57,55 @@ extraSpecialArgs = {work_toggle = "enabled";};  # or "disabled"
 `programs/default.nix` appends `work/default.nix` when enabled. This controls
 git email/key, WORK_GITHUB_USER, Go private modules, and work fish functions.
 
-## Git Worktree Workflow (Critical)
+## Worktree / Workspace Workflow (Critical)
 
-**All branch switching uses worktrees** — each branch is its own directory.
+**All branch switching uses per-branch directories.** `c`/`w`/`bd` **dispatch per
+repo** (via the git-free `repo_root` helper): a jj repo (it has a `.jj/repo` store at
+the root) uses jj workspaces; a plain git repo uses git worktrees.
+
+- **New repos are jj-native.** `clone` (and `w` cloning a fresh repo) uses
+  `jj git clone` → **no `.git` at all**, just a bare `.jj` store at the root. jj does
+  GitHub fetch/push directly; no git layer.
+- **Existing git repos** stay git until you explicitly run `jj-init`, which converts
+  them in place to a **hybrid** layout (bare `.git` kept alongside the new bare `.jj`).
+  git is a **transitional** fallback there, not permanent.
 
 ```
-repo/
-├── .git/           # bare git dir (never checkout here)
-├── main/           # main branch
-└── my-feature/     # feature branch
+new (jj-native)              existing → after jj-init (hybrid)
+repo/                        repo/
+├── .jj/    bare jj store    ├── .git/   bare git store (transitional fallback)
+├── main/   jj workspace     ├── .jj/    bare jj store
+└── feat/   jj workspace     ├── main/   jj workspace
+                             └── feat/   jj workspace
 ```
 
-### Key Commands
+In both, the bare `.jj` store sits at the root with its default workspace *forgotten*,
+so the root never snapshots stray files, and every dir is a jj workspace.
 
-- `c [BRANCH]` — create/switch worktree branch in current repo. Also creates
-  `.claude` dir and symlinks shared local configs between worktrees.
-- `w [PROJECT] [BRANCH]` — same but for work repos in `~/Documents/work`
-- `bd [BRANCH]` — delete current (or named) worktree, return to default branch
-- `rbd` — rebase default branch onto current, then delete worktree
-- `default_branch` — returns `main` or `master` for current repo
+### Key Commands (dispatching — un-prefixed)
 
-**Never use `git checkout` directly** — always use `c` or `w`.
+- `jj-init` — **explicitly convert** an existing git repo to jj (hybrid; keeps `.git`).
+  All-or-nothing: aborts untouched if any worktree is dirty. Not needed for new clones
+  (already native).
+- `c [NAME [BASE]]` — create/switch. jj repo: a jj workspace off the current `@`
+  (falls back to `trunk()`), bookmark named after the branch (for PRs) + `.claude` +
+  symlinks; `-o`/`origin/NAME` checks out a remote branch. git repo: a git worktree.
+  Existing dir → switch.
+- `w [PROJECT] [BRANCH]` — same, for work repos in `~/Documents/work` (also parses
+  GitHub PR/tree/blob URLs). Fresh clones are jj-native.
+- `bd [-r] [NAME]` — tear down the current/named workspace/worktree, return to the
+  default branch. jj repo `-r` integrates the change into the default branch first
+  (the old `rbd`); never touches `.jj`/`.git`.
+
+### Key Commands (force git — `g`-prefixed)
+
+- `gc` / `gw` / `gbd [-r]` — git-worktree implementations the dispatchers fall back to
+  for plain-git repos; also callable directly to force git worktrees. `gw` clones with
+  `clone --git` (plain-git, no jj). Meaningful only in git/hybrid repos, not jj-native.
+- `default_branch` — returns `main` or `master` for current repo (git-based; shared).
+
+**Never use `git checkout` / `jj workspace add` directly** — always use `c`/`w`/`bd`
+(or the `g`-prefixed force-git variants).
 
 ## Important Gotchas
 
@@ -90,6 +118,17 @@ repo/
 - **Go workspace** is `~/Documents/go` (not `~/go`).
 - **SSH agent** uses Secretive: `~/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh`
 - **Git signing** uses SSH via Secretive, not GPG.
+- **Prompt** (bobthefish) is pinned via `fetchFromGitHub` in
+  `programs/fish/default.nix` to **our fork** `tommyknows/theme-bobthefish`
+  (jj-aware + tuned for the bare-clone/worktree layout, built on upstream's
+  `feature/moar-perf`). To update: in the fork's `master` worktree reset to new
+  upstream, reapply the jj + worktree-display customizations, push, then bump
+  `rev` + `sha256` here. A separate `conf.d/zzz-bobthefish-load.fish` eagerly
+  sources `${bobthefishSrc}/functions/*.fish` — bobthefish groups helpers into
+  files named after a *different* function, so home-manager's lazy autoload-by-
+  name misses them and they error when called. (Don't try to do this by adding a
+  `conf.d/plugin-bobthefish.fish` entry — home-manager generates a file by that
+  exact name for the plugin and silently shadows yours; hence the unique name.)
 - When adding new files, they need to be added to git staging (`git add`) to be picked up by a rebuild.
 
 ## Initial Setup (New Machine)

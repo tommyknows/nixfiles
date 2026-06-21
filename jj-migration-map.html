@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>jj Migration Map — nixfiles</title>
+<style>
+  :root{
+    --bg:#0f1115; --panel:#171a21; --panel2:#1d212b; --ink:#e7eaf0; --muted:#9aa3b2;
+    --line:#2a2f3a; --accent:#7aa2f7; --keep:#5ec98a; --adapt:#e0af68; --drop:#7d8799; --gap:#f7768e;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:32px 20px 80px}
+  h1{font-size:28px;margin:0 0 4px;letter-spacing:-.02em}
+  .sub{color:var(--muted);margin:0 0 28px;font-size:15px}
+  h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);
+    margin:38px 0 14px;font-weight:600}
+  p{margin:0 0 12px}
+  code{background:#11141a;border:1px solid var(--line);border-radius:5px;padding:1px 6px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.86em;color:#c0caf5}
+  .strategy{background:linear-gradient(180deg,#1a2030,#171a21);border:1px solid #2c3550;
+    border-radius:12px;padding:18px 20px;margin-bottom:8px}
+  .strategy b{color:var(--accent)}
+  .strategy p:last-child{margin-bottom:0}
+  .decisions{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin:6px 0 8px}
+  .dec{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--keep);
+    border-radius:9px;padding:12px 14px}
+  .dec h3{margin:0 0 4px;font-size:13.5px}
+  .dec p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.45}
+  .blocker{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--gap);
+    border-radius:10px;padding:16px 18px;margin:6px 0 8px}
+  .blocker h3{margin:0 0 6px;font-size:15px}
+  .blocker p{margin:0 0 8px;color:var(--muted);font-size:13.5px}
+  .blocker p:last-child{margin-bottom:0}
+  .resolved{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px;margin-top:10px}
+  .res{background:#13171f;border:1px solid var(--line);border-radius:9px;padding:11px 13px}
+  .res h3{margin:0 0 3px;font-size:13px;color:var(--keep)}
+  .res p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.45}
+  .tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px;margin-bottom:8px}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px}
+  th{text-align:left;background:var(--panel2);color:var(--muted);font-weight:600;
+    padding:9px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;font-size:12px;
+    text-transform:uppercase;letter-spacing:.04em}
+  td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  tr:last-child td{border-bottom:none}
+  tr:nth-child(even) td{background:#14171e}
+  .grp td{background:#10141d!important;color:var(--accent);font-weight:600;font-size:12px;
+    text-transform:uppercase;letter-spacing:.05em;padding-top:11px;padding-bottom:11px}
+  .badge{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;
+    white-space:nowrap;text-transform:uppercase;letter-spacing:.03em}
+  .b-keep{background:rgba(94,201,138,.14);color:var(--keep)}
+  .b-adapt{background:rgba(224,175,104,.14);color:var(--adapt)}
+  .b-drop{background:rgba(125,135,153,.16);color:var(--drop)}
+  .b-gap{background:rgba(247,118,142,.14);color:var(--gap)}
+  .muted{color:var(--muted)}
+  ol.phases{counter-reset:p;list-style:none;padding:0;margin:0}
+  ol.phases li{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+    padding:14px 16px 14px 56px;margin-bottom:10px;position:relative}
+  ol.phases li::before{counter-increment:p;content:counter(p);position:absolute;left:14px;top:14px;
+    width:28px;height:28px;border-radius:50%;background:#222a3d;color:var(--accent);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;border:1px solid #2c3550}
+  ol.phases h3{margin:0 0 4px;font-size:15px}
+  ol.phases p{margin:0;color:var(--muted);font-size:13px}
+  .tag{font-size:11px;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:1px 6px;margin-left:6px}
+  .tag.warn{color:var(--gap);border-color:rgba(247,118,142,.4)}
+  ul.verify{list-style:none;padding:0;margin:0}
+  ul.verify li{padding:8px 0 8px 26px;border-bottom:1px solid var(--line);position:relative;color:var(--muted);font-size:13.5px}
+  ul.verify li:last-child{border:none}
+  ul.verify li::before{content:"?";position:absolute;left:0;top:8px;width:18px;height:18px;border-radius:50%;
+    background:rgba(247,118,142,.14);color:var(--gap);font-weight:700;font-size:11px;
+    display:flex;align-items:center;justify-content:center}
+  ul.verify b{color:var(--ink)}
+  ul.verify li.done::before{content:"✓";background:rgba(94,201,138,.14);color:var(--keep)}
+  ul.verify li.done{color:var(--muted)}
+  ul.verify li.done b{color:var(--keep)}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin:0 0 14px;font-size:12px;color:var(--muted)}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .dot{width:9px;height:9px;border-radius:50%}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>jj Migration Map</h1>
+  <p class="sub">Holistic plan for moving the nixfiles git tooling to Jujutsu — colocated, incremental, reversible. Worktree-first workflow retained.</p>
+
+  <div class="strategy">
+    <p><b>Core strategy:</b> nothing is big-bang. Run jj <b>colocated</b> (<code>jj git init --colocate</code>) so every repo stays a normal git repo and <code>git</code> remains a permanent escape hatch. <b>Add</b> a <code>programs.jujutsu</code> nix module alongside the existing git config rather than replacing it; retire git-specific bits only once each is confirmed unused. Adopt <b>per-repo</b>, starting with nixfiles itself.</p>
+    <p style="margin-bottom:0"><b>Chosen workflow — keep worktrees (Model B).</b> Worktree use here is <b>concurrency-driven</b> (parallel work, holding a branch's state open during review) and doubles as an <b>in-flight TODO list</b> — not a workaround for painful switching. So worktrees stay: <code>c</code> / <code>w</code> / <code>bd</code> / <code>cl</code> are retained and re-pointed at <b>jj workspaces</b>, with <b>auto-update-stale enabled</b> so restacks reconcile siblings transparently. Drifting toward in-place editing (Model A) is allowed to happen naturally, but is not a goal.</p>
+  </div>
+
+  <h2>Locked decisions</h2>
+  <div class="decisions">
+    <div class="dec"><h3>Colocated + additive</h3><p>jj alongside git; new <code>programs.jujutsu</code> module, git config stays during transition.</p></div>
+    <div class="dec"><h3>Keep worktrees (Model B)</h3><p><code>c/w/bd/cl</code> retained → jj workspaces. Concurrency + TODO-list use justify them.</p></div>
+    <div class="dec"><h3>auto-update-stale = on</h3><p>Sibling workspaces reconcile automatically after a restack — no manual <code>update-stale</code>.</p></div>
+    <div class="dec"><h3>Drop mergiraf &amp; ticket hook</h3><p>Gap #1 and #4 dismissed — not needed under jj's model.</p></div>
+  </div>
+
+  <h2>Workstreams — 3 to build, 1 to execute</h2>
+  <div class="decisions">
+    <div class="dec"><h3>1 · jj config module ✓ done</h3><p>Built &amp; verified: identity (reused from git), scoped work-identity, SSH signing via Secretive, delta diffs. Deferred to WS2: <code>auto-update-stale</code> + aliases.</p></div>
+    <div class="dec"><h3>2 · Worktree-tooling port ✓ done</h3><p><code>c/w/bd</code> <b>dispatch per repo</b> (jj if <code>&lt;root&gt;/.jj/repo</code> exists, else git); <code>bd -r</code> replaces <code>rbd</code>. Conversion is explicit + whole-repo via <b><code>jj-init</code></b> (all-or-nothing clean pre-flight) — nothing else converts a repo. <code>gc/gw/gbd</code> are the git impls / force-git escape hatch. <code>cl</code> enumerates jj workspaces too. Layout: bare <code>.jj</code> at the repo root, default workspace <b>forgotten</b> (Option D) — direct analogue of bare <code>.git</code>. Pending final <code>rebuild</code> verification.</p></div>
+    <div class="dec"><h3>3 · Prompt rewrite ✓ done</h3><p>jj-native <code>__bobthefish_prompt_jj</code> built on latest upstream bobthefish (<code>feature/moar-perf</code>), worktree path display reapplied, pinned via <code>fetchFromGitHub</code> to the fork <code>tommyknows/theme-bobthefish</code>. Source-tested across git-worktree + jj workspaces and clean/changes/conflict states. Pending final <code>rebuild</code> verification.</p></div>
+    <div class="dec" style="border-left-color:var(--drop)"><h3>— · Rollout &amp; cleanup</h3><p>Not a build: per-repo colocation, pre-commit split, CLAUDE.md, retiring dead git config over time.</p></div>
+  </div>
+
+  <h2>Gap status — 0 open, 4 resolved</h2>
+  <div class="resolved">
+    <div class="res"><h3>✓ #2 The prompt — built (Workstream 3)</h3><p><b>Was breaking colocated:</b> git segment showed detached <code>HEAD</code> (hash not name) + permanently "dirty". <b>Resolved:</b> fresh <code>__bobthefish_prompt_jj</code> dispatched (with precedence over git) from <code>fish_prompt</code>'s VCS section via a git-independent <code>__bobthefish_jj_project_dir</code> that walks up for <code>.jj</code> — so it also covers non-colocated <code>jj workspace</code>s; single snapshot-free <code>jj log -r @ --ignore-working-copy</code> call. Mirrors the git worktree display: repo base in the path, identity in the VCS segment = bookmark (≈ tracked GitHub branch), else workspace dir name. State→color/glyph reuses <code>color_repo*</code>: clean <code>○</code> green · changes <code>●</code> orange · conflict <code>✗</code> red. Chose <b>bobthefish-rewrite</b> over Starship. Worktree path display reapplied onto upstream. Pinned to the fork via <code>fetchFromGitHub</code>.</p></div>
+    <div class="res"><h3>✓ #1 prepare-commit-msg hook</h3><p>Not needed in practice. Could template the ticket into the change description later if ever wanted.</p></div>
+    <div class="res"><h3>✓ #3 work-identity (includeIf)</h3><p>Solvable via jj's directory/repo-scoped config (jj#616 + landed commit). Pin exact syntax at implementation.</p></div>
+    <div class="res"><h3>✓ #4 mergiraf</h3><p>Dropped. jj's first-class conflicts make the git merge-driver moot.</p></div>
+  </div>
+
+  <h2>Workstream 2 — worktree tooling design</h2>
+  <p class="muted" style="font-size:13.5px;margin-top:-4px"><b>One set of commands; conversion is explicit and whole-repo.</b> <code>c</code>/<code>w</code>/<code>bd</code> <b>transparently dispatch</b> on whether the repo is jj (<code>test -d &lt;root&gt;/.jj/repo</code>): jj impl if converted, git impl otherwise — no <code>g</code>-prefixed command to remember (the git impl is the fallback the dispatcher calls; keep <code>gc</code>/<code>gw</code>/<code>gbd</code> only as an explicit "force git" escape hatch). A repo is converted in one shot by <code>jj-init</code>, never half-and-half. Working dirs become jj workspaces (non-colocated — no git CLI inside; the bare store is shared).</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Tool</th><th>Behavior</th><th>Notes</th></tr></thead>
+    <tbody>
+      <tr><td><code>jj-init</code><br><span class="muted">eager full conversion</span></td>
+        <td><b>Converts a whole existing git repo to jj (validated).</b> Locate the bare via <code>git rev-parse --git-common-dir</code> → set the interop refspec (<code>+refs/heads/*:refs/remotes/origin/*</code>) → <code>jj git init --no-colocate --git-repo=.git &lt;root&gt;</code> → <code>jj git fetch</code> + track bookmarks → <code>jj workspace forget default</code> (bare <code>.jj</code> at root). Then enumerate <code>git worktree list --porcelain</code> and for <b>every</b> worktree incl. <code>main</code>/<code>master</code>: assert clean → <code>git worktree remove</code> → <code>jj workspace add --name &lt;n&gt; -r &lt;branch&gt;</code>. <b>All-or-nothing:</b> the clean check is a <b>pre-flight before <code>jj git init</code></b> — if <em>any</em> worktree is dirty, abort listing them and touch nothing (a store with no converted workspaces is itself the broken half-state, and would flip <code>c</code>/<code>w</code> into jj-mode over still-git worktrees). Recovery: commit/stash the listed trees, re-run. End state: every dir is a jj workspace, only the bare git worktree remains.</td>
+        <td>For <b>existing</b> git repos only (keeps the bare <code>.git</code> as a transitional fallback). <b>New clones skip this</b>: <code>clone</code> uses native <code>jj git clone --no-colocate</code> → no <code>.git</code> at all, fully jj-native. <code>clone -g/--git</code> (used by <code>gw</code>) opts back into plain git.</td></tr>
+      <tr><td><code>c</code> / <code>w</code> / <code>bd [-r]</code><br><span class="muted">auto-dispatch</span></td>
+        <td>If the repo is jj: <code>jj workspace add</code> off current <code>@</code> (fallback <code>trunk()</code>) + bookmark-per-branch + claude-symlinks + <code>cd</code>; <code>bd [-r]</code> = <code>jj workspace forget</code> + rm + <code>bookmark delete</code> (<code>-r</code> first advances the default bookmark). If the repo is plain git: today's <code>git worktree</code> behavior. Existing dir → just <code>cd</code>. <code>rbd</code> folds into <code>bd -r</code>.</td>
+        <td>Same short names, now jj-or-git automatically.</td></tr>
+      <tr><td><code>gc</code> / <code>gw</code> / <code>gbd [-r]</code><br><span class="muted">git impl / escape hatch</span></td>
+        <td>The git implementation the dispatcher falls back to; also callable directly to force git worktrees even in a jj repo.</td>
+        <td>No longer the primary fallback mechanism — just an override.</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="muted" style="font-size:13px;margin:8px 0 6px"><b>Store-anchor — resolved (Option D, verified):</b> the earlier worry was that <code>.jj/repo</code> lives in the <em>first</em> workspace, so deleting that dir destroys the store. We avoid it entirely: <code>jj git init &lt;root&gt;</code> puts the store at <code>&lt;repo&gt;/.jj</code> (root), then <code>jj workspace forget default</code> drops the root's own working copy. The store now sits at the root — the direct analogue of bare <code>.git</code> — owned by <em>no</em> workspace, so every real workspace (incl. <code>main</code>) is freely deletable and the root never snapshots stray files. No <code>.jj-store/</code> anchor dir needed.</p>
+  <p class="muted" style="font-size:13px;margin:8px 0 6px">Decisions — all resolved:</p>
+  <ul class="verify">
+    <li><b>Anchor strategy ✓</b> — Option D (bare <code>.jj</code> at root, default workspace forgotten). Strictly better than the earlier <code>.jj-store/</code> sibling: one fewer dir, zero snapshot churn, exact bare-<code>.git</code> analogue.</li>
+    <li><b>Repo-type dispatch ✓</b> — <code>c/w/bd</code> branch on <code>test -d &lt;root&gt;/.jj/repo</code>; conversion is explicit via <code>jj-init</code>, never lazy in <code>c</code>.</li>
+    <li><b>Default base ✓</b> — current workspace's <code>@</code> (stacking-friendly, matches today's <code>c</code>), falling back to <code>trunk()</code> when <code>@</code> can't resolve (e.g. called from a git worktree / first init).</li>
+    <li><b>Bookmark on create ✓</b> — yes, a bookmark named after the branch (slashes preserved) at the new <code>@</code>, so PRs can be pushed. Skipped for the default branch. (Bookmarks don't auto-advance onto a later <code>jj new</code>.)</li>
+    <li><b><code>workspace add -r</code> semantics ✓</b> — new workspace's <code>@</code> = an empty change on top of <code>&lt;base&gt;</code> (verified).</li>
+    <li><b><code>bd -r</code> ✓</b> — advances the default bookmark to the workspace's change (<code>jj bookmark set &lt;default&gt; -r &lt;change&gt; --allow-backwards</code>) before teardown. No auto-push.</li>
+  </ul>
+
+  <h2>Item-by-item classification</h2>
+  <div class="legend">
+    <span><span class="dot" style="background:var(--keep)"></span>Keep — works under colocated jj</span>
+    <span><span class="dot" style="background:var(--adapt)"></span>Adapt — has a jj equivalent</span>
+    <span><span class="dot" style="background:var(--drop)"></span>Drop — obsolete in jj's model</span>
+    <span><span class="dot" style="background:var(--gap)"></span>Gap — needs a real solution</span>
+  </div>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Current (file)</th><th>Status</th><th>jj equivalent / note</th></tr></thead>
+    <tbody>
+      <tr class="grp"><td colspan="3">Identity &amp; signing</td></tr>
+      <tr><td><code>user.name / email</code> <span class="muted">(git)</span></td><td><span class="badge b-keep">Keep</span></td><td>Set in <code>programs.jujutsu</code> → <code>user.name/email</code>.</td></tr>
+      <tr><td><code>signByDefault</code> + <code>gpg.format=ssh</code></td><td><span class="badge b-adapt">Adapt</span></td><td>jj <code>signing.behavior="own"</code>, <code>backend="ssh"</code>. <b>Verify Secretive agent.</b></td></tr>
+      <tr><td>work <code>includeIf</code> email+key <span class="muted">(work)</span></td><td><span class="badge b-adapt">Adapt</span></td><td>jj scoped/directory config (jj#616). Ideally set by the <code>w</code> wrapper per work repo.</td></tr>
+
+      <tr class="grp"><td colspan="3">Diff / merge / UI</td></tr>
+      <tr><td><code>delta</code> as differ</td><td><span class="badge b-keep">Keep</span></td><td>Use as jj pager / external diff-formatter. Built-in jj diff also strong.</td></tr>
+      <tr><td><code>diff.algorithm/colorMoved/renames</code></td><td><span class="badge b-adapt">Adapt</span></td><td>jj has its own diff settings; rename detection on by default.</td></tr>
+      <tr><td><code>merge.conflictstyle=zdiff3</code></td><td><span class="badge b-drop">Drop</span></td><td>jj materializes conflicts in its own format; setting is git-only.</td></tr>
+      <tr><td><code>merge "mergiraf"</code> + attributes</td><td><span class="badge b-drop">Drop</span></td><td>Decision locked: drop. git merge drivers unused by jj.</td></tr>
+
+      <tr class="grp"><td colspan="3">Commit flow &amp; aliases</td></tr>
+      <tr><td><code>git absorb</code> + <code>absorb.*</code> config</td><td><span class="badge b-adapt">Adapt</span></td><td><b>Native <code>jj absorb</code></b>. Config knobs become irrelevant.</td></tr>
+      <tr><td><code>rebase.updateRefs=true</code></td><td><span class="badge b-drop">Drop</span></td><td>Descendant rebase is automatic — the whole reason this thread started.</td></tr>
+      <tr><td><code>pull.rebase=true</code></td><td><span class="badge b-drop">Drop</span></td><td>jj <code>git fetch</code> + rebase onto <code>trunk()</code>.</td></tr>
+      <tr><td>aliases <code>c/ca/cn/cna</code> (commit -S)</td><td><span class="badge b-drop">Drop</span></td><td><code>jj commit</code> / <code>jj describe</code>; signing automatic.</td></tr>
+      <tr><td>aliases <code>lg/st/msg/hash/root</code></td><td><span class="badge b-adapt">Adapt</span></td><td><code>jj log</code> (pretty by default), <code>jj status</code>, templates, jj aliases.</td></tr>
+      <tr><td><code>git-fix</code> fish fn (fixup)</td><td><span class="badge b-drop">Drop</span></td><td>Superseded by <code>jj squash</code> / <code>jj absorb</code>.</td></tr>
+      <tr><td><code>git-pick-commit</code> (fzf)</td><td><span class="badge b-adapt">Adapt</span></td><td>fzf over <code>jj log</code> + revsets.</td></tr>
+      <tr><td><code>gitclean</code></td><td><span class="badge b-drop">Drop</span></td><td><code>jj abandon</code> / op-log cleanup.</td></tr>
+
+      <tr class="grp"><td colspan="3">Branch / default handling</td></tr>
+      <tr><td><code>init.defaultBranch</code>, master/main tracking</td><td><span class="badge b-drop">Drop</span></td><td><code>trunk()</code> auto-detects the default branch.</td></tr>
+      <tr><td><code>default_branch</code> fish fn</td><td><span class="badge b-adapt">Adapt</span></td><td>Replace call sites with <code>trunk()</code> (kept where still git-touching).</td></tr>
+      <tr><td><code>push.default/autoSetupRemote</code></td><td><span class="badge b-adapt">Adapt</span></td><td>jj bookmark tracking + <code>jj git push</code> semantics.</td></tr>
+      <tr><td><code>credential.helper="!gh ..."</code></td><td><span class="badge b-keep">Keep</span></td><td>jj git uses git credential helpers (HTTPS) / SSH agent. <b>Verify.</b></td></tr>
+      <tr><td><code>git ignores</code> (.claude, AGENTS.md…)</td><td><span class="badge b-keep">Keep</span></td><td>jj reads <code>.gitignore</code> natively; can also use jj's own ignore.</td></tr>
+
+      <tr class="grp"><td colspan="3">Worktree tooling — retained (Model B)</td></tr>
+      <tr><td><code>c</code> / <code>w</code> (create/switch worktree)</td><td><span class="badge b-adapt">Rework</span></td><td>jj-backed <code>c</code>/<code>w</code> via <code>jj workspace add</code> off current <code>@</code>, bookmark-per-branch, claude-symlinks. <b>Design update:</b> drop the lazy auto-init — instead <b>transparently dispatch</b> jj-vs-git on <code>.jj</code> presence, with whole-repo conversion moved to an explicit eager <code>jj-init</code> (see WS2 design table). <code>gc</code>/<code>gw</code> become the git impl / escape hatch.</td></tr>
+      <tr><td><code>bd</code> / <code>rbd</code></td><td><span class="badge b-keep">Done</span></td><td>WS2 ✓ — jj <code>bd [-r]</code> = <code>workspace forget</code> + rm + <code>bookmark delete</code> (+ <code>-r</code> integrate). <code>rbd</code> folded into <code>bd -r</code>; git original is <code>gbd -r</code>.</td></tr>
+      <tr><td><code>cl</code> (Claude sessions, --add-dir)</td><td><span class="badge b-keep">Done</span></td><td>WS2 ✓ — enumerates dirs with <code>.jj</code> or <code>.git</code>; safehouse grants RW on <code>~/.config/jj</code> for in-session <code>c</code>.</td></tr>
+      <tr><td>auto-update-stale</td><td><span class="badge b-keep">Keep</span></td><td><b>Enable.</b> Makes per-branch workspaces low-friction after restacks.</td></tr>
+      <tr><td>bare-clone + sibling-worktree layout</td><td><span class="badge b-keep">Done</span></td><td>WS2 ✓ — Option D store-at-root (default workspace forgotten), sibling workspaces. <b>New clones are jj-native</b> (<code>jj git clone --no-colocate</code>, bare <code>.jj</code> only, no <code>.git</code>). <b>Existing</b> git repos convert via <code>jj-init</code> to a <b>hybrid</b> (bare <code>.git</code> kept as transitional fallback + bare <code>.jj</code>). Root detection is git-free (<code>repo_root</code>: first ancestor whose <code>.jj/repo</code> or <code>.git</code> is a directory); <code>default_branch</code> reads jj's <code>trunk()</code> alias in jj repos. <code>c</code>/<code>w</code>/<code>bd</code> dispatch jj-or-git; <code>gc/gw/gbd</code> force git.</td></tr>
+      <tr><td>bobthefish fork (worktree prompt)</td><td><span class="badge b-keep">Done</span></td><td>WS3 ✓ — jj-native segment built on latest upstream, worktree path display reapplied, pinned to the fork via <code>fetchFromGitHub</code>.</td></tr>
+
+      <tr class="grp"><td colspan="3">Hooks &amp; ticket workflow</td></tr>
+      <tr><td><code>prepare-commit-msg</code> ticket prefix</td><td><span class="badge b-drop">Drop</span></td><td>Not needed in practice. Optional: jj commit-description template later.</td></tr>
+      <tr><td>pre-commit framework (work repos)</td><td><span class="badge b-adapt">Adapt</span></td><td>Won't fire on <code>jj commit</code>. Split: formatters → <code>jj fix</code>; blocking linters → push-time gate / CI.</td></tr>
+
+      <tr class="grp"><td colspan="3">Host / external tools</td></tr>
+      <tr><td><code>gh-dash</code></td><td><span class="badge b-keep">Keep</span></td><td>GitHub-side, VCS-agnostic.</td></tr>
+      <tr><td>git LFS</td><td><span class="badge b-adapt">Adapt</span></td><td>jj LFS support is limited/evolving. <b>Verify per repo.</b></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>Phased rollout</h2>
+  <ol class="phases">
+    <li><h3>Foundation <span class="tag">low risk · keep git intact</span></h3><p>Add <code>programs.jujutsu</code>: identity, scoped work-identity, SSH signing, delta/ui, <code>auto-update-stale</code>, a few aliases. Install jj, colocate on nixfiles. Read-only exploration alongside normal git work.</p></li>
+    <li class="done"><h3>Prompt rewrite (Workstream 3) ✓ <span class="tag">done · source-tested</span></h3><p>Built jj-natively on latest upstream bobthefish (chose bobthefish-rewrite over Starship). Mirrors the git worktree display: repo base in path, bookmark (else workspace dir name) in the VCS segment; material-monokai colors preserved; path + k8s reused. Handles non-colocated <code>jj workspace</code>s. Pinned to the fork via <code>fetchFromGitHub</code>. Pending final <code>rebuild</code>.</p></li>
+    <li><h3>Daily-drive nixfiles (Model B) <span class="tag">~1–2 weeks</span></h3><p>Real commits / stacks / amend-low-restack, worktrees as today. <code>jj undo</code> as safety net; build a git→jj cheat sheet. Confirm the workflow feels right before touching work repos.</p></li>
+    <li><h3>Port worktree tooling</h3><p><code>c/w/bd/cl</code> → jj workspace wrappers; settle layout; update CLAUDE.md. Keep the spatial "one branch = one workspace" model.</p></li>
+    <li><h3>Roll out to work repos, one at a time</h3><p>Colocate per repo. Verify signing / LFS / scoped identity / pre-commit split. Retire obsolete git aliases + functions from nix only once each is confirmed unused.</p></li>
+  </ol>
+
+  <h2>To verify before committing (open unknowns)</h2>
+  <ul class="verify">
+    <li class="done"><b>Secretive SSH agent + jj signing</b> — works (<code>SSH_AUTH_SOCK</code> → Secretive; <code>behavior="own"</code>, ssh backend).</li>
+    <li class="done"><b>Scoped config syntax</b> — works: <code>[[--scope]]</code> + <code>--when.repositories</code>; applies inside a colocated repo under the path.</li>
+    <li class="done"><b>delta diffs</b> — render correctly via <code>:git</code> + delta pager.</li>
+    <li class="done"><b>home-manager <code>programs.jujutsu</code></b> — covers everything; identity reused from git via <code>config</code>.</li>
+    <li class="done"><b>jj ↔ GitHub interop (pull/push) — validated, with a catch.</b> <code>git clone --bare</code> sets <code>remote.origin.url</code> but <b>no fetch refspec</b> and stores branches as <code>refs/heads/*</code>, so <code>jj git fetch</code> does nothing (no <code>main@origin</code>). Fix: set <code>remote.origin.fetch = +refs/heads/*:refs/remotes/origin/*</code> on the bare, then <code>jj git fetch</code> + <code>jj bookmark track &lt;b&gt; --remote=origin</code>. After that: <code>git pull origin X</code> ≈ <code>jj git fetch</code> (tracked bookmark auto-advances); <code>git push origin X</code> ≈ <code>jj git push --bookmark X</code>. <b>So <code>clone</code> (or first <code>c</code>) must add the refspec</b> — ties into the clone-jj-init TODO above.</li>
+    <li class="done"><b>Migration: existing git worktree → jj workspace — validated.</b> Per worktree (assert clean first): <code>git -C &lt;bare&gt; worktree remove &lt;name&gt;</code> then <code>jj workspace add --name &lt;name&gt; -r &lt;branch&gt; &lt;path&gt;</code>. Existing non-colocated jj workspaces (e.g. <code>test</code>) are untouched. End state: all dirs are jj workspaces, only the bare git worktree remains.</li>
+    <li><b>auto-update-stale config key</b> — confirm the setting name; needed for WS2 (multi-workspace restacks).</li>
+    <li><b>delta on <code>jj log</code></b> — check the graph isn't mangled by the global pager; if so, wire delta for diffs only.</li>
+    <li><b>pre-commit split</b> — which work repos use it; what maps to <code>jj fix</code> vs a push-time gate.</li>
+    <li><b>git LFS under jj</b> — confirm on any LFS-using repo (dashboard?).</li>
+  </ul>
+</div>
+</body>
+</html>
