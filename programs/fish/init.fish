@@ -1,6 +1,9 @@
 fish_hybrid_key_bindings
 
-set -g EDITOR vim
+# -gx (exported), not -g: subprocesses (jj, git, crontab, …) read $EDITOR from
+# the environment, and a plain `set -g` is not exported unless EDITOR was already
+# exported upstream — so without -x, jj/git silently fall back to their defaults.
+set -gx EDITOR vim
 set -g LANG C
 # prompt customisation
 set -g theme_nerd_fonts yes
@@ -8,6 +11,8 @@ set -g theme_title_display_process yes
 set -g theme_display_vi yes
 set -g theme_color_scheme dark
 set -g theme_git_worktree_support yes
+# don't clutter the prompt with the Go toolchain version in go.mod repos
+set -g theme_display_go no
 
 fzf_configure_bindings --directory=\co
 set fzf_preview_file_cmd bat --line-range :50 --color=always --style=rule
