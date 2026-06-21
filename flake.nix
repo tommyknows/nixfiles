@@ -64,6 +64,7 @@
                     fish = final.unstable.fish;
                     git-absorb = final.unstable.git-absorb;
                     claude-code = final.unstable.claude-code;
+                    jujutsu = final.unstable.jujutsu;
                   })
                 ];
               }

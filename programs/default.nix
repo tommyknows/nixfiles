@@ -5,6 +5,7 @@
     ./claude
     ./fish
     ./git
+    ./jujutsu
     ./packages.nix
     ./tmux
     ./vim

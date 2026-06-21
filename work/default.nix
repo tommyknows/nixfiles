@@ -1,4 +1,5 @@
 {
+  config,
   lib,
   pkgs,
   ic,
@@ -68,6 +69,16 @@ in {
             signingKey = "/Users/ramon/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/PublicKeys/a1653ad1704845cd0eb35d5822dc9408.pub";
           };
         };
+      }
+    ];
+
+    # jj equivalent of the git includeIf above: work identity + signing key
+    # for any repo under ~/Documents/work.
+    jujutsu.settings."--scope" = [
+      {
+        "--when".repositories = ["${config.home.homeDirectory}/Documents/work"];
+        user.email = "ramon.ruttimann@infracost.io";
+        signing.key = "/Users/ramon/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/PublicKeys/a1653ad1704845cd0eb35d5822dc9408.pub";
       }
     ];
 
