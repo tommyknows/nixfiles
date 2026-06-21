@@ -1,10 +1,8 @@
-set -l _git_common (git rev-parse --git-common-dir 2>/dev/null)
+set -l _groot (repo_root)
 if test $status -ne 0
-    echo "repo-init: not inside a git repository" >&2
+    echo "repo-init: not inside a repository" >&2
     return 1
 end
-
-set -l _groot (path dirname (realpath $_git_common))
 
 # Derive the Claude projects directory key:
 # strip leading '/', replace remaining '/' with '-'

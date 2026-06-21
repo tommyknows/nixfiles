@@ -42,7 +42,14 @@ function _cl_make_cmd --no-scope-shadowing
         set _claude_cmd $_claude_binary
         return
     end
-    set -l _rw $HOME/Documents/go $HOME/Library/Caches/go-build $argv $_flag_wt
+    # ~/.config/jj is RW so in-session `c` can write jj's per-repo "secure config"
+    # (jj 0.42+ stores it under ~/.config/jj/repos/); otherwise jj errors on every call.
+    # The repo's own .jj store (at the repo root) is RW too, so jj can snapshot the
+    # working copy even in the scoped modes that don't grant the whole tree.
+    set -l _repo_jj
+    set -l _rr (repo_root 2>/dev/null)
+    test -n "$_rr"; and test -d $_rr/.jj; and set _repo_jj $_rr/.jj
+    set -l _rw $HOME/Documents/go $HOME/Library/Caches/go-build $HOME/.config/jj $_repo_jj $argv $_flag_wt
     set -l _safehouse_args \
         --add-dirs=(string join : $_rw) \
         --add-dirs-ro=$HOME/Documents/work:$HOME/Documents/nixfiles \
@@ -81,15 +88,13 @@ set -l _cl_tilt
 set -l _claude_cmd
 _cl_make_cmd
 
-set -l _git_common (git rev-parse --git-common-dir 2>/dev/null)
+set -l _groot (repo_root 2>/dev/null)
 if test $status -ne 0
     _cl_detect_tilt (pwd)
     _cl_make_cmd
     _cl_marked_run $argv
     return
 end
-
-set -l _groot (path dirname (realpath $_git_common))
 
 function _cl_invoke --no-scope-shadowing
     set -l _dir $argv[1]
@@ -145,7 +150,7 @@ if test (count $argv) -ge 2; and not string match -q -- '-*' "$argv[1]"; and not
 
     if test -n "$_repo_path"
         set -l _target $_repo_path/$argv[2]
-        if not test -d $_target; or not test -e $_target/.git
+        if not test -d $_target; or begin; not test -e $_target/.git; and not test -e $_target/.jj; end
             echo "cl: branch '$argv[2]' not found in $_repo_path"
             return 1
         end
@@ -160,7 +165,7 @@ end
 # Mode 3: cl <branch> — single non-flag arg treated as branch in current repo
 if test (count $argv) -eq 1; and not string match -q -- '-*' "$argv[1]"
     set -l _candidate $_groot/$argv[1]
-    if test -d $_candidate; and test -e $_candidate/.git
+    if test -d $_candidate; and begin; test -e $_candidate/.git; or test -e $_candidate/.jj; end
         cd $_candidate
         _cl_detect_tilt $_candidate
         _cl_make_cmd
@@ -180,7 +185,7 @@ set -l _add_dirs
 set -l _siblings
 for dir in $_groot/*/
     set dir (string trim --right --chars=/ $dir)
-    if test -e $dir/.git; and test $dir != (pwd)
+    if begin; test -e $dir/.git; or test -e $dir/.jj; end; and test $dir != (pwd)
         set _add_dirs $_add_dirs --add-dir $dir
         set -a _siblings $dir
     end

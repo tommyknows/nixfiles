@@ -1,29 +1,82 @@
-set default_branch (default_branch)
-set -l _groot (path dirname (realpath (git rev-parse --git-common-dir 2>/dev/null)))
+# `bd` — tear down a worktree/workspace and return to the default branch.
+#
+# Dispatches on repo type: a jj repo (<root>/.jj/repo) tears down jj workspaces;
+# a plain git repo falls back to `gbd` (git worktrees). Call `gbd` directly to force
+# the git behavior.
 
-if test (count $argv) -ne 0
-    set branch_name $argv[1]
-    set dir_name (string replace -a "/" "_" "$branch_name")
-    # if the branch to delete is the same branch as we're currently on, switch to
-    # the default branch dir first.
-    if [ (basename (git rev-parse --show-toplevel)) = $dir_name ]
-        c $default_branch
-    end
-else
-    set branch_name (git rev-parse --abbrev-ref HEAD | string replace 'heads/' '')
-    set dir_name (basename (git rev-parse --show-toplevel))
-    # remove the current dir from z so that we won't try to jump back.
-    z --delete
+argparse r/rebase h/help -- $argv
 
-    c $default_branch
-    git pull origin
+if set --query _flag_help
+    printf '%b' "bd - tear down the current/named jj workspace + bookmark, return to default.
+bd [-r] [NAME]    -r: integrate the change into the default branch first (old rbd).
+In a plain git repo this dispatches to gbd (git worktrees).
+"
+    return
 end
 
-# We need the if-check in there as with detached heads, we don't want to delete anything
-bb "cd $_groot
-    and git worktree remove $dir_name
-    and if test $branch_name != HEAD
-        git branch -D $branch_name
-    end"
+set -l groot (repo_root)
+if test $status -ne 0
+    gbd $argv
+    return
+end
+if not test -d $groot/.jj/repo
+    # Plain git repo → git-worktree teardown. Forward the rebase flag.
+    if set -q _flag_rebase
+        gbd -r $argv
+    else
+        gbd $argv
+    end
+    return
+end
 
-rm -f ~/.claude/projects/(string replace -a / - $_groot/$dir_name)
+# -------------------------------- jj teardown --------------------------------
+set -l default_branch (default_branch)
+
+# Resolve the target workspace leaf (dir name) + bookmark name (slashes preserved).
+set -l dir_leaf
+set -l name
+if set -q argv[1]
+    set name $argv[1]
+    set dir_leaf (string replace -a "/" "_" -- "$name")
+else
+    set -l wsroot (jj workspace root 2>/dev/null)
+    if test -z "$wsroot"
+        echo "bd: not inside a jj workspace; pass a NAME" >&2
+        return 1
+    end
+    set dir_leaf (basename $wsroot)
+    # The real bookmark name (with slashes): first bookmark at @, else the dir leaf.
+    set name (jj -R $wsroot log --no-graph --no-pager -r @ -T 'bookmarks' 2>/dev/null | string split ' ')[1]
+    test -z "$name"; and set name $dir_leaf
+end
+set -l dir $groot/$dir_leaf
+
+if not test -d $dir/.jj
+    echo "bd: no jj workspace at $dir" >&2
+    return 1
+end
+
+# -r: capture the tip to fold into the default branch *before* we move away.
+set -l integrate_rev
+if set -q _flag_rebase
+    set integrate_rev (jj -R $dir log --no-graph --no-pager -r @ -T change_id 2>/dev/null | string trim)
+end
+
+# If we're standing in the workspace we're about to delete, leave first.
+set -l here (realpath (pwd) 2>/dev/null)
+if test "$here" = (realpath $dir 2>/dev/null)
+    z --delete
+    c $default_branch
+end
+
+# Let jj voice the teardown (consistent jj-style log instead of custom echoes).
+if set -q _flag_rebase; and test -n "$integrate_rev"
+    jj -R $groot bookmark set $default_branch -r $integrate_rev --allow-backwards
+end
+
+jj -R $groot workspace forget $dir_leaf
+if test "$name" != "$default_branch"
+    jj -R $groot bookmark delete $name
+end
+rm -rf $dir
+rm -f ~/.claude/projects/(string replace -a / - $dir)

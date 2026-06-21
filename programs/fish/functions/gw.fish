@@ -1,23 +1,21 @@
-set -l helptext "w - switch to work repositories and their jj workspaces, and check out PRs
+set -l helptext "gw - switch to work git repositories and their branches and check out PRs (git fallback)
 
-w [[PROJECT NAME] [BRANCH NAME] [COMMIT SHA / BRANCH] | [PR URL]]
+gw [[PROJECT NAME] [BRANCH NAME] [COMMIT SHA / BRANCH] | [PR URL]]
 
 DESCRIPTION
-w switches to the work dir (/Users/ramon/Documents/work) and checks out the given project.
+gw is the git-worktree fallback for `w` (which is jj-backed). It switches to the work
+dir (/Users/ramon/Documents/work) and checks out the given project as a git worktree.
 If the project should not already exist, it will be cloned automatically. The second and
-third positional argument can be the same as the arguments to the `c` command.
+third positional argument can be the same as the arguments to the `gc` command.
 
 Additionally, if instead of a project name, a Github PR URL is provided, the given repository
 will be cloned (if necessary) and the PR's branch opened. The Github PR URL does not need to
 be 'clean', e.g. it can also include a trailing `/files` for example.
 
-w delegates to `c`, which dispatches per-repo: jj workspaces if the repo has been
-converted with `jj-init`, otherwise git worktrees. Use `gw` to force git worktrees.
-
 EXAMPLES
-`w snyk-docker-plugin` switches to \"/Users/ramon/Documents/work/snyk-docker-plugin/main\", cloning it if necessary.
-`w snyk-docker-plugin my-feature` works the same as the above example, but will check out the branch my-feature.
-`w https://github.com/snyk/cli/pull/4959` checks out the branch of PR #4959 in the CLI repo.
+`gw snyk-docker-plugin` switches to \"/Users/ramon/Documents/work/snyk-docker-plugin/main\", cloning it if necessary.
+`gw snyk-docker-plugin my-feature` works the same as the above example, but will check out the branch my-feature.
+`gw https://github.com/snyk/cli/pull/4959` checks out the branch of PR #4959 in the CLI repo.
 "
 
 argparse h/help -- $argv
@@ -87,7 +85,8 @@ end
 
 set dir $workdir/$repo
 if [ ! -d $dir ]
-    if ! clone $owner/$repo $dir
+    # gw forces git worktrees → clone as a plain git repo (no jj-init).
+    if ! clone --git $owner/$repo $dir
         return
     end
 else
@@ -98,9 +97,9 @@ if [ -z $branch ]
     set branch (default_branch)
 end
 
-c $branch $commit
+gc $branch $commit
 
-# `c` cd'd from the bare repo into the workspace, which left the bare repo on
+# `gc` cd'd from the bare repo into the worktree, which left the bare repo on
 # top of `$dirprev`. Drop it so Alt-Left jumps straight back to the caller's
 # original directory instead of stopping at the (useless) bare repo.
 if test (count $dirprev) -gt 0; and test "$dirprev[-1]" = "$dir"

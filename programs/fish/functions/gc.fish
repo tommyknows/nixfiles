@@ -1,0 +1,144 @@
+set -l helptext "gc - switch / checkout git branches / worktrees (git fallback for the jj-backed `c`).
+
+gc [OPTIONS] [BRANCH_NAME [COMMIT SHA / BRANCH]]
+
+DESCRIPTION
+gc checks out git branches into worktrees, and switches to the corresponding worktree.
+If the branch does not exist, it will be created.
+If the worktree does not exist, it will be created.
+If no BRANCH_NAME is specified, c will switch to the default branch (main / master).
+If no checkout_target or BRANCH is specified and BRANCH_NAME does not exist yet, c will 
+check out the new branch at the given checkout_target or BRANCH.
+If the BRANCH_NAME starts with 'origin/', a local branch will be checked out with the 
+same name as the remote branch. In this case, specifying a COMMIT SHA or BRANCH is invalid.
+Effectively, it is a shortcut for doing `c my-branch origin/my-branch`.
+
+Note that this command has a corresponding auto-completion script (_c_complete) to help
+pick both BRANCH_NAME and COMMIT SHA / BRANCH. By default, `c <TAB>` will list all local
+branches. If the branch name is prefixed with 'o' (e.g. `c o<TAB>`), all origin-branches
+will be shown as well to check out. If the branch name is prefixed with 'v', tags will be
+shown ('v' for the 'v0.0.0' prefix).
+
+`c <branch-name> <TAB>` will bring up an interactive commit-picker with fuzzy-finding.
+
+The following options are available:
+
+-t or --ticket
+      Stores a ticket reference (in the form [ABC-123]) in git notes for later extraction
+      when \"git commit\"ing. Only valid if a new branch / worktree is being created.
+      If the currently checked out branch already specifies a ticket and this
+      flag is not set, the value will be copied from the current branch.
+
+-h or --help
+      Displays help about using this command.
+
+EXAMPLES
+`gc` switches to the main branch.
+`gc new-branch a12346` checks out `new-branch` at the commit SHA `a12346`.
+`gc feat/my-branch` checks out `feat/my-branch`, and will ensure a sane directory name without slashes.
+`gc origin/hello` checks out the remote branch `hello` in a new local branch named `hello`.
+`gc -t PROJ-2048 my-feature` will create a branch `my-feature` corresponding to the ticket `PROJ-2048`.
+"
+
+argparse 't/ticket=' h/help -- $argv
+
+if set --query _flag_help
+    printf '%b' $helptext
+    return
+end
+
+set -l default_branch (default_branch)
+set -l local_branch_name (string replace 'origin/' '' "$argv[1]")
+set -l checkout_target
+set -l track_upstream false
+# if these don't match, the user specified to check out an origin/<BRANCH>. 
+if test "$local_branch_name" != "$argv[1]"
+    set checkout_target "$argv[1]"
+    set track_upstream true
+end
+set -l ticket_ref "$_flag_ticket"
+
+# invoking only 'c' without a branch name should switch to the default branch.
+if test -z $argv[1]
+    set local_branch_name $default_branch
+end
+
+# check if there's a target given to check out, and make sure it's valid.
+if test -n "$argv[2]" && test -z "$checkout_target"
+    if ! git rev-parse --quiet --verify "$argv[2]" &>/dev/null
+        echo "invalid commit sha or branch name: $argv[2]"
+        return
+    end
+    set checkout_target "$argv[2]"
+end
+
+# the "groot" (git root) is the parent directory of all worktrees, where the .git dir resides.
+set -l groot (path dirname (realpath (git rev-parse --git-common-dir 2>/dev/null)))
+
+# if the branch name contains a slash, don't make the dir name annoying.
+set dir_name $groot/(string replace -a "/" "_" "$local_branch_name")
+
+# if worktree already exists, switch to that and return!
+if git worktree list --porcelain | rg "branch refs/heads/$local_branch_name" &>/dev/null
+    cd $dir_name
+    return
+end
+
+echo -n "Creating worktree for branch $local_branch_name"
+if test -n "$checkout_target"
+    echo " at $checkout_target"
+else
+    echo ""
+end
+
+if "$track_upstream"
+    # Fetch potential changes from the remote.
+    echo "Checking out remote branch, pulling changes from remote..."
+    git fetch origin $local_branch_name &>/dev/null
+else if test -n "$checkout_target" && ! git cat-file -e $checkout_target
+    echo "Checkout target doesn't exist, trying to pull changes from remote..."
+    git fetch origin $checkout_target
+end
+
+set -l create_branch_flag
+# if the branch doesn't exist yet, use `-b` to create it.
+if ! git rev-parse --verify --quiet $local_branch_name &>/dev/null
+    set create_branch_flag -b
+end
+
+if ! git worktree add -q $dir_name $create_branch_flag $local_branch_name $checkout_target
+    echo "Error adding worktree!"
+    return
+end
+
+mkdir -p $dir_name/.claude
+
+echo "Symlinking files & directories..."
+# TODO: copy other config files?
+for fileOrDir in "config.local.json" ".local-dev-deps" tools/node_modules "tools/.bin"
+    if [ -e $groot/$default_branch/$fileOrDir -a ! -f $dir_name/$fileOrDir ]
+        ln -s $groot/$default_branch/$fileOrDir $dir_name/$fileOrDir
+    end
+end
+
+set -l _claude_canonical ~/.claude/projects/(string replace -a / - $groot)
+set -l _claude_link ~/.claude/projects/(string replace -a / - $dir_name)
+mkdir -p $_claude_canonical
+if test ! -e $_claude_link; and test ! -L $_claude_link
+    ln -s $_claude_canonical $_claude_link
+end
+
+if test -z "$ticket_ref"
+    # this might also return an empty string, which is fine.
+    set ticket_ref (git config branch.(git rev-parse --abbrev-ref HEAD).note)
+end
+
+if test -n "$ticket_ref"
+    git config branch.$local_branch_name.note $ticket_ref
+end
+
+cd $dir_name
+
+if "$track_upstream"
+    git branch --set-upstream-to=origin/$local_branch_name
+end

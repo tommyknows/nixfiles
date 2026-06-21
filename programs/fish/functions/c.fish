@@ -1,144 +1,157 @@
-set -l helptext "c - switch / checkout git branches / worktrees.
+# `c` — create / switch a worktree-or-workspace in the current repo.
+#
+# Dispatches on repo type: a repo converted to jj (<root>/.jj/repo exists, created
+# explicitly by `jj-init`) uses jj workspaces; a plain git repo falls back to `gc`
+# (git worktrees). `c` never converts a repo — run `jj-init` for that. Call `gc`
+# directly to force git worktrees even inside a jj repo.
 
-c [OPTIONS] [BRANCH_NAME [COMMIT SHA / BRANCH]]
+# Dispatch first, forwarding the raw args to the git impl when this isn't a jj repo
+# (or we're not in a repo at all — gc handles help/errors).
+set -l groot (repo_root)
+if test $status -ne 0
+    gc $argv
+    return
+end
+if not test -d $groot/.jj/repo
+    # git impl (gc) uses git's origin/<branch> form, so translate -o/--origin <branch>
+    # into that, keeping `c -o foo` uniform across jj and git repos.
+    set -l fwd
+    set -l want_origin 0
+    for a in $argv
+        switch $a
+            case -o --origin
+                set want_origin 1
+            case '*'
+                if test $want_origin -eq 1
+                    set -a fwd "origin/$a"
+                    set want_origin 0
+                else
+                    set -a fwd $a
+                end
+        end
+    end
+    gc $fwd
+    return
+end
+
+# ----------------------------- jj workspace impl -----------------------------
+set -l helptext "c - switch / create jj workspaces (this repo is jj; run `gc` to force git).
+
+c [OPTIONS] [NAME [BASE]]
 
 DESCRIPTION
-c checks out git branches into worktrees, and switches to the corresponding worktree.
-If the branch does not exist, it will be created.
-If the worktree does not exist, it will be created.
-If no BRANCH_NAME is specified, c will switch to the default branch (main / master).
-If no checkout_target or BRANCH is specified and BRANCH_NAME does not exist yet, c will 
-check out the new branch at the given checkout_target or BRANCH.
-If the BRANCH_NAME starts with 'origin/', a local branch will be checked out with the 
-same name as the remote branch. In this case, specifying a COMMIT SHA or BRANCH is invalid.
-Effectively, it is a shortcut for doing `c my-branch origin/my-branch`.
+c creates and switches between jj workspaces — sibling directories next to the bare
+.git and the bare .jj store. If NAME is omitted, c switches to the default-branch dir.
+If the workspace directory already exists (jj workspace OR git worktree), c switches
+to it. Otherwise a new jj workspace is created.
 
-Note that this command has a corresponding auto-completion script (_c_complete) to help
-pick both BRANCH_NAME and COMMIT SHA / BRANCH. By default, `c <TAB>` will list all local
-branches. If the branch name is prefixed with 'o' (e.g. `c o<TAB>`), all origin-branches
-will be shown as well to check out. If the branch name is prefixed with 'v', tags will be
-shown ('v' for the 'v0.0.0' prefix).
+BASE selects the revision the new workspace branches off:
+  - if given, it must be a valid jj revset (a bookmark, change-id, tag).
+  - otherwise it defaults to the current workspace's @ (stacking-friendly), falling
+    back to trunk() (the default branch) when @ can't be resolved.
 
-`c <branch-name> <TAB>` will bring up an interactive commit-picker with fuzzy-finding.
+With -o (or the 'origin/NAME' alias), the matching remote bookmark is fetched and
+tracked. A bookmark named after NAME is created at the new @ (for PR pushes); skipped
+for the default branch.
 
-The following options are available:
-
--t or --ticket
-      Stores a ticket reference (in the form [ABC-123]) in git notes for later extraction
-      when \"git commit\"ing. Only valid if a new branch / worktree is being created.
-      If the currently checked out branch already specifies a ticket and this
-      flag is not set, the value will be copied from the current branch.
-
--h or --help
-      Displays help about using this command.
+OPTIONS
+-o or --origin   Check out / track a remote (origin) branch (≈ git 'origin/NAME').
+-t or --ticket   Store a ticket reference for later extraction when committing.
+-h or --help     Display this help.
 
 EXAMPLES
-`c` switches to the main branch.
-`c new-branch a12346` checks out `new-branch` at the commit SHA `a12346`.
-`c feat/my-branch` checks out `feat/my-branch`, and will ensure a sane directory name without slashes.
-`c origin/hello` checks out the remote branch `hello` in a new local branch named `hello`.
-`c -t PROJ-2048 my-feature` will create a branch `my-feature` corresponding to the ticket `PROJ-2048`.
+`c`                 switches to the default-branch directory.
+`c my-feature`      creates a jj workspace 'my-feature' off the current @.
+`c hotfix trunk()`  creates 'hotfix' branched off the default branch.
+`c -o pr-123`       fetches and tracks the remote bookmark pr-123.
+`c origin/pr-123`   same, via the compat alias.
 "
 
-argparse 't/ticket=' h/help -- $argv
-
+argparse 't/ticket=' o/origin h/help -- $argv
 if set --query _flag_help
     printf '%b' $helptext
     return
 end
 
+set -l bare $groot/.git
 set -l default_branch (default_branch)
-set -l local_branch_name (string replace 'origin/' '' "$argv[1]")
-set -l checkout_target
+
+# Resolve the workspace name + directory.
+set -l name $argv[1]
+test -z "$name"; and set name $default_branch
+
+# -o/--origin, or an 'origin/<x>' name (compat alias), means: fetch + track the
+# remote bookmark <x>.
 set -l track_upstream false
-# if these don't match, the user specified to check out an origin/<BRANCH>. 
-if test "$local_branch_name" != "$argv[1]"
-    set checkout_target "$argv[1]"
+if set -q _flag_origin
     set track_upstream true
 end
-set -l ticket_ref "$_flag_ticket"
-
-# invoking only 'c' without a branch name should switch to the default branch.
-if test -z $argv[1]
-    set local_branch_name $default_branch
+if string match -q 'origin/*' -- "$name"
+    set name (string replace 'origin/' '' -- "$name")
+    set track_upstream true
 end
 
-# check if there's a target given to check out, and make sure it's valid.
-if test -n "$argv[2]" && test -z "$checkout_target"
-    if ! git rev-parse --quiet --verify "$argv[2]" &>/dev/null
-        echo "invalid commit sha or branch name: $argv[2]"
-        return
-    end
-    set checkout_target "$argv[2]"
-end
+set -l dir_leaf (string replace -a "/" "_" -- "$name")
+set -l dir $groot/$dir_leaf
 
-# the "groot" (git root) is the parent directory of all worktrees, where the .git dir resides.
-set -l groot (path dirname (realpath (git rev-parse --git-common-dir 2>/dev/null)))
-
-# if the branch name contains a slash, don't make the dir name annoying.
-set dir_name $groot/(string replace -a "/" "_" "$local_branch_name")
-
-# if worktree already exists, switch to that and return!
-if git worktree list --porcelain | rg "branch refs/heads/$local_branch_name" &>/dev/null
-    cd $dir_name
+# Already exists (jj workspace or git worktree)? Just switch.
+if test -d $dir
+    cd $dir
     return
 end
 
-echo -n "Creating worktree for branch $local_branch_name"
-if test -n "$checkout_target"
-    echo " at $checkout_target"
+# Classify NAME so we check out an existing branch instead of branching off @ for it
+# (mirrors git `c`: existing branch → check out; new name → create off @/base).
+set -l locals  (jj -R $groot bookmark list -T 'name ++ "\n"' 2>/dev/null)
+set -l remotes (jj -R $groot bookmark list -a -T 'if(remote == "origin", name ++ "\n")' 2>/dev/null)
+
+set -l base $argv[2]
+set -l mode  # explicit | track | checkout-local | new
+if test -n "$base"
+    set mode explicit                                  # c NAME BASE → new branch off BASE
+else if test "$track_upstream" = true
+    set mode track; set base "$name@origin"            # c origin/NAME → track remote
+else if contains -- $name $locals
+    set mode checkout-local; set base $name             # existing bookmark → check it out
+else if contains -- $name $remotes
+    set mode track; set track_upstream true; set base "$name@origin"  # remote-only → track
 else
-    echo ""
+    set mode new                                        # brand-new branch off current @
+    set base (jj log --no-graph --no-pager -r @ -T change_id 2>/dev/null | string trim)
+    test -z "$base"; and set base 'trunk()'
 end
 
-if "$track_upstream"
-    # Fetch potential changes from the remote.
-    echo "Checking out remote branch, pulling changes from remote..."
-    git fetch origin $local_branch_name &>/dev/null
-else if test -n "$checkout_target" && ! git cat-file -e $checkout_target
-    echo "Checkout target doesn't exist, trying to pull changes from remote..."
-    git fetch origin $checkout_target
+# Fetch when we're tracking a remote bookmark (let jj voice the result, for a
+# consistent jj-style log rather than a custom echo).
+if test "$mode" = track
+    jj -R $groot git fetch
 end
 
-set -l create_branch_flag
-# if the branch doesn't exist yet, use `-b` to create it.
-if ! git rev-parse --verify --quiet $local_branch_name &>/dev/null
-    set create_branch_flag -b
+if not jj -R $groot workspace add --name $dir_leaf -r $base $dir
+    echo "c: failed to create workspace" >&2
+    return 1
 end
 
-if ! git worktree add -q $dir_name $create_branch_flag $local_branch_name $checkout_target
-    echo "Error adding worktree!"
-    return
-end
-
-mkdir -p $dir_name/.claude
-
-echo "Symlinking files & directories..."
-# TODO: copy other config files?
-for fileOrDir in "config.local.json" ".local-dev-deps" tools/node_modules "tools/.bin"
-    if [ -e $groot/$default_branch/$fileOrDir -a ! -f $dir_name/$fileOrDir ]
-        ln -s $groot/$default_branch/$fileOrDir $dir_name/$fileOrDir
+# Bookmark: track remote, create one for genuinely new branches, leave existing alone.
+if test "$name" != "$default_branch"
+    switch $mode
+        case track
+            jj -R $groot bookmark track $name --remote=origin 2>/dev/null
+        case new explicit
+            jj -R $dir bookmark create $name -r @ 2>/dev/null
     end
 end
 
-set -l _claude_canonical ~/.claude/projects/(string replace -a / - $groot)
-set -l _claude_link ~/.claude/projects/(string replace -a / - $dir_name)
-mkdir -p $_claude_canonical
-if test ! -e $_claude_link; and test ! -L $_claude_link
-    ln -s $_claude_canonical $_claude_link
-end
+__jj_ws_links $groot $dir $default_branch
 
+# Ticket note: store explicitly via -t, else inherit from the current branch.
+# Best-effort (git config still reads/writes via the shared bare store).
+set -l ticket_ref "$_flag_ticket"
 if test -z "$ticket_ref"
-    # this might also return an empty string, which is fine.
-    set ticket_ref (git config branch.(git rev-parse --abbrev-ref HEAD).note)
+    set ticket_ref (git config branch.(git rev-parse --abbrev-ref HEAD 2>/dev/null).note 2>/dev/null)
 end
-
 if test -n "$ticket_ref"
-    git config branch.$local_branch_name.note $ticket_ref
+    git config branch.$name.note $ticket_ref 2>/dev/null
 end
 
-cd $dir_name
-
-if "$track_upstream"
-    git branch --set-upstream-to=origin/$local_branch_name
-end
+cd $dir
