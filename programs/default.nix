@@ -34,8 +34,13 @@
       arguments = [
         "--smart-case"
         "--hidden"
+        # --hidden makes rg descend into dotfiles/dirs, so re-exclude the VCS
+        # stores it would otherwise search (rg only skips .git by default, and
+        # only without --hidden). .jj is jj's equivalent.
         "--glob"
         "  !.git"
+        "--glob"
+        "  !.jj"
       ];
     };
     ssh = {
