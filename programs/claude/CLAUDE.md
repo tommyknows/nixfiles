@@ -7,14 +7,22 @@
 - Work repos: `~/Documents/work/<repo>/`
 - Nixfiles: `~/Documents/nixfiles/`
 
-All repos use a bare-clone + worktree layout. Each repo is a bare `.git`; branches are checked out as sibling directories:
+All repos use a bare-clone + per-branch-directory layout: branches are checked
+out as sibling directories under the repo root. Repos are migrating from git to
+**Jujutsu (jj)** incrementally, **per repo** — so at any time some are plain git
+and some are jj. **Tell them apart by a `.jj/` directory at the repo root.**
 
 ```
-~/Documents/work/replay/
-  .git/         ← bare git repo
-  master/       ← worktree for branch `master`
-  feat_thing/   ← worktree for branch `feat/thing` (slashes → underscores)
+plain git (not migrated)        jj-migrated (hybrid)
+~/Documents/work/replay/        ~/Documents/work/replay/
+  .git/   ← bare git repo         .git/   ← bare git store (transitional)
+  master/ ← git worktree          .jj/    ← bare jj store (default ws forgotten)
+  feat_thing/ ← git worktree      master/ ← jj workspace (.jj, no .git)
+                                  feat_thing/ ← jj workspace
 ```
+
+(slashes in branch names → underscores in dir names). A jj **workspace** is
+*non-colocated*: it has `.jj` but **no `.git`** of its own.
 
 ## Fish commands
 
@@ -35,24 +43,41 @@ All repos use a bare-clone + worktree layout. Each repo is a bare `.git`; branch
 
 Sessions for all worktrees of a repo are stored in `~/.claude/projects/<path-with-slashes-as-dashes>/` (e.g. nixfiles → `-Users-ramon-Documents-nixfiles`). Worktree-specific paths are symlinks to that canonical directory, so `--resume` shows full history from any worktree. This is set up automatically by `c` when creating a worktree.
 
-## Creating worktrees
+## Creating worktrees / workspaces
 
-Always use `c <branch> [base]` — never `git worktree add` directly.
+Always use `c <branch> [base]` — never `git worktree add` or `jj workspace add`
+directly. `c`/`w`/`bd` **dispatch automatically**: in a jj repo they manage jj
+workspaces; in a plain-git repo, git worktrees. (Their git implementations are
+also exposed as `gc`/`gw`/`gbd` to force git.) Convert an existing git repo to jj
+with `jj-init` (whole-repo, all-or-nothing if any worktree is dirty).
+
+## VCS operations — use the repo's actual VCS
+
+In a **jj repo** (has `.jj/`), use **`jj`, never `git`**, for VCS work. Its
+workspaces are non-colocated, so `git status`/`git diff`/`git commit` there read
+the bare repo, not your working copy — they silently mislead or fail. Map:
+
+- inspect: `jj st`, `jj log`, `jj diff`
+- record: `jj describe -m` (set message on `@`), `jj commit -m` (describe + start a new change), `jj new` (new empty change)
+- amend mid-stack: `jj edit <change>` then just edit files; or `jj squash [--into <change>]`; or `jj absorb` (auto-distribute working-copy hunks into the ancestors that last touched them)
+- remote: `jj git fetch` (≈ pull), `jj git push --bookmark <name>` (≈ push). A **bookmark** is jj's equivalent of a branch
+- resolve conflicts: `jj resolve` (uses mergiraf; non-blocking — conflicts don't stop a merge/rebase)
+
+In a **plain-git repo** (no `.jj/`), use `git` as before.
 
 ## Stacked branch workflow
 
-When working with stacked branches (`master` ← `wt-1` ← `wt-2`), each branch owns its commits. Always amend in the worktree that created the commit, then cascade the rebase downstream.
+**jj repos — restacking is automatic.** Each workspace's change sits on its base;
+edit any change in place (`jj edit <change>` then edit files, or `jj squash` /
+`jj absorb` from the working copy) and **descendants rebase automatically**
+(`auto-update-stale` is on) — no manual downstream cascade. `bd -r` integrates the
+current workspace's change into the default branch before teardown. To restack
+onto a moved base explicitly: `jj rebase -d <base>`.
 
-**Preferred method — `git absorb`**: stage changes and run:
-
-```bash
-git absorb --and-rebase --base <upstream-branch>
-```
-
-Manual flow for amending a commit in `wt-1`:
-1. `git rebase -i master` in the `wt-1` worktree
-2. In `wt-2`: `git rebase wt-1` (use `--onto` to skip duplicates if needed)
-3. Repeat downstream
+**plain-git repos** (`master` ← `wt-1` ← `wt-2`): each branch owns its commits;
+amend in the worktree that created the commit, then cascade downstream.
+- Preferred — `git absorb`: stage changes, then `git absorb --and-rebase --base <upstream-branch>`.
+- Manual: `git rebase -i master` in `wt-1`; then in `wt-2` `git rebase wt-1` (`--onto` to skip duplicates); repeat downstream.
 
 ## Spawning subagents
 

@@ -79,6 +79,13 @@ in {
           "Bash(gofmt*)"
           "Bash(git diff*)"
           "Bash(git log*)"
+          # jj equivalents of the read-only git allowances above (repos are
+          # migrating to jj; these are the commands run constantly while reading).
+          "Bash(jj log*)"
+          "Bash(jj st*)"
+          "Bash(jj diff*)"
+          "Bash(jj show*)"
+          "Bash(jj op log*)"
           "Read(**/.claude/skills/**)"
           "Write(**/.claude/context.md)"
           "Write(**/.claude/session)"
