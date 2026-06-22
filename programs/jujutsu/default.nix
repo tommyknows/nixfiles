@@ -27,6 +27,13 @@
       # Tune the two depths to taste.
       revsets.log = "present(@) | ancestors(immutable_heads().., 5) | present(trunk()) | ancestors(trunk(), 10)";
 
+      # Auto-reconcile a workspace whose working copy went stale because another
+      # workspace rewrote a commit it depends on (rebase/amend/squash). jj's
+      # default is false, which would force a manual `jj workspace update-stale`;
+      # we use per-branch sibling workspaces (Model B), so enable it for seamless
+      # restacks across them.
+      snapshot.auto-update-stale = true;
+
       ui = {
         default-command = "log";
         # Explicit so jj's editor (change descriptions, `jj describe`, split, etc.)
