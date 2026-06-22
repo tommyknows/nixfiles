@@ -62,6 +62,25 @@
     (home-subpath "/.local/share/fish")                             ;; fish history + generated_completions cache.
 )
 
+;; -- Jujutsu (jj) config + central repo state -----------------------------
+;; ~/.config/jj holds config.toml (a home-manager symlink into /nix/store) and
+;; repos/<hash>/ — jj's central per-repo metadata (e.g. metadata.binpb), which
+;; jj reads AND writes on essentially every command. Without write access here,
+;; jj fails with "Operation not permitted" on .../metadata.binpb, so worktree
+;; management (c/w/bd → jj workspaces) and every jj command break in the sandbox.
+;; Safehouse ships no jj profile, so we grant it here. config.toml's target is
+;; read-only in /nix/store (already granted); only repos/ is mutated, and it's
+;; jj bookkeeping — not a secret store (cf. the fish-history rationale above).
+;; ~/.config ancestor traversal is already granted in the fish section above.
+
+(allow file-read*
+    (home-subpath "/.config/jj")                                    ;; config.toml (symlink into /nix/store) + dir listing.
+)
+
+(allow file-read* file-write*
+    (home-subpath "/.config/jj/repos")                              ;; jj central per-repo metadata (metadata.binpb, op-store pointers).
+)
+
 ;; -- Nix daemon (for nix-shell -p / nix run nixpkgs#…) --------------------
 ;; The nix-daemon protocol lets clients realise derivations, query the store,
 ;; and trigger downloads from substituters. Granting socket access enables
