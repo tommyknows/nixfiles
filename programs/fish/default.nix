@@ -10,8 +10,8 @@
   bobthefishSrc = pkgs.fetchFromGitHub {
     owner = "tommyknows";
     repo = "theme-bobthefish";
-    rev = "3a5bfbc6329e3c79b969094366527020e1c66008";
-    sha256 = "sha256-ZQfNdIXVockfTu4fV6PRhtp5ysoz8Via5Bv7FkN4U0k=";
+    rev = "43a668203e6924f8dc2d32eca0f4a3ea1b80d827";
+    sha256 = "sha256-Fg47v9Y5fA5dzbu+xTeyrL/4CX3josx+wHZAYaEoptI=";
   };
 in {
   xdg.configFile = {
