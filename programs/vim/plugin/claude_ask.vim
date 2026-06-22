@@ -11,10 +11,17 @@ function! s:err(msg) abort
   echohl ErrorMsg | echo 'claude-ask: ' . a:msg | echohl None
 endfunction
 
-function! s:git_root() abort
-  let l:r = systemlist('git rev-parse --show-toplevel')
-  if v:shell_error || empty(l:r) | return '' | endif
-  return l:r[0]
+" Worktree/workspace root — the dir `cl` records in @claude-session. In a jj
+" repo this is the jj workspace root: jj workspaces are non-colocated (no .git),
+" so `git rev-parse` fails there. Try jj first (--ignore-working-copy so merely
+" locating the root never triggers a snapshot), then fall back to the git
+" worktree toplevel for plain-git repos.
+function! s:worktree_root() abort
+  let l:r = systemlist('jj root --ignore-working-copy 2>/dev/null')
+  if !v:shell_error && !empty(l:r) | return l:r[0] | endif
+  let l:r = systemlist('git rev-parse --show-toplevel 2>/dev/null')
+  if !v:shell_error && !empty(l:r) | return l:r[0] | endif
+  return ''
 endfunction
 
 function! s:project_dir(cwd) abort
@@ -224,8 +231,8 @@ endfunction
 function! s:ask(l1, l2) abort
   if empty($TMUX) | call s:err('not in tmux') | return | endif
 
-  let l:wt = s:git_root()
-  if empty(l:wt) | call s:err('not in a git repo') | return | endif
+  let l:wt = s:worktree_root()
+  if empty(l:wt) | call s:err('not in a repo') | return | endif
 
   let l:abs = expand('%:p')
   if empty(l:abs) | call s:err('no file in this buffer') | return | endif
