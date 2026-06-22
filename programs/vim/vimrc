@@ -135,6 +135,9 @@ nnoremap <leader>gd :Gvdiffsplit<CR>
 nnoremap <leader>gD :Gvdiffsplit @{u}<CR>
 " coc-git: floating popup with the diff hunk under the cursor.
 nnoremap <leader>gh :CocCommand git.chunkInfo<CR>
+" Blame: jj file annotate in a jj repo, else fugitive :Git blame.
+" See programs/vim/plugin/jj_blame.vim.
+nnoremap <leader>gb :Blame<CR>
 
 " In insert mode, absolute numbers, in command mode relative / hybrid ones
 set number
