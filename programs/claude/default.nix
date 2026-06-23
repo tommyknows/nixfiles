@@ -9,6 +9,16 @@
     [ -n "$session_id" ] || exit 0
     ${pkgs.tmux}/bin/tmux set-option -p -t "$TMUX_PANE" @claude-id "$session_id" 2>/dev/null || true
   '';
+
+  # Custom `@`-mention file search — replaces the built-in, which roots its
+  # search via `git rev-parse` and so breaks in jj non-colocated workspaces.
+  # Full rationale + the `@:` cross-tree syntax live in file-suggestion.sh;
+  # writeShellApplication adds the shebang/`set` and puts rg/jq/fzf on PATH.
+  fileSuggestionScript = pkgs.writeShellApplication {
+    name = "claude-file-suggestion";
+    runtimeInputs = [pkgs.ripgrep pkgs.jq pkgs.fzf pkgs.coreutils];
+    text = builtins.readFile ./file-suggestion.sh;
+  };
 in {
   imports = [./sandbox.nix];
 
@@ -33,6 +43,10 @@ in {
       autoMemoryEnabled = true;
       autoDreamEnabled = true;
       skipDangerousModePermissionPrompt = true;
+      fileSuggestion = {
+        type = "command";
+        command = "${fileSuggestionScript}/bin/claude-file-suggestion";
+      };
       hooks = {
         PreToolUse = [
           {
