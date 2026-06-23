@@ -39,7 +39,7 @@
     version = ic.shortRev or "dev";
     src = infracost_cli;
     subPackages = ["."];
-    vendorHash = "sha256-lwlr94U7oloMJFt4YfYrb2k1ELSqVImcDaCLPtjgvsY=";
+    vendorHash = "sha256-Gm+B37QpscV9Qopan/TEedrLcNVz3p/rVst9aEe0/b0=";
     ldflags = [
       "-s"
       "-w"
