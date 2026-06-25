@@ -77,6 +77,7 @@ in {
       enabledPlugins = {
         "infracost@infracost" = true;
         "gopls-lsp@claude-plugins-official" = true;
+        "pr-review-toolkit@claude-plugins-official" = true;
       };
       permissions = {
         allow = [
