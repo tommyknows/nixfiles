@@ -19,13 +19,26 @@
         key = config.programs.git.signing.key;
       };
 
-      # `jj log` with no args. The built-in default
-      #   present(@) | ancestors(immutable_heads().., 2) | present(trunk())
-      # shows your mutable stack + trunk but nothing *below* trunk, so history
-      # stops at the trunk merge commit. Extend it: deeper mutable stacks
-      # (depth 5, so long stacks show fully) plus ~10 commits of trunk history.
-      # Tune the two depths to taste.
-      revsets.log = "present(@) | ancestors(immutable_heads().., 5) | present(trunk()) | ancestors(trunk(), 10)";
+      # `jj log` with no args. We use per-branch sibling workspaces, so the
+      # question we actually want answered is "where do my worktrees sit
+      # relative to trunk?" — not "dump all mutable history + N commits of
+      # trunk", which the old revset did and which always overflowed the pager.
+      #
+      #   fork_point(working_copies() | trunk()) :: (working_copies() | trunk())
+      #
+      # - working_copies(): the `@` of every workspace (each worktree), including
+      #   ones based on an older commit than trunk (which `trunk()::@` would drop).
+      # - trunk(): the default branch tip.
+      # - fork_point(...):(...): the DAG range from their common fork point up to
+      #   each tip, so jj draws the branch lines connecting every worktree to
+      #   trunk. Shows only the commits needed to relate them — typically a
+      #   handful, no pager. (Pathological orphan branches with no recent common
+      #   ancestor could widen this; in practice worktrees sit near trunk.)
+      revsets.log = "fork_point(working_copies() | trunk())::(working_copies() | trunk())";
+
+      # `jj log` shows the author's email by default, override the alias to show the
+      # author's name instead if set.
+      template-aliases."format_short_signature(signature)" = "if(signature.name(), signature.name(), signature.email())";
 
       # Auto-reconcile a workspace whose working copy went stale because another
       # workspace rewrote a commit it depends on (rebase/amend/squash). jj's
@@ -34,24 +47,14 @@
       # restacks across them.
       snapshot.auto-update-stale = true;
 
+      # Auto-track new bookmarks on the origin remote so `jj git push`
+      # automatically creates them.
+      remotes.origin.auto-track-bookmarks = "glob:*";
+
       ui = {
         default-command = "log";
-        # Explicit so jj's editor (change descriptions, `jj describe`, split, etc.)
-        # never depends on whether $EDITOR happens to be exported. Mirrors $EDITOR.
         editor = "vim";
-
-        # Default tool for `jj resolve` (despite the name, not a UI — it's jj's
-        # generic term for the conflict-resolution program, like `diff-editor`).
-        # mergiraf is non-interactive: it syntax-merges what it can and leaves the
-        # rest as conflicts (its default merge-tools config exits 1 → jj keeps
-        # them). jj ships the mergiraf merge-tools args; this just makes plain
-        # `jj resolve` use it without `--tool mergiraf`. (mergiraf is in packages.)
         merge-editor = "mergiraf";
-        # Render diffs through delta (git-format diffs piped to delta). delta
-        # picks up its [delta] options from gitconfig (programs.delta), so the
-        # look matches git verbatim, and it does word-level intra-line + syntax
-        # highlighting.
-        #
         # TODO: evaluate difftastic instead — syntax-aware structural/word diff,
         # closer to jj's native color-words feel. Would be:
         #   ui.diff-formatter = ["difft" "--color=always" "$left" "$right"];

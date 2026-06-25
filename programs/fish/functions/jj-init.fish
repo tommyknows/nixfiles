@@ -121,9 +121,14 @@ end
 jj -R $groot new 'root()' 2>/dev/null
 jj -R $groot workspace forget default 2>/dev/null
 
-# Refresh + track remote bookmarks so future fetch/push know their upstreams.
+# Refresh remote refs, then track ONLY the local branches we just imported (the
+# worktree branches) to their origin upstreams, so future fetch/push know them.
+# We deliberately do NOT track every remote bookmark: that would mirror the whole
+# remote branch namespace into local bookmarks. (jj's git.auto-local-bookmark
+# defaults to false, so a plain fetch won't recreate them either — remote-only
+# branches stay as `name@origin`.)
 jj -R $groot git fetch 2>/dev/null
-for bm in (jj -R $groot bookmark list -a -T 'if(remote && remote != "git", name ++ "\n")' 2>/dev/null | sort -u)
+for bm in (jj -R $groot bookmark list -T 'name ++ "\n"' 2>/dev/null)
     jj -R $groot bookmark track $bm --remote=origin 2>/dev/null
 end
 
