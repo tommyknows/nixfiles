@@ -133,8 +133,12 @@ xmap <leader>cl <Plug>(ClaudeAsk)
 nnoremap <leader>gd :Gvdiffsplit<CR>
 " Fugitive: vertical diff against the upstream branch (handy for PR review).
 nnoremap <leader>gD :Gvdiffsplit @{u}<CR>
-" coc-git: floating popup with the diff hunk under the cursor.
-nnoremap <leader>gh :CocCommand git.chunkInfo<CR>
+" jj gutter signs (plugin/jj_signs.vim). Glyphs mirror the coc-git signs in
+" coc-settings.json so jj and git workspaces match — keep the two in sync.
+let g:jj_signs_text = {'add': '▎', 'change': '▎', 'delete': '▎', 'topdelete': '▔', 'changedelete': '▎'}
+" Hunk info: jj @- diff popup in a jj repo, else coc-git's chunkInfo.
+" See programs/vim/plugin/jj_signs.vim (also provides ]h/[h to jump hunks).
+nnoremap <leader>gh :HunkInfo<CR>
 " Blame: jj file annotate in a jj repo, else fugitive :Git blame.
 " See programs/vim/plugin/jj_blame.vim.
 nnoremap <leader>gb :Blame<CR>
@@ -331,7 +335,10 @@ let g:BufKillCreateMappings = 0
 
 " disable keymappings for vim-gh-line
 let g:gh_line_map_default = 0
-let g:gh_line_blame_map_default = 1
+" gh-line's default blame map is <leader>gb, which would clobber our :Blame
+" (and it shells out to git, so it errors in a jj workspace). Move it to <leader>gB.
+let g:gh_line_blame_map_default = 0
+let g:gh_line_blame_map = '<leader>gB'
 " copy to clipboard instead of opening page directly.
 let g:gh_open_command = 'fn() { echo "$@" | pbcopy; }; fn '
 " use version hashes instead of branch names.
