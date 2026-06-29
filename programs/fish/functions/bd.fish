@@ -78,5 +78,8 @@ jj -R $groot workspace forget $dir_leaf
 if test "$name" != "$default_branch"
     jj -R $groot bookmark delete $name
 end
-rm -rf $dir
+# The workspace is forgotten from jj's store above, so the on-disk dir is now
+# just orphaned files — `rm -rf` is the only slow step, so background it (à la
+# gbd) instead of blocking the prompt on a large worktree delete.
+bb "rm -rf $dir"
 rm -f ~/.claude/projects/(string replace -a / - $dir)

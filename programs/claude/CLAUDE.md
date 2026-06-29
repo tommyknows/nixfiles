@@ -65,6 +65,29 @@ the bare repo, not your working copy — they silently mislead or fail. Map:
 
 In a **plain-git repo** (no `.jj/`), use `git` as before.
 
+### If commit signing fails (Mac locked), commit unsigned and keep going
+
+Commit normally — commits are signed via SSH through **Secretive** (key in the
+Secure Enclave) and that's the desired default. But when the Mac is locked the
+agent stops responding, so signing fails with errors like `agent refused
+operation`, `sign_and_send_pubkey: signing failed`, or `failed to write commit
+object`. **Don't get stuck on this and don't try to fix signing** — just redo the
+same commit unsigned and carry on as normal.
+
+**In a jj repo**, re-run the commit with `--config signing.behavior=drop`:
+
+```
+jj commit --config signing.behavior=drop -m "..."
+jj describe --config signing.behavior=drop -m "..."
+```
+
+Re-signing is trivial, so leaving a commit unsigned costs nothing — the user
+re-signs in bulk afterwards with `jj sign -r <revset>`. No further action from you;
+don't flag it as a problem.
+
+**In a plain-git repo**, re-signing means a rebase, so still prefer signed commits;
+if signing fails, retry with `git commit --no-gpg-sign` and note it's unsigned.
+
 ## Stacked branch workflow
 
 **jj repos — restacking is automatic.** Each workspace's change sits on its base;

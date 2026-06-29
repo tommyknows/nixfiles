@@ -97,8 +97,17 @@ in {
         function = "__groot_path";
         setCursor = true;
       };
+      # `jj log` keeps jj's default revset (so `jj log -n 15` gives the normal,
+      # just-truncated view). `jl` is a glimpse alias: where each worktree's `@`
+      # sits relative to trunk and the lines connecting them — no pager. Expands
+      # inline, so you can still append flags (`jl -n 5`, `jl --stat`, …).
+      jl = "jj log -r 'fork_point(working_copies() | trunk())::(working_copies() | trunk())'";
       k = "kubectl";
-      rebuild = "sudo nix run nix-darwin -- switch --flake ~/Documents/nixfiles/main#${hostname}";
+      # `path:` forces Nix to treat the dir as a plain path instead of walking up
+      # into the bare `.git` at the (non-colocated jj) repo root — `git status` on
+      # a bare repo is illegal (libgit2 error 6). TEMPORARY workaround: drop the
+      # `path:` prefix once https://github.com/NixOS/nix/pull/16066 lands.
+      rebuild = "sudo nix run nix-darwin -- switch --flake path:$HOME/Documents/nixfiles/main#${hostname}";
       tat = "tmux a -t";
       tan = "tmux new -s";
       tf = "terraform";

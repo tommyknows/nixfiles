@@ -46,10 +46,21 @@ function _cl_make_cmd --no-scope-shadowing
     # (jj 0.42+ stores it under ~/.config/jj/repos/); otherwise jj errors on every call.
     # The repo's own .jj store (at the repo root) is RW too, so jj can snapshot the
     # working copy even in the scoped modes that don't grant the whole tree.
+    # jj only has a git backend; where its object store lives depends on how the repo
+    # was made. A native `jj git clone` keeps it INSIDE .jj (.jj/repo/store/git), which
+    # the .jj grant above already covers. But a `jj-init`-converted repo keeps the
+    # original EXTERNAL bare .git at the root (git_target -> ../../../.git) and writes
+    # objects there — .jj alone isn't enough. So also grant the bare .git RW when
+    # present, or `jj commit`/`new`/`describe` fail writing the new commit object
+    # ("Operation not permitted .../.git/objects") even though `jj st` works
+    # (snapshotting reuses already-written objects). Plain-git repos likewise keep
+    # their bare store in .git at the root, so this covers them too.
     set -l _repo_jj
+    set -l _repo_git
     set -l _rr (repo_root 2>/dev/null)
     test -n "$_rr"; and test -d $_rr/.jj; and set _repo_jj $_rr/.jj
-    set -l _rw $HOME/Documents/go $HOME/Library/Caches/go-build $HOME/.config/jj $_repo_jj $argv $_flag_wt
+    test -n "$_rr"; and test -d $_rr/.git; and set _repo_git $_rr/.git
+    set -l _rw $HOME/Documents/go $HOME/Library/Caches/go-build $HOME/.config/jj $_repo_jj $_repo_git $argv $_flag_wt
     set -l _safehouse_args \
         --add-dirs=(string join : $_rw) \
         --add-dirs-ro=$HOME/Documents/work:$HOME/Documents/nixfiles \

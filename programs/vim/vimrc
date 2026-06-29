@@ -333,13 +333,12 @@ nmap <silent> <F8> :call ToggleNetrw()<CR>
 " do not create all the BufKill mappings, they're annoying with <Leader>b for buffer list.
 let g:BufKillCreateMappings = 0
 
-" disable keymappings for vim-gh-line
+" disable keymappings for vim-gh-line. Its default blame map <leader>gb would
+" clobber our :Blame; and its git-shelling URL builder is broken in jj
+" workspaces, so plugin/jj_gh.vim overrides :GH/:GB (and owns <leader>gB).
 let g:gh_line_map_default = 0
-" gh-line's default blame map is <leader>gb, which would clobber our :Blame
-" (and it shells out to git, so it errors in a jj workspace). Move it to <leader>gB.
 let g:gh_line_blame_map_default = 0
-let g:gh_line_blame_map = '<leader>gB'
-" copy to clipboard instead of opening page directly.
+" copy to clipboard instead of opening page directly. jj_gh.vim reuses this.
 let g:gh_open_command = 'fn() { echo "$@" | pbcopy; }; fn '
 " use version hashes instead of branch names.
 let g:gh_use_canonical = 1
