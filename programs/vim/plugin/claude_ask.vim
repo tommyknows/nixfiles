@@ -168,7 +168,9 @@ function! s:inject(pane_id, prompt) abort
   if v:shell_error | call s:err('tmux load-buffer failed') | return | endif
   call system('tmux paste-buffer -p -d -t ' . shellescape(a:pane_id))
   if v:shell_error | call s:err('tmux paste-buffer failed') | return | endif
-  call system('tmux send-keys -t ' . shellescape(a:pane_id) . ' Enter')
+  " Deliberately no `send-keys Enter` — the prompt is left unsubmitted in the
+  " input box so you can edit it (multi-line formatting) or paste several asks
+  " from different lines before hitting Enter yourself.
   " Focus the pane within the current session: raise its window
   " (cross-window — select-pane alone won't), then select the pane. We
   " never switch tmux sessions — claude panes in other sessions are

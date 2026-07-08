@@ -28,6 +28,10 @@
         # `show` insists on appending a diff, so `--tool true` swaps in a no-op diff
         # command that emits nothing, leaving only the `-T description` output.
         msg = ["show" "-T" "description" "--tool" "true"];
+
+        # log the current workspace's changes.
+        ws = ["log" "-r" "trunk()..heads(@::)"];
+        pu = ["git" "push"];
       };
 
       # Auto-reconcile a workspace whose working copy went stale because another
