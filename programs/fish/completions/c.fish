@@ -6,13 +6,23 @@ function __c_complete_dispatch
     set -l groot (repo_root 2>/dev/null); or return
     if test -d $groot/.jj/repo
         # jj repo: sibling workspace dirs (switch targets) + local bookmarks +
-        # remote bookmarks as origin/<name> (so `c origin/<tab>` resolves).
+        # remote bookmarks as origin/<name> (so `c origin/<tab>` resolves). A bookmark
+        # whose workspace already exists is dropped — its dir leaf is already offered,
+        # so we don't show both 'chore/foo' (bookmark) and 'chore_foo' (leaf).
+        set -l leaves
         for d in $groot/*/
             set -l leaf (basename (string trim --right --chars=/ $d))
-            test -d $d/.jj -o -e $d/.git; and echo $leaf
+            if test -d $d/.jj -o -e $d/.git
+                set -a leaves $leaf
+                echo $leaf
+            end
         end
-        jj -R $groot bookmark list -T 'name ++ "\n"' 2>/dev/null
-        jj -R $groot bookmark list -a -T 'if(remote == "origin", "origin/" ++ name ++ "\n")' 2>/dev/null
+        for bm in (jj -R $groot bookmark list -T 'name ++ "\n"' 2>/dev/null)
+            contains -- (string replace -a / _ -- $bm) $leaves; or echo $bm
+        end
+        for bm in (jj -R $groot bookmark list -a -T 'if(remote == "origin", name ++ "\n")' 2>/dev/null)
+            contains -- (string replace -a / _ -- $bm) $leaves; or echo "origin/$bm"
+        end
     else
         # plain git repo: same branch picker `gc` uses.
         _c_complete (commandline -ct)

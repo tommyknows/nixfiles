@@ -32,12 +32,11 @@ end
 # -------------------------------- jj teardown --------------------------------
 set -l default_branch (default_branch)
 
-# Resolve the target workspace leaf (dir name) + bookmark name (slashes preserved).
+# Resolve the target workspace leaf (dir name). NAME may be given as either the
+# bookmark ('chore/foo') or the dir leaf ('chore_foo'); both map to the same leaf.
 set -l dir_leaf
-set -l name
 if set -q argv[1]
-    set name $argv[1]
-    set dir_leaf (string replace -a "/" "_" -- "$name")
+    set dir_leaf (string replace -a "/" "_" -- "$argv[1]")
 else
     set -l wsroot (jj workspace root 2>/dev/null)
     if test -z "$wsroot"
@@ -45,9 +44,6 @@ else
         return 1
     end
     set dir_leaf (basename $wsroot)
-    # The real bookmark name (with slashes): first bookmark at @, else the dir leaf.
-    set name (jj -R $wsroot log --no-graph --no-pager -r @ -T 'bookmarks' 2>/dev/null | string split ' ')[1]
-    test -z "$name"; and set name $dir_leaf
 end
 set -l dir $groot/$dir_leaf
 
@@ -55,6 +51,13 @@ if not test -d $dir/.jj
     echo "bd: no jj workspace at $dir" >&2
     return 1
 end
+
+# Recover the *real* bookmark name (slashes preserved) from the workspace itself —
+# the dir leaf is lossy ('/' → '_'), so we can't reconstruct it by string ops. The
+# bookmark usually sits on @'s parent (the working copy is an empty child), so take
+# the tip-most bookmark in @'s ancestry; fall back to the dir leaf if there is none.
+set -l name (jj -R $dir log --no-graph --no-pager -r 'heads(bookmarks() & ::@)' -T 'local_bookmarks.map(|b| b.name() ++ "\n")' 2>/dev/null)[1]
+test -z "$name"; and set name $dir_leaf
 
 # -r: capture the tip to fold into the default branch *before* we move away.
 set -l integrate_rev
