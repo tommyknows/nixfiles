@@ -122,6 +122,45 @@
     (home-subpath "/.cache/nix")                                    ;; nix client-side eval / fetcher caches consulted on `nix-shell` startup.
 )
 
+;; -- Determinate nix: CLI exec + config read ------------------------------
+;; Determinate installs the nix CLI at /nix/var/nix/profiles/default/bin/nix
+;; and there is NO nix under ~/.nix-profile. Without read on the profiles tree,
+;; exec() of that path fails at the profile-symlink hop, `nix` resolves to
+;; ENOENT, and every attempt to run it dies with "operation not permitted: nix".
+;; This also breaks determinate-nixd, which shells out to `nix config show`.
+;; So this grant is what actually makes the nix-daemon socket grant above
+;; usable: `nix flake check` / `nix eval …drvPath` / `nix build` /
+;; `nix store prefetch-file` all have to exec nix first. (The store targets the
+;; profile symlinks point at are already covered by the /nix/store grant.)
+;;
+;; /etc/nix holds nix.conf, nix.custom.conf and any netrc-file, which nix and
+;; determinate-nixd read on startup. /etc -> /private/etc on macOS, so both
+;; forms are granted (cf. the /etc/static pair above).
+
+(allow file-read-metadata
+    (literal "/etc")                                                ;; Ancestor traversal toward /etc/nix.
+    (literal "/private/etc")                                        ;; macOS realpath form.
+)
+
+(allow file-read*
+    (subpath "/nix/var/nix/profiles")                               ;; Determinate nix CLI + per-user profiles (symlinks into /nix/store).
+    (subpath "/etc/nix")                                            ;; nix.conf, nix.custom.conf, netrc-file.
+    (subpath "/private/etc/nix")                                    ;; macOS realpath form.
+)
+
+;; NIX_PATH / `<nixpkgs>` lookup entries. nix's built-in `nix-path` default
+;; still lists $HOME/.nix-defexpr/channels even when NIX_PATH is empty, so an
+;; `--impure` eval that resolves `<nixpkgs>` stats these. They exist here but
+;; are denied by default → EPERM (not a clean ENOENT), which aborts the eval
+;; ("Operation not permitted"). Grant read so ad-hoc impure evals work; content
+;; is just nix expressions / channel symlinks into /nix/store (already readable),
+;; same exposure class as the profiles grant above. (Locked flakerefs avoid the
+;; lookup entirely and remain the right habit for reproducible builds.)
+(allow file-read*
+    (home-subpath "/.nix-defexpr")                                  ;; channel / default-expr lookup path in the nix-path default.
+    (home-subpath "/.nixpkgs")                                      ;; legacy user nixpkgs override path.
+)
+
 ;; -- rtk state ------------------------------------------------------------
 ;; rtk (token-killing proxy hooked into claude via PreToolUse) persists its
 ;; sqlite tracking DB, hook-warn rate-limit timestamp, and `tee` output dumps

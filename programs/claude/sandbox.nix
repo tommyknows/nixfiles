@@ -26,4 +26,8 @@ in {
   # Machine-local appended profile sourced by the `cl` fish function (and any
   # other safehouse invocation that passes --append-profile).
   xdg.configFile."agent-safehouse/local-overrides.sb".source = ./local-overrides.sb;
+
+  # Extra grants for the Nix server workflow, appended only when `cl --server`
+  # is passed (determinate-nixd control socket). See server-overrides.sb.
+  xdg.configFile."agent-safehouse/server-overrides.sb".source = ./server-overrides.sb;
 }

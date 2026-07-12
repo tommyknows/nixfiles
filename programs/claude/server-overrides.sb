@@ -1,0 +1,41 @@
+;; ---------------------------------------------------------------------------
+;; Server-workflow Overrides (ramon)
+;; Appended ONLY when `cl --server` is passed, AFTER local-overrides.sb.
+;; Grants the extra access needed to develop & test the Nix-based server setup
+;; (hosts/server/, packages/emby-server/, the server-vm) that plain nix builds
+;; don't require. Later rules win. Source: programs/claude/server-overrides.sb.
+;; ---------------------------------------------------------------------------
+
+;; -- determinate-nixd control socket --------------------------------------
+;; determinate-nixd exposes its own control socket, separate from the
+;; nix-daemon protocol socket (/nix/var/nix/daemon-socket/socket) that
+;; local-overrides.sb already grants. Plain `nix build`/`flake check`/`eval`
+;; go through the nix-daemon socket and do NOT need this; only the
+;; `determinate-nixd` CLI subcommands that talk to the daemon do.
+;;
+;; Trust note: this is a ROOT-owned, mode-0666 control socket that manages
+;; Determinate/system nix state — a broader surface than the nix-daemon
+;; socket, which is why it lives behind the --server flag rather than in the
+;; base profile. /var/run and /run both canonicalise to /private/var/run on
+;; macOS, so all three literal forms are granted to match whichever path the
+;; client opens.
+
+(allow file-read-metadata
+    (literal "/var")                                                ;; Ancestor traversal toward the socket.
+    (literal "/private/var")                                        ;; macOS realpath form.
+    (literal "/var/run")                                            ;; Ancestor traversal toward the socket.
+    (literal "/private/var/run")                                    ;; macOS realpath form.
+    (literal "/run")                                                ;; /run -> /var/run symlink.
+)
+
+(allow file-read*
+    (literal "/var/run/determinate-nixd.socket")                    ;; Socket file metadata + open() before connect().
+    (literal "/private/var/run/determinate-nixd.socket")            ;; macOS realpath form.
+    (literal "/run/determinate-nixd.socket")                        ;; /run symlink form.
+)
+
+(allow network-outbound
+    (remote unix-socket (literal "/var/run/determinate-nixd.socket"))
+    (remote unix-socket (literal "/private/var/run/determinate-nixd.socket"))
+    (remote unix-socket (literal "/run/determinate-nixd.socket"))
+)
