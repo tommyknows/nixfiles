@@ -2,9 +2,10 @@
 
 ## Overview
 
-macOS (darwin, aarch64) system configuration using Nix flakes, nix-darwin, and
-home-manager. Manages two hosts: `work` and `private`. Heavy CLI focus: fish,
-vim, tmux, alacritty.
+Nix flakes config using nix-darwin + home-manager for two macOS hosts (`work`,
+`private`, aarch64) and a NixOS homeserver (`server`, x86_64). Heavy CLI focus:
+fish, vim, tmux, alacritty. Two module libraries — `system/` (OS/nix-darwin) and
+`home/` (home-manager) — composed by thin per-host dirs under `hosts/`.
 
 **Repository location:** `~/Documents/nixfiles/main`
 
@@ -23,39 +24,57 @@ alejandra .
 ## Project Structure
 
 ```
-flake.nix                 # Hosts, overlays, inputs
-darwin/                   # macOS system preferences
-hosts/
-  system.nix              # Imports darwin configs
-  user.nix                # Imports packages + programs
-  work/user.nix           # Adds grpcurl, pnpm, work signing key
-  private/user.nix        # Adds yt-dlp, vlc-bin, private signing key
-packages/default.nix      # All packages
-programs/                 # fish, vim, tmux, git, alacritty, go, etc.
-work/                     # Work-specific config (loaded conditionally)
-  default.nix             # Git email, ic CLI, WORK_GITHUB_USER, Go private modules
-  functions/              # Work-specific fish functions
+flake.nix                 # inputs; darwin hosts (genAttrs) + nixosConfigurations (server, server-vm)
+system/                   # system layer (nix-darwin / NixOS)
+  nixpkgs.nix             #   shared nixpkgs.config (unfree allowance) — imported by both below
+  darwin/                 #   macOS system: defaults, determinate, overlays, fonts
+  nixos.nix               #   generic NixOS base: admin user, sshd, locale, nix settings
+hosts/                    # thin per-host composition (pick system layer + home profiles + machine bits)
+  private/                #   system.nix (dock) + home.nix (client + private identity + signing key)
+  work/                   #   system.nix + home.nix (client + work identity + signing key)
+  server/                 #   NixOS homeserver — base + service modules + home.nix
+home/                     # home-manager layer
+  default.nix             #   shared base: shell/editor/VCS + core CLI packages
+  client.nix  server.nix  #   platform profiles (macOS / NixOS)
+  private.nix  work/       #   identity profiles (work/ builds infracost CLIs, sets work git identity)
+  fish/ git/ jujutsu/ vim/ tmux/ alacritty.nix autokbisw.nix claude/
+packages/emby-server/     # custom Emby .deb repack (server)
+secrets/                  # sops-encrypted (age); .sops.yaml + server.yaml
 sfx/                      # good.ogg / bad.ogg for boop/sfx functions
 ```
+
+Two system layers (`system/darwin`, `system/nixos`) share `system/nixpkgs.nix`;
+hosts compose one of them plus home profiles. The server's layout constants +
+`appDir` helper live in `hosts/server/paths.nix`, injected to every server
+module as the arg `paths` via `_module.args`. Server *service* config
+(zfs/media/nginx/…) is co-located in `hosts/server/`; the generic NixOS base is
+in `system/nixos.nix`.
 
 ## Key Architecture Patterns
 
 ### Flake Inputs
 
-- `nixpkgs`: nixpkgs-25.11-darwin
+- `nixpkgs`: nixpkgs-26.05-darwin (the Macs)
+- `nixos`: nixos-26.05 (the server)
 - `unstable`: nixos-unstable (fish, gopls, golangci-lint, claude-code, zed, etc.)
-- `ic`: infracost internal CLI, built from source (work host only)
+- `sops-nix`: server secrets (age)
+- `determinate`: Determinate Nix nix-darwin module
+- `ic` / `infracost_cli` / `cloud-data` / `internal-skills`: infracost sources,
+  built/used by the work identity profile (work host only)
 
-### Work Toggle
+### Host composition & the work identity
 
-Work config is conditionally loaded via `extraSpecialArgs`:
+Each `hosts/<host>/` is thin: `system.nix` (per-host system bits) + `home.nix`
+that imports the shared home profiles. macOS hosts compose
+`home/client.nix` + an identity profile:
 
-```nix
-extraSpecialArgs = {work_toggle = "enabled";};  # or "disabled"
-```
+- `private` → `home/private.nix`
+- `work` → `home/work/` (infracost CLIs, work git/jj identity for
+  `~/Documents/work`, work env + fish functions, work Claude skills)
 
-`programs/default.nix` appends `work/default.nix` when enabled. This controls
-git email/key, WORK_GITHUB_USER, Go private modules, and work fish functions.
+Work's private flake inputs are threaded only for that host, via
+`home-manager.extraSpecialArgs` gated on `hostname == "work"` in `flake.nix`
+(there is no separate toggle). The server composes `home/server.nix`.
 
 ## Worktree / Workspace Workflow (Critical)
 
@@ -110,7 +129,7 @@ so the root never snapshots stray files, and every dir is a jj workspace.
 ## Important Gotchas
 
 - **Nix core is installed/managed by Determinate**, not nix-darwin
-  (`nix.enable = false` in `hosts/system.nix`) — so nix-darwin's `nix.settings`
+  (`nix.enable = false` in `system/darwin/default.nix`) — so nix-darwin's `nix.settings`
   / `nix.extraOptions` are inert. Configure Nix declaratively through the
   **Determinate nix-darwin module** instead (`inputs.determinate.darwinModules.default`):
   `determinateNix.customSettings` is a freeform attrset written to
@@ -120,15 +139,16 @@ so the root never snapshots stray files, and every dir is a jj workspace.
   in customSettings; that's on the module's reserved-settings denylist and will
   fail the build). Don't hand-edit `/etc/nix/*` or run `launchctl kickstart` for
   config that belongs here.
-- **Unfree packages** must be in `allowed-unfree-packages` in `flake.nix`.
+- **Unfree packages** must be added to the allow-list in `system/nixpkgs.nix`
+  (shared by macOS and NixOS; the list is the union across hosts).
 - **Fish functions** that modify shell state (e.g. `cd`) must be fish
   functions, not scripts. Completions live separately in
-  `programs/fish/completions/`.
+  `home/fish/completions/`.
 - **Go workspace** is `~/Documents/go` (not `~/go`).
 - **SSH agent** uses Secretive: `~/Library/Containers/com.maxgoedjen.Secretive.SecretAgent/Data/socket.ssh`
 - **Git signing** uses SSH via Secretive, not GPG.
 - **Prompt** (bobthefish) is pinned via `fetchFromGitHub` in
-  `programs/fish/default.nix` to **our fork** `tommyknows/theme-bobthefish`
+  `home/fish/default.nix` to **our fork** `tommyknows/theme-bobthefish`
   (jj-aware + tuned for the bare-clone/worktree layout, built on upstream's
   `feature/moar-perf`). To update: in the fork's `master` worktree reset to new
   upstream, reapply the jj + worktree-display customizations, push, then bump

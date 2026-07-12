@@ -1,0 +1,21 @@
+# sops creation rules for the homeserver secrets.
+#
+# Two recipients still need adding before this is production-ready:
+#   - A BACKUP recipient (an age key held somewhere other than the Enclave). With
+#     only the key below, a lost or reset Secure Enclave means the secrets can
+#     never be decrypted again. Add it, then re-key: `sops updatekeys secrets/server.yaml`.
+#   - The SERVER's own recipient, so it can decrypt on boot. Derive it from the
+#     host key once the machine exists — `ssh-keyscan server | ssh-to-age` — add
+#     it below, then `sops updatekeys`.
+# The committed values in secrets/server.yaml are placeholders; fill real ones
+# with `sops secrets/server.yaml` before deploying.
+keys:
+  # ramon's Secure-Enclave age identity (age-plugin-se). Private key is
+  # non-extractable in the Enclave; edit with `sops secrets/server.yaml` (Touch
+  # ID). SOPS_AGE_KEY_FILE (set in home-manager) points at the identity handle.
+  - &ramon-se age1se1q2pqm76n5jpglcc86tlpwrdvzmr8sarm2cgk60yw8tay2jekq7s75t8m73d
+creation_rules:
+  - path_regex: secrets/server\.yaml$
+    key_groups:
+      - age:
+          - *ramon-se
