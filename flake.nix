@@ -11,6 +11,11 @@
     nix-darwin.url = "github:LnL7/nix-darwin/nix-darwin-26.05";
     nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
 
+    # Determinate Nix's own nix-darwin module — lets us configure Determinate
+    # (incl. the native Linux builder) declaratively instead of hand-editing
+    # /etc/nix/nix.custom.conf. Requires nix.enable = false (set in system.nix).
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
+
     ic = {
       url = "git+ssh://git@github.com/infracost/ic";
       flake = false;
@@ -71,6 +76,7 @@
               # Host configuration, non-home-manager stuff.
               (./hosts + "/${hostname}/${hostname}.nix")
               ./hosts/system.nix
+              inputs.determinate.darwinModules.default
               # base home-manager to get it installed
               home-manager.darwinModules.home-manager
               # expression for all home-manager specific things.

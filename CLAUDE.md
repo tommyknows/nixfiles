@@ -109,8 +109,17 @@ so the root never snapshots stray files, and every dir is a jj workspace.
 
 ## Important Gotchas
 
-- **Nix is NOT managed by nix-darwin** (`nix.enable = false`) — installed via
-  Determinate Systems. Don't try to configure nix itself in the nix files.
+- **Nix core is installed/managed by Determinate**, not nix-darwin
+  (`nix.enable = false` in `hosts/system.nix`) — so nix-darwin's `nix.settings`
+  / `nix.extraOptions` are inert. Configure Nix declaratively through the
+  **Determinate nix-darwin module** instead (`inputs.determinate.darwinModules.default`):
+  `determinateNix.customSettings` is a freeform attrset written to
+  `/etc/nix/nix.custom.conf`, and dedicated options cover things the module
+  reserves — e.g. the native Linux builder is
+  `determinateNix.determinateNixd.builder.state = "enabled"` (NOT `external-builders`
+  in customSettings; that's on the module's reserved-settings denylist and will
+  fail the build). Don't hand-edit `/etc/nix/*` or run `launchctl kickstart` for
+  config that belongs here.
 - **Unfree packages** must be in `allowed-unfree-packages` in `flake.nix`.
 - **Fish functions** that modify shell state (e.g. `cd`) must be fish
   functions, not scripts. Completions live separately in
