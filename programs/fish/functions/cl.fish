@@ -3,10 +3,16 @@ or return
 
 set -l _claude_binary ~/Downloads/claude
 
-# --wt=<dir> (repeatable): grant the sandbox RW access to a worktree. If <dir>
-# is a linked git worktree, its git-common-dir (the bare .git/) is added too —
-# otherwise git ops fail because per-worktree state lives outside the worktree.
-# Falls back to a plain RW grant for non-git paths.
+# --wt=<dir> (repeatable): grant the sandbox RW access to a worktree. The
+# worktree's bare store(s) at the repo root are added too — otherwise VCS
+# writes fail even though the working copy is writable. Both layouts keep the
+# store at the root: jj's shared object store + change metadata in <root>/.jj
+# (jj workspaces are non-colocated, so the store is NOT under the workspace
+# dir), and git's bare store in <root>/.git. Without the .jj grant,
+# `jj commit`/`describe`/`new` fail writing to <root>/.jj/repo/store/**
+# ("Operation not permitted") even though `jj st` snapshots fine (that only
+# touches <workspace>/.jj/working_copy, which is inside the granted dir). This
+# mirrors the pwd-repo _repo_jj/_repo_git grant in _cl_make_cmd.
 if set -q _flag_wt
     set -l _expanded
     for d in $_flag_wt
@@ -15,7 +21,14 @@ if set -q _flag_wt
         test -e $d; or continue
         set d (realpath $d)
         set -a _expanded $d
-        # If <d> is a linked git worktree, also grant RW to its common dir.
+        # Grant the bare store(s) at <d>'s repo root (jj and/or git).
+        set -l _wrr (repo_root $d 2>/dev/null)
+        if test -n "$_wrr"
+            test -d $_wrr/.jj; and set -a _expanded $_wrr/.jj
+            test -d $_wrr/.git; and set -a _expanded $_wrr/.git
+        end
+        # Fallback for linked git worktrees whose bare store isn't an ancestor
+        # dir (repo_root can't find it by walking up): git's own common-dir pointer.
         set -l _gc (git -C $d rev-parse --git-common-dir 2>/dev/null); or continue
         string match -q '/*' $_gc; or set _gc $d/$_gc
         set _gc (realpath $_gc 2>/dev/null); and set -a _expanded $_gc
