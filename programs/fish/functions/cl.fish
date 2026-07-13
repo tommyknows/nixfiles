@@ -1,7 +1,7 @@
 argparse --ignore-unknown a/attach n/no-sandbox server 'wt=+' -- $argv
 or return
 
-set -l _claude_binary ~/Downloads/claude
+set -l _claude_binary ~/.nix-profile/bin/claude
 
 # --wt=<dir> (repeatable): grant the sandbox RW access to a worktree. The
 # worktree's bare store(s) at the repo root are added too — otherwise VCS

@@ -329,6 +329,27 @@
     (home-subpath "/.ic")                                           ;; ic CLI state: GitHub token cache.
 )
 
+;; -- Clipboard image paste (pasteboard mach service) ----------------------
+;; Claude Code's macOS image paste (ctrl-v) shells out to
+;;   osascript -e 'the clipboard as «class PNGf»'
+;; to detect and extract a clipboard image. osascript itself launches fine
+;; (its CoreServices/LaunchServices mach deps are in the base allow-list), but
+;; reading NSPasteboard requires the pasteboard server's mach service
+;; com.apple.pasteboard.1. Safehouse only grants that inside its OPTIONAL
+;; chromium-full integration profile, so a normal `cl` session has it denied
+;; by the base `(deny default)` — the AppleScript errors and Claude reports
+;; "No image found in clipboard. Use ctrl-v to paste images" even when an
+;; image is on the clipboard (which is why `--no-sandbox` works).
+;;
+;; Trust boundary: this exposes read of the shared system clipboard to the
+;; sandbox. Accepted — the clipboard is user-facing scratch space, the same
+;; content is already reachable by any unsandboxed process, and pasting into
+;; the agent is the explicit intent here.
+
+(allow mach-lookup
+    (global-name "com.apple.pasteboard.1")                          ;; NSPasteboard server, for osascript clipboard image extraction.
+)
+
 ;; -- Explicit denies (belt-and-suspenders) ---------------------------------
 ;; These paths are already covered by Safehouse's deny-by-default baseline.
 ;; The explicit denies here guarantee they stay denied even if a future
