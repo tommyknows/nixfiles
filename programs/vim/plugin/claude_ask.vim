@@ -1,8 +1,8 @@
 " Ask the current worktree's claude session about specific lines.
 " Finds the tmux pane marked by `cl` for this worktree (@claude-session
 " pane option), pastes a prompt with the selected text + your question,
-" and focuses the pane. If no marked pane exists, spawns a horizontal
-" split running `cl . @<tempfile>`.
+" and focuses the pane. If no marked pane exists, spawns a fresh session
+" in a new tmux window running `cl . <prompt>`.
 
 if exists('g:loaded_claude_ask') | finish | endif
 let g:loaded_claude_ask = 1
@@ -63,45 +63,6 @@ function! s:session_summary(jsonl_path) abort
   if !empty(l:custom) | return l:custom | endif
   if !empty(l:ai) | return l:ai | endif
   return l:first_user
-endfunction
-
-" Session ids (@claude-id) currently live in a pane of this tmux session,
-" as a set. The project dir is symlinked across all worktrees of a repo,
-" so the resume list below is repo-wide — without this, picking a session
-" that's already running in another worktree's pane would spawn a second
-" process on the same JSONL. (Cross-tmux-session panes are deliberately
-" invisible, so a session live elsewhere can't be guarded against here.)
-function! s:live_ids() abort
-  let l:out = systemlist('tmux list-panes -sF ' . shellescape('#{@claude-id}'))
-  if v:shell_error | return {} | endif
-  let l:ids = {}
-  for l:id in l:out
-    if !empty(l:id) | let l:ids[l:id] = 1 | endif
-  endfor
-  return l:ids
-endfunction
-
-" Top 5 most-recently-modified session JSONLs in the worktree's project
-" dir, within the last 7 days, excluding sessions already live in a pane.
-" Used when no live pane exists and we're about to spawn — offer to resume
-" instead of always starting fresh.
-function! s:recent_sessions(worktree) abort
-  let l:dir = s:project_dir(a:worktree)
-  if !isdirectory(l:dir) | return [] | endif
-  let l:live = s:live_ids()
-  let l:cands = []
-  for l:f in glob(l:dir . '/*.jsonl', 0, 1)
-    let l:id = fnamemodify(l:f, ':t:r')
-    if has_key(l:live, l:id) | continue | endif
-    call add(l:cands, {'id': l:id, 'mtime': getftime(l:f), 'path': l:f})
-  endfor
-  call sort(l:cands, {a, b -> b.mtime - a.mtime})
-  let l:cutoff = localtime() - (7 * 86400)
-  let l:recent = filter(l:cands, 'v:val.mtime > ' . l:cutoff)[:4]
-  for l:s in l:recent
-    let l:s.summary = s:session_summary(l:s.path)
-  endfor
-  return l:recent
 endfunction
 
 function! s:rel(path, wt) abort
@@ -193,35 +154,16 @@ function! s:numbered_pick(header, labels) abort
   return l:n
 endfunction
 
-" No existing claude session — spawn one in a tmux popup. If there are
-" recent JSONLs on disk, offer to resume one before falling through to
-" a fresh session. Persistent main sessions should still be launched
-" manually via `cl` in a regular pane; the plugin discovers them by
-" marker and injects.
+" No existing claude session in this tmux session — spawn a fresh one in a
+" new tmux window (which becomes active). Persistent main sessions should
+" still be launched manually via `cl` in a regular pane; the plugin
+" discovers them by marker and injects. Resuming sessions from disk was
+" dropped deliberately: those are repo-wide (the project dir is symlinked
+" across worktrees) and not scoped to this tmux session — re-add behind a
+" separate mapping if that's ever wanted.
 function! s:spawn(worktree, prompt) abort
-  let l:recent = s:recent_sessions(a:worktree)
-  let l:resume_id = ''
-  if !empty(l:recent)
-    let l:labels = []
-    for l:s in l:recent
-      let l:ts = strftime('%a %H:%M', l:s.mtime)
-      let l:sum = empty(l:s.summary) ? '(empty)' : substitute(l:s.summary, '\n.*', '', '')
-      if strlen(l:sum) > 70 | let l:sum = l:sum[:67] . '...' | endif
-      call add(l:labels, printf('%s  %s', l:ts, l:sum))
-    endfor
-    call add(l:labels, 'new session')
-    let l:n = s:numbered_pick('No active session — pick:', l:labels)
-    if l:n == 0
-      redraw | echo 'claude-ask: cancelled' | return
-    endif
-    if l:n <= len(l:recent)
-      let l:resume_id = l:recent[l:n - 1].id
-    endif
-  endif
-
-  let l:args = empty(l:resume_id) ? '' : '--resume ' . shellescape(l:resume_id) . ' '
-  let l:cmd = 'cl . ' . l:args . shellescape(a:prompt)
-  call system('tmux display-popup -E -w 90% -h 90% -d ' . shellescape(a:worktree) . ' ' . shellescape(l:cmd))
+  let l:cmd = 'cl . ' . shellescape(a:prompt)
+  call system('tmux new-window -c ' . shellescape(a:worktree) . ' ' . shellescape(l:cmd))
 endfunction
 
 function! s:pick(hits) abort
