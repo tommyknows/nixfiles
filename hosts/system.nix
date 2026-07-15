@@ -20,6 +20,7 @@
   determinateNix = {
     enable = true;
     determinateNixd.builder.state = "enabled";
+    customSettings."use-case-hack" = false;
   };
 
   nixpkgs = {
