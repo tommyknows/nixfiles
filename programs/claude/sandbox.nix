@@ -27,7 +27,7 @@ in {
   # other safehouse invocation that passes --append-profile).
   xdg.configFile."agent-safehouse/local-overrides.sb".source = ./local-overrides.sb;
 
-  # Extra grants for the Nix server workflow, appended only when `cl --server`
-  # is passed (determinate-nixd control socket). See server-overrides.sb.
-  xdg.configFile."agent-safehouse/server-overrides.sb".source = ./server-overrides.sb;
+  # Extra grants for the Nix server workflow, appended only when `cl --nix`
+  # is passed (determinate-nixd control socket). See nix-overrides.sb.
+  xdg.configFile."agent-safehouse/nix-overrides.sb".source = ./nix-overrides.sb;
 }

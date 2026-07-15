@@ -122,6 +122,21 @@
     (home-subpath "/.cache/nix")                                    ;; nix client-side eval / fetcher caches consulted on `nix-shell` startup.
 )
 
+;; -- Nix build logs (`nix log`) -------------------------------------------
+;; A failed `nix build` prints "For full logs, run: nix log <drv>", and that
+;; log lives in the compressed build-log tree at
+;; /nix/var/log/nix/drvs/<xx>/<hash>.drv.bz2. Only /nix/var/nix/{daemon-socket,
+;; profiles} are granted above, so the log tree is denied by default and both
+;; `nix log` and the build's own log tail die with "Operation not permitted" on
+;; the .drv.bz2 (an EPERM, not a clean ENOENT). Grant read on the log dir so
+;; build failures are actually diagnosable inside the sandbox. Build logs are
+;; world-readable build output (same exposure class as the /nix/store grant),
+;; and nothing here writes them — the daemon does that as root, out of band.
+
+(allow file-read*
+    (subpath "/nix/var/log")                                        ;; nix build logs read by `nix log` / failed-build log tails.
+)
+
 ;; -- Determinate nix: CLI exec + config read ------------------------------
 ;; Determinate installs the nix CLI at /nix/var/nix/profiles/default/bin/nix
 ;; and there is NO nix under ~/.nix-profile. Without read on the profiles tree,

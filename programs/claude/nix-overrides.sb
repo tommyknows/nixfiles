@@ -1,9 +1,9 @@
 ;; ---------------------------------------------------------------------------
-;; Server-workflow Overrides (ramon)
-;; Appended ONLY when `cl --server` is passed, AFTER local-overrides.sb.
-;; Grants the extra access needed to develop & test the Nix-based server setup
-;; (hosts/server/, packages/emby-server/, the server-vm) that plain nix builds
-;; don't require. Later rules win. Source: programs/claude/server-overrides.sb.
+;; Nix-workflow Overrides (ramon)
+;; Appended ONLY when `cl --nix` is passed, AFTER local-overrides.sb.
+;; Grants the extra Nix access needed to develop & test the Nix-based server
+;; setup (hosts/server/, packages/emby-server/, the server-vm) that plain nix
+;; builds don't require. Later rules win. Source: programs/claude/nix-overrides.sb.
 ;; ---------------------------------------------------------------------------
 
 ;; -- determinate-nixd control socket --------------------------------------

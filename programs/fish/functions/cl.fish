@@ -1,4 +1,4 @@
-argparse --ignore-unknown a/attach n/no-sandbox server 'wt=+' -- $argv
+argparse --ignore-unknown a/attach n/no-sandbox nix 'wt=+' -- $argv
 or return
 
 set -l _claude_binary ~/.nix-profile/bin/claude
@@ -83,13 +83,13 @@ function _cl_make_cmd --no-scope-shadowing
         --env-pass=TEST_LOCALSTACK_ENDPOINT \
         --env-pass=TMUX \
         --env-pass=TMUX_PANE
-    # --server: append the server-workflow profile (determinate-nixd control
-    # socket) on top of local-overrides.sb. Everything else the Nix server
-    # workflow needs (nix CLI exec, /etc/nix, nix-daemon socket, egress,
+    # --nix: append the nix-workflow profile (determinate-nixd control socket)
+    # on top of local-overrides.sb. Everything else the Nix server workflow
+    # needs (nix CLI exec, /etc/nix, nix-daemon socket, build-log reads, egress,
     # localhost hostfwd binds for the server-vm) is already in the base profile;
     # grant the server config dir itself with --wt=~/Documents/private/server/...
-    if set -q _flag_server
-        set _safehouse_args $_safehouse_args --append-profile=$HOME/.config/agent-safehouse/server-overrides.sb
+    if set -q _flag_nix
+        set _safehouse_args $_safehouse_args --append-profile=$HOME/.config/agent-safehouse/nix-overrides.sb
     end
     set -l _env_prefix
     if test -n "$_cl_tilt"
@@ -118,8 +118,8 @@ end
 
 set -l _cl_tilt
 set -l _claude_cmd
-if set -q _flag_server; and not set -q _flag_no_sandbox
-    echo "cl: --server — enabling determinate-nixd control socket" >&2
+if set -q _flag_nix; and not set -q _flag_no_sandbox
+    echo "cl: --nix — enabling determinate-nixd control socket" >&2
 end
 _cl_make_cmd
 
