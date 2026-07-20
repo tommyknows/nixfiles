@@ -51,14 +51,15 @@ complete --command c --exclusive \
     --condition 'not __fish_contains_opt -s o origin; and test (count (commandline -opc)) -eq 1' \
     --arguments '(__c_complete_dispatch)'
 
-# 2nd positional (no -o): base/commit. jj repo → bookmarks (revset base); git → commit picker.
+# 2nd positional (no -o): base/commit. jj repo → fuzzy change picker (jj-pick-change,
+# returns a change-id revset); git → commit picker.
 complete --command c --exclusive \
     --keep-order \
     --condition 'not __fish_contains_opt -s o origin; and test (count (commandline -opc)) -eq 2' \
     --arguments '(
 set -l groot (repo_root 2>/dev/null); or exit
 if test -d $groot/.jj/repo
-    jj -R $groot bookmark list -T "name ++ \"\n\"" 2>/dev/null
+    jj-pick-change
 else
     git-pick-commit
 end

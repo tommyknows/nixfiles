@@ -3,16 +3,16 @@
     "cloud-data": {
       "flake": false,
       "locked": {
-        "lastModified": 1779310279,
-        "narHash": "sha256-A/bkzdM1/EJ63qLQUUD/AlgohtVz7iGUDsCOyLI7zRk=",
-        "ref": "refs/tags/api/gen/go/v0.0.29",
-        "rev": "4e420f6521d02b1a11be1b0c1d4942b3b8de06c3",
-        "revCount": 191,
+        "lastModified": 1782294045,
+        "narHash": "sha256-QKr7t6YZv93JAf/UlZ1KyEMWWelRlzdewyIr1LlSnsY=",
+        "ref": "refs/tags/api/gen/go/v0.11.0",
+        "rev": "32d2b06dbfcadd87739d1da9d34d5df623e7c38d",
+        "revCount": 317,
         "type": "git",
         "url": "ssh://git@github.com/infracost/cloud-data"
       },
       "original": {
-        "ref": "refs/tags/api/gen/go/v0.0.29",
+        "ref": "refs/tags/api/gen/go/v0.11.0",
         "type": "git",
         "url": "ssh://git@github.com/infracost/cloud-data"
       }
@@ -161,11 +161,11 @@
     "ic": {
       "flake": false,
       "locked": {
-        "lastModified": 1781814637,
-        "narHash": "sha256-eQXicY29BPijiyQze6Qysirmb5gVD+I1ELTJNd/hee8=",
+        "lastModified": 1783949794,
+        "narHash": "sha256-nOl/anZ+UqatsVblXdxPh3TKQZdyZgFRzrGgfqBl+C0=",
         "ref": "refs/heads/master",
-        "rev": "9d0ae6f83a21178bcfd3895b880a537578a90038",
-        "revCount": 283,
+        "rev": "7f00ddcc66dddbc5654a30a23ba47a36c1463fa3",
+        "revCount": 291,
         "type": "git",
         "url": "ssh://git@github.com/infracost/ic"
       },
@@ -193,11 +193,11 @@
     "internal-skills": {
       "flake": false,
       "locked": {
-        "lastModified": 1782124220,
-        "narHash": "sha256-hqsytGm6Kd1b8mQ9fB/HykgW2GgIk1gr9jjmxpkH/jY=",
+        "lastModified": 1783423634,
+        "narHash": "sha256-T3eAI64y2RuGpY409544M22I6a8O5CEFRCxmmgrhj0o=",
         "ref": "refs/heads/master",
-        "rev": "1f6aef803605e852d93cd2b292d506bc7771ef5a",
-        "revCount": 39,
+        "rev": "52c32a94e19af0b4f447ef6efff2d954b7d96bf9",
+        "revCount": 40,
         "type": "git",
         "url": "ssh://git@github.com/infracost/internal-skills"
       },

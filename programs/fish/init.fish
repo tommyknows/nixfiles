@@ -20,21 +20,9 @@ set fzf_preview_dir_cmd lsd --almost-all --long --total-size --color=always
 set fzf_dir_opts --height=50 --bind='ctrl-v:execute(vim {} &> /dev/tty)'
 set fzf_fd_opts --hidden --exclude .git
 
-bind \eo _kubectl_fzf_autocomplete
-bind -M insert \eo _kubectl_fzf_autocomplete
-bind \er _rzf
-bind -M insert \er _rzf
-
-bind -M insert alt-backspace backward-kill-word
-# Fish 4.0 changed the behaviour of alt-left and right to travel
-# full "tokens" instead of words. 
-# > alt-left and alt-right will now move by one argument (which may 
-# > contain quoted spaces), not just one word like ctrl-left and 
-# > ctrl-right do.
-# ctrl-left and right are unusable on Mac because they're used to 
-# switch desktops, so we change the behaviour back.
-bind -M insert alt-left prevd-or-backward-word
-bind -M insert alt-right nextd-or-forward-word
+# Key bindings live in bind.fish (loaded via interactiveShellInit, so they run after
+# the fzf integration and win on shared keys like alt-c). Only fzf.fish plugin config
+# stays above, since it's plugin setup rather than raw `bind` statements.
 
 fish_add_path --path --move --prepend /Users/ramon/Documents/go/bin \
     /Users/ramon/.nix-profile/bin \

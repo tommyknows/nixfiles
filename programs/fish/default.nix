@@ -163,5 +163,9 @@ in {
       }
     ];
     shellInit = builtins.readFile ./init.fish;
+    # Key bindings (bind.fish). interactiveShellInit gets the default order (1000),
+    # which sorts *after* home-manager's fzf fish integration (mkOrder 200) — so our
+    # binds win on shared keys (e.g. alt-c, which fzf otherwise takes for cd-widget).
+    interactiveShellInit = builtins.readFile ./bind.fish;
   };
 }

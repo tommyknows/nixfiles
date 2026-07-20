@@ -65,9 +65,12 @@ if set -q _flag_rebase
     set integrate_rev (jj -R $dir log --no-graph --no-pager -r @ -T change_id 2>/dev/null | string trim)
 end
 
-# If we're standing in the workspace we're about to delete, leave first.
+# If we're standing in the workspace we're about to delete — at its root *or* in
+# any subdirectory — leave first, otherwise the background `rm -rf` below pulls the
+# ground out from under us and we never land back on the default branch.
 set -l here (realpath (pwd) 2>/dev/null)
-if test "$here" = (realpath $dir 2>/dev/null)
+set -l dir_real (realpath $dir 2>/dev/null)
+if test "$here" = "$dir_real"; or string match -q -- "$dir_real/*" "$here"
     z --delete
     c $default_branch
 end

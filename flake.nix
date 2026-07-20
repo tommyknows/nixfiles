@@ -25,7 +25,7 @@
       flake = false;
     };
     cloud-data = {
-      url = "git+ssh://git@github.com/infracost/cloud-data?ref=refs/tags/api/gen/go/v0.0.29";
+      url = "git+ssh://git@github.com/infracost/cloud-data?ref=refs/tags/api/gen/go/v0.11.0";
       flake = false;
     };
     internal-skills = {

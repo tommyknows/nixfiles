@@ -7,13 +7,13 @@
   cloud-data,
   ...
 }: let
-  cloudDataReplaceModule = "github.com/infracost/cloud-data/api/gen/go@v0.0.29";
+  cloudDataReplaceModule = "github.com/infracost/cloud-data/api/gen/go@v0.11.0";
   ic-cli = (pkgs.buildGoModule.override {go = pkgs.go_1_26;}) {
     pname = "ic";
     version = ic.shortRev or "dev";
     src = ic;
     subPackages = ["cmd/ic"];
-    vendorHash = "sha256-3zVh5BiEKtfV2+qYqH3NFkU3E/BcsN1gSmNLBquJ6jY=";
+    vendorHash = "sha256-0mjusDxd1oFFgThENdlFCN5NbH34N0lfBYjk2NLPPJI=";
     ldflags = [
       "-s"
       "-w"
